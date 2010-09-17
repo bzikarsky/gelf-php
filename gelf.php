@@ -2,6 +2,10 @@
 
 class GELFMessage {
 
+    const MAX_CHUNK_SIZE = 8192;
+
+    const GELF_ID = 'gf';
+
     private $graylogHostname;
     private $graylogPort;
     
@@ -29,16 +33,52 @@ class GELFMessage {
     {
         // Check if all required parameters are set.
         if (!$this->dataParamSet("short_message") || !$this->dataParamSet("host")) {
-            print_r($this->data);
             throw new Exception('Missing required data parameter: "short_message" and "host" are required.');
         }
 
+echo json_encode($this->data) . "\n";
+
         // Convert data array to JSON and GZIP.
         $gzippedJsonData = gzcompress(json_encode($this->data));
-
-        // Send.
+	
         $sock = stream_socket_client('udp://' . gethostbyname($this->graylogHostname) .':' . $this->graylogPort);
-        fwrite($sock, $gzippedJsonData);
+
+	// Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
+/*	if (strlen($gzippedJsonData) > self::MAX_CHUNK_SIZE) {
+            // Too big for one datagram. Send in chunks.
+            $msgId = microtime(true) . rand(0,10000);
+
+            // TODO: $parts = str_split($gzippedJsonData, self::MAX_CHUNK_SIZE);
+            $parts = str_split($gzippedJsonData, 100);
+            $i = 0;
+            foreach($parts as $part) {
+                fwrite($sock, $this->prependChunkData($part, $msgId, $i, count($parts)));
+                $i++;
+            }
+*/
+        //} else {
+            // Send in one datagram.
+            fwrite($sock, $gzippedJsonData);
+	//}
+    }
+
+    private function prependChunkData($data, $msgId, $seqNum, $seqCnt)
+    {
+        if (!is_string($data) || $data === '') {
+            throw new Exception('Data must be a string and not be empty');
+        }
+
+        if (!is_integer($seqNum) || !is_integer($seqCnt) || $seqCnt <= 0) {
+            throw new Exception('Sequence number and count must be integer. Sequence count must be bigger than 0.');
+        }
+
+        if ($seqNum > $seqCnt) {
+            throw new Exception('Sequence number must be bigger than sequence count');
+        }
+
+	echo pack('c', self::GELF_ID);
+
+	return self::GELF_ID . sha1($msgId) . '<' . $seqNum . '><' . $seqCnt . '>' . $data;
     }
 
     // Setters / Getters.
