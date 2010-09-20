@@ -2,7 +2,8 @@
 
 class GELFMessage {
 
-    const MAX_CHUNK_SIZE = 8192;
+    //const MAX_CHUNK_SIZE = 7168;
+    const MAX_CHUNK_SIZE = 100;
 
     const GELF_ID = 'gf';
 
@@ -36,30 +37,28 @@ class GELFMessage {
             throw new Exception('Missing required data parameter: "short_message" and "host" are required.');
         }
 
-echo json_encode($this->data) . "\n";
-
         // Convert data array to JSON and GZIP.
         $gzippedJsonData = gzcompress(json_encode($this->data));
 	
         $sock = stream_socket_client('udp://' . gethostbyname($this->graylogHostname) .':' . $this->graylogPort);
 
-	// Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
-/*	if (strlen($gzippedJsonData) > self::MAX_CHUNK_SIZE) {
+	      // Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
+        echo strlen($gzippedJsonData);
+        if (strlen($gzippedJsonData) > self::MAX_CHUNK_SIZE) {
             // Too big for one datagram. Send in chunks.
             $msgId = microtime(true) . rand(0,10000);
 
-            // TODO: $parts = str_split($gzippedJsonData, self::MAX_CHUNK_SIZE);
-            $parts = str_split($gzippedJsonData, 100);
+            $parts = str_split($gzippedJsonData, self::MAX_CHUNK_SIZE);
             $i = 0;
             foreach($parts as $part) {
                 fwrite($sock, $this->prependChunkData($part, $msgId, $i, count($parts)));
                 $i++;
             }
-*/
-        //} else {
+
+        } else {
             // Send in one datagram.
             fwrite($sock, $gzippedJsonData);
-	//}
+	      }
     }
 
     private function prependChunkData($data, $msgId, $seqNum, $seqCnt)
@@ -76,9 +75,11 @@ echo json_encode($this->data) . "\n";
             throw new Exception('Sequence number must be bigger than sequence count');
         }
 
-	echo pack('c', self::GELF_ID);
+      echo "SENDING PART 1: " . strlen(pack('CC', 30, 15)) . "\n";
+      echo "SENDING PART 2: " . strlen(hash('sha256', $msgId)) . "\n";
+      echo "SENDING PART 3: " . strlen(pack('nn', $seqNum, $seqCnt)) . "\n";
 
-	return self::GELF_ID . sha1($msgId) . '<' . $seqNum . '><' . $seqCnt . '>' . $data;
+	      return pack('CC', 30, 15) . hash('sha256', $msgId) . pack('nn', $seqNum, $seqCnt) . $data;
     }
 
     // Setters / Getters.
