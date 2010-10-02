@@ -2,8 +2,7 @@
 
 class GELFMessage {
 
-    //const MAX_CHUNK_SIZE = 8154;
-    const MAX_CHUNK_SIZE = 5000;
+    const MAX_CHUNK_SIZE = 8154;
 
     private $graylogHostname;
     private $graylogPort;
@@ -40,7 +39,7 @@ class GELFMessage {
 	
         $sock = stream_socket_client('udp://' . gethostbyname($this->graylogHostname) .':' . $this->graylogPort);
 
-	 // Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
+        // Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
         if (strlen($gzippedJsonData) > self::MAX_CHUNK_SIZE) {
             // Too big for one datagram. Send in chunks.
             $msgId = microtime(true) . rand(0,10000);
@@ -55,7 +54,7 @@ class GELFMessage {
         } else {
             // Send in one datagram.
             fwrite($sock, $gzippedJsonData);
-	      }
+        }
     }
 
     private function prependChunkData($data, $msgId, $seqNum, $seqCnt)
@@ -72,12 +71,10 @@ class GELFMessage {
             throw new Exception('Sequence number must be bigger than sequence count');
         }
 
-echo "header size: " + strlen(pack('CC', 30, 15) . hash('sha256', $msgId, true) . pack('nn', $seqNum, $seqCnt)) . "\n";
-
-	return pack('CC', 30, 15) . hash('sha256', $msgId, true) . pack('nn', $seqNum, $seqCnt) . $data;
+        return pack('CC', 30, 15) . hash('sha256', $msgId, true) . pack('nn', $seqNum, $seqCnt) . $data;
     }
 
-    // Setters / Getters.
+    // Setters / Getters.- Nothing to see here.
 
     public function setShortMessage($message)
     {
