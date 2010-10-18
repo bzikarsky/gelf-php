@@ -111,6 +111,12 @@ class GELFMessage {
         $this->data["line"] = $line;
     }
 
+    public function setAdditional($key, $value)
+    {
+      $key = str_replace (" ", "", $key);
+      $this->data[$key] = $value;
+    }
+
     public function getShortMessage()
     {
         return isset($this->data["short_message"]) ? $this->data["short_message"] : null;
@@ -144,6 +150,11 @@ class GELFMessage {
     public function getLine()
     {
         return isset($this->data["line"]) ? $this->data["line"] : null;
+    }
+
+    public function getAdditional()
+    {
+        return isset($this->data[$key]) ? $this->data[$key] : null;
     }
     
 }
