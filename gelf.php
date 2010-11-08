@@ -2,7 +2,7 @@
 
 class GELFMessage {
 
-    const MAX_CHUNK_SIZE = 8154;
+    const MAX_CHUNK_SIZE = 1420;
 
     private $graylogHostname;
     private $graylogPort;
