@@ -2,14 +2,13 @@
 
 class GELFMessage {
 
-    const MAX_CHUNK_SIZE = 1420;
-
     private $graylogHostname;
     private $graylogPort;
+    private $maxChunkSize;
     
     private $data;
 
-    public function  __construct($graylogHostname, $graylogPort)
+    public function  __construct($graylogHostname, $graylogPort, $maxChunkSize = 'WAN')
     {
         if (!is_numeric($graylogPort)) {
             throw new Exception("Port must be numeric");
@@ -17,6 +16,16 @@ class GELFMessage {
 
         $this->graylogHostname = $graylogHostname;
         $this->graylogPort = $graylogPort;
+        switch ($maxChunkSize) {
+            case 'WAN':
+                $this->maxChunkSize = 1420;
+                break;
+            case 'LAN':
+                $this->maxChunkSize = 8154;
+                break;
+            default:
+                $this->maxChunkSize = $maxChunkSize;
+        }
     }
 
     private function dataParamSet($dataType) {
@@ -40,11 +49,11 @@ class GELFMessage {
         $sock = stream_socket_client('udp://' . gethostbyname($this->graylogHostname) .':' . $this->graylogPort);
 
         // Maximum size is 8192 byte. Split to chunks. (GELFv2 supports chunking)
-        if (strlen($gzippedJsonData) > self::MAX_CHUNK_SIZE) {
+        if (strlen($gzippedJsonData) > $this->maxChunkSize) {
             // Too big for one datagram. Send in chunks.
             $msgId = microtime(true) . rand(0,10000);
 
-            $parts = str_split($gzippedJsonData, self::MAX_CHUNK_SIZE);
+            $parts = str_split($gzippedJsonData, $this->maxChunkSize);
             $i = 0;
             foreach($parts as $part) {
                 fwrite($sock, $this->prependChunkData($part, $msgId, $i, count($parts)));
