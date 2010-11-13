@@ -10,4 +10,6 @@ $gelf->setHost('somehost');
 $gelf->setLevel(2);
 $gelf->setFile('/var/www/example.php');
 $gelf->setLine(1337);
+$gelf->setAdditional("something", "foo");
+$gelf->setAdditional("something_else", "bar");
 $gelf->send();
