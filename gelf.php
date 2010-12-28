@@ -2,6 +2,8 @@
 
 class GELFMessage {
 
+    const VERSION = "1.0";
+
     private $graylogHostname;
     private $graylogPort;
     private $maxChunkSize;
@@ -26,6 +28,8 @@ class GELFMessage {
             default:
                 $this->maxChunkSize = $maxChunkSize;
         }
+        
+        $this->setVersion(self::VERSION);
     }
 
     private function dataParamSet($dataType) {
@@ -36,11 +40,20 @@ class GELFMessage {
         return false;
     }
 
+    private function setVersion($version) {
+        $this->data["_version"] = $version;
+    }
+
     public function send()
     {
         // Check if all required parameters are set.
-        if (!$this->dataParamSet("short_message") || !$this->dataParamSet("host")) {
-            throw new Exception('Missing required data parameter: "short_message" and "host" are required.');
+        if (!$this->dataParamSet("_version") || !$this->dataParamSet("_short_message") || !$this->dataParamSet("_host")) {
+            throw new Exception('Missing required data parameter: "_version", "_short_message" and "_host" are required.');
+        }
+
+        // Standard facility.
+        if (!$this->dataParamSet("_facility")) {
+            $this->setFacility(-1);
         }
 
         // Convert data array to JSON and GZIP.
@@ -87,37 +100,42 @@ class GELFMessage {
 
     public function setShortMessage($message)
     {
-        $this->data["short_message"] = $message;
+        $this->data["_short_message"] = $message;
     }
 
     public function setFullMessage($message)
     {
-        $this->data["full_message"] = $message;
+        $this->data["_full_message"] = $message;
     }
 
     public function setHost($host)
     {
-        $this->data["host"] = $host;
+        $this->data["_host"] = $host;
     }
 
     public function setLevel($level)
     {
-        $this->data["level"] = $level;
+        $this->data["_level"] = $level;
     }
 
     public function setType($type)
     {
-        $this->data["type"] = $type;
+        $this->data["_type"] = $type;
     }
 
     public function setFile($file)
     {
-        $this->data["file"] = $file;
+        $this->data["_file"] = $file;
     }
 
     public function setLine($line)
     {
-        $this->data["line"] = $line;
+        $this->data["_line"] = $line;
+    }
+
+    public function setFacility($facility)
+    {
+        $this->data["_facility"] = $facility;
     }
 
     public function setAdditional($key, $value)
