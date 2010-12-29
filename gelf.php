@@ -138,10 +138,15 @@ class GELFMessage {
         $this->data["_facility"] = $facility;
     }
 
+    public function setUTCTimestamp($timestamp)
+    {
+      $this->data["_timestamp"] = $timestamp;
+    }
+
     public function setAdditional($key, $value)
     {
       $key = str_replace (" ", "", $key);
-      $this->data[$key] = $value;
+      $this->data["a_" . $key] = $value;
     }
 
     public function getShortMessage()
