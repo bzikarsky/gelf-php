@@ -138,7 +138,7 @@ class GELFMessage {
         $this->data["_facility"] = $facility;
     }
 
-    public function setUTCTimestamp($timestamp)
+    public function setTimestamp($timestamp)
     {
       $this->data["_timestamp"] = $timestamp;
     }
