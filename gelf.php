@@ -51,11 +51,6 @@ class GELFMessage {
             throw new Exception('Missing required data parameter: "_version", "_short_message" and "_host" are required.');
         }
 
-        // Standard facility.
-        if (!$this->dataParamSet("_facility")) {
-            $this->setFacility(-1);
-        }
-
         // Convert data array to JSON and GZIP.
         $gzippedJsonData = gzcompress(json_encode($this->data));
 	
