@@ -41,14 +41,14 @@ class GELFMessage {
     }
 
     private function setVersion($version) {
-        $this->data["_version"] = $version;
+        $this->data["version"] = $version;
     }
 
     public function send()
     {
         // Check if all required parameters are set.
-        if (!$this->dataParamSet("_version") || !$this->dataParamSet("_short_message") || !$this->dataParamSet("_host")) {
-            throw new Exception('Missing required data parameter: "_version", "_short_message" and "_host" are required.');
+        if (!$this->dataParamSet("version") || !$this->dataParamSet("short_message") || !$this->dataParamSet("host")) {
+            throw new Exception('Missing required data parameter: "version", "short_message" and "host" are required.');
         }
 
         // Convert data array to JSON and GZIP.
@@ -95,53 +95,53 @@ class GELFMessage {
 
     public function setShortMessage($message)
     {
-        $this->data["_short_message"] = $message;
+        $this->data["short_message"] = $message;
     }
 
     public function setFullMessage($message)
     {
-        $this->data["_full_message"] = $message;
+        $this->data["full_message"] = $message;
     }
 
     public function setHost($host)
     {
-        $this->data["_host"] = $host;
+        $this->data["host"] = $host;
     }
 
     public function setLevel($level)
     {
-        $this->data["_level"] = $level;
+        $this->data["level"] = $level;
     }
 
     public function setType($type)
     {
-        $this->data["_type"] = $type;
+        $this->data["type"] = $type;
     }
 
     public function setFile($file)
     {
-        $this->data["_file"] = $file;
+        $this->data["file"] = $file;
     }
 
     public function setLine($line)
     {
-        $this->data["_line"] = $line;
+        $this->data["line"] = $line;
     }
 
     public function setFacility($facility)
     {
-        $this->data["_facility"] = $facility;
+        $this->data["facility"] = $facility;
     }
 
     public function setTimestamp($timestamp)
     {
-      $this->data["_timestamp"] = $timestamp;
+      $this->data["timestamp"] = $timestamp;
     }
 
     public function setAdditional($key, $value)
     {
       $key = str_replace (" ", "", $key);
-      $this->data["a_" . $key] = $value;
+      $this->data["_" . $key] = $value;
     }
 
     public function getShortMessage()
