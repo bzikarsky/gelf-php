@@ -88,7 +88,7 @@ class GELFMessage {
             throw new Exception('Sequence number must be bigger than sequence count');
         }
 
-        return pack('CC', 30, 15) . hash('sha256', $msgId, true) . pack('nn', $seqNum, $seqCnt) . $data;
+        return pack('CC', 30, 15) . substr(md5($msgId, true), 0, 8) . pack('CC', $seqNum, $seqCnt) . $data;
     }
 
     // Setters / Getters.- Nothing to see here.
