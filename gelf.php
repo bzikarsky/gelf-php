@@ -179,7 +179,7 @@ class GELFMessage {
         return isset($this->data["line"]) ? $this->data["line"] : null;
     }
 
-    public function getAdditional()
+    public function getAdditional($key)
     {
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
