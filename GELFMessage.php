@@ -1,7 +1,5 @@
 <?php
-/**
- * @see util/errorhandler/PHPErrorHandlerModuleGraylog2.php
- */
+
 class GELFMessage {
 	/**
 	 * @var string

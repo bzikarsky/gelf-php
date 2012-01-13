@@ -1,7 +1,5 @@
 <?php
-
 class GELFMessagePublisher {
-
 	/**
 	 * @var integer
 	 */
