@@ -1,15 +1,17 @@
 <?php
 
-require('gelf.php');
+require('GELFMessage.php');
+require('GELFMessagePublisher.php');
 
-$gelf = new GELFMessage('localhost', 12201);
+$message = new GELFMessage();
+$message->setShortMessage('something is broken.');
+$message->setFullMessage("lol full message!");
+$message->setHost('somehost');
+$message->setLevel(2);
+$message->setFile('/var/www/example.php');
+$message->setLine(1337);
+$message->setAdditional("something", "foo");
+$message->setAdditional("something_else", "bar");
 
-$gelf->setShortMessage('something is broken.');
-$gelf->setFullMessage("lol full message!");
-$gelf->setHost('somehost');
-$gelf->setLevel(2);
-$gelf->setFile('/var/www/example.php');
-$gelf->setLine(1337);
-$gelf->setAdditional("something", "foo");
-$gelf->setAdditional("something_else", "bar");
-$gelf->send();
+$publisher = new GELFMessagePublisher('172.16.22.30');
+$publisher->publish($message);
