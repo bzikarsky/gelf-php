@@ -3,7 +3,7 @@
 require('GELFMessage.php');
 require('GELFMessagePublisher.php');
 
-$message = new GELFMessage(microtime(true));
+$message = new GELFMessage();
 $message->setShortMessage('something is broken.');
 $message->setFullMessage("lol full message!");
 $message->setHost('somehost');
