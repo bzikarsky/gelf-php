@@ -1,234 +1,236 @@
 <?php
-
 class GELFMessage {
-	/**
-	 * @var string
-	 */
-	private $version = null;
+    /**
+     * @var string
+     */
+    private $version = null;
 
-	/**
-	 * @var integer
-	 */
-	private $timestamp = null;
+    /**
+     * @var integer
+     */
+    private $timestamp = null;
 
-	/**
-	 * @var string
-	 */
-	private $shortMessage = null;
+    /**
+     * @var string
+     */
+    private $shortMessage = null;
 
-	/**
-	 * @var string
-	 */
-	private $fullMessage = null;
+    /**
+     * @var string
+     */
+    private $fullMessage = null;
 
-	/**
-	 * @var string
-	 */
-	private $facility = null;
+    /**
+     * @var string
+     */
+    private $facility = null;
 
-	/**
-	 * @var string
-	 */
-	private $host = null;
+    /**
+     * @var string
+     */
+    private $host = null;
 
-	/**
-	 * @var integer
-	 */
-	private $level = null;
+    /**
+     * @var integer
+     */
+    private $level = null;
 
-	/**
-	 * @var string
-	 */
-	private $file = null;
+    /**
+     * @var string
+     */
+    private $file = null;
 
-	/**
-	 * @var integer
-	 */
-	private $line = null;
+    /**
+     * @var integer
+     */
+    private $line = null;
 
-	/**
-	 * @var array
-	 */
-	private $data = array();
+    /**
+     * @var array
+     */
+    private $data = array();
 
-	/**
-	 * @param integer $timestamp
-	 */
-	public function __construct($timestamp) {
-		$this->timestamp = $timestamp;
-	}
+    /**
+     * @param string $version
+     * @return GELFMessage
+     */
+    public function setVersion($version) {
+        $this->version = $version;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getVersion() {
-		return $this->version;
-	}
+    /**
+     * @return string
+     */
+    public function getVersion() {
+        return $this->version;
+    }
 
-	/**
-	 * @param string $version
-	 * @return void
-	 */
-	public function setVersion($version) {
-		$this->version = $version;
-	}
+    /**
+     * @param integer $timestamp
+     * @return GELFMessage
+     */
+    public function setTimestamp($timestamp) {
+        $this->timestamp = $timestamp;
+        return $this;
+    }
 
-	/**
-	 * @return integer
-	 */
-	public function getTimestamp() {
-		return $this->timestamp;
-	}
+    /**
+     * @return integer
+     */
+    public function getTimestamp() {
+        return $this->timestamp;
+    }
 
-	/**
-	 * @param string $shortMessage
-	 * @return GELFMessage
-	 */
-	public function setShortMessage($shortMessage) {
-		$this->shortMessage = $shortMessage;
-		return $this;
-	}
+    /**
+     * @param string $shortMessage
+     * @return GELFMessage
+     */
+    public function setShortMessage($shortMessage) {
+        $this->shortMessage = $shortMessage;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getShortMessage() {
-		return $this->shortMessage;
-	}
+    /**
+     * @return string
+     */
+    public function getShortMessage() {
+        return $this->shortMessage;
+    }
 
-	/**
-	 * @param string $fullMessage
-	 * @return GELFMessage
-	 */
-	public function setFullMessage($fullMessage) {
-		$this->fullMessage = $fullMessage;
-		return $this;
-	}
+    /**
+     * @param string $fullMessage
+     * @return GELFMessage
+     */
+    public function setFullMessage($fullMessage) {
+        $this->fullMessage = $fullMessage;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getFullMessage() {
-		return $this->fullMessage;
-	}
+    /**
+     * @return string
+     */
+    public function getFullMessage() {
+        return $this->fullMessage;
+    }
 
-	/**
-	 * @param string $facility
-	 * @return GELFMessage
-	 */
-	public function setFacility($facility) {
-		$this->facility = $facility;
-		return $this;
-	}
+    /**
+     * @param string $facility
+     * @return GELFMessage
+     */
+    public function setFacility($facility) {
+        $this->facility = $facility;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getFacility() {
-		return $this->facility;
-	}
+    /**
+     * @return string
+     */
+    public function getFacility() {
+        return $this->facility;
+    }
 
-	/**
-	 * @param string $host
-	 * @return GELFMessage
-	 */
-	public function setHost($host) {
-		$this->host = $host;
-		return $this;
-	}
+    /**
+     * @param string $host
+     * @return GELFMessage
+     */
+    public function setHost($host) {
+        $this->host = $host;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getHost() {
-		return $this->host;
-	}
+    /**
+     * @return string
+     */
+    public function getHost() {
+        return $this->host;
+    }
 
-	/**
-	 * @param integer $level
-	 * @return GELFMessage
-	 */
-	public function setLevel($level) {
-		$this->level = $level;
-		return $this;
-	}
+    /**
+     * @param integer $level
+     * @return GELFMessage
+     */
+    public function setLevel($level) {
+        $this->level = $level;
+        return $this;
+    }
 
-	/**
-	 * @return integer
-	 */
-	public function getLevel() {
-		return $this->level;
-	}
+    /**
+     * @return integer
+     */
+    public function getLevel() {
+        return $this->level;
+    }
 
-	/**
-	 * @param string $file
-	 * @return GELFMessage
-	 */
-	public function setFile($file) {
-		$this->file = $file;
-		return $this;
-	}
+    /**
+     * @param string $file
+     * @return GELFMessage
+     */
+    public function setFile($file) {
+        $this->file = $file;
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getFile() {
-		return $this->file;
-	}
+    /**
+     * @return string
+     */
+    public function getFile() {
+        return $this->file;
+    }
 
-	/**
-	 * @param integer $line
-	 * @return GELFMessage
-	 */
-	public function setLine($line) {
-		$this->line = $line;
-		return $this;
-	}
+    /**
+     * @param integer $line
+     * @return GELFMessage
+     */
+    public function setLine($line) {
+        $this->line = $line;
+        return $this;
+    }
 
-	/**
-	 * @return integer
-	 */
-	public function getLine() {
-		return $this->line;
-	}
+    /**
+     * @return integer
+     */
+    public function getLine() {
+        return $this->line;
+    }
 
-	/**
-	 * @param string $key
-	 * @param mixed $value
-	 * @return GELFMessage
-	 */
-	public function setAdditional($key, $value) {
-		$this->data["_" . trim($key)] = $value;
-		return $this;
-	}
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return GELFMessage
+     */
+    public function setAdditional($key, $value) {
+        $this->data["_" . trim($key)] = $value;
+        return $this;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getAdditional($key) {
-		return isset($this->data["_" . trim($key)]) ? $this->data[$key] : null;
-	}
+    /**
+     * @return mixed
+     */
+    public function getAdditional($key) {
+        return isset($this->data["_" . trim($key)]) ? $this->data[$key] : null;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function toArray() {
-		$messageAsArray = array(
-			'version' => $this->getVersion(),
-			'timestamp' => $this->getTimestamp(),
-			'short_message' => $this->getShortMessage(),
-			'full_message' => $this->getFullMessage(),
-			'facility' => $this->getFacility(),
-			'host' => $this->getHost(),
-			'level' => $this->getLevel(),
-			'file' => $this->getFile(),
-			'line' => $this->getLine(),
-		);
+    /**
+     * @return array
+     */
+    public function toArray() {
+        $messageAsArray = array(
+            'version' => $this->getVersion(),
+            'timestamp' => $this->getTimestamp(),
+            'short_message' => $this->getShortMessage(),
+            'full_message' => $this->getFullMessage(),
+            'facility' => $this->getFacility(),
+            'host' => $this->getHost(),
+            'level' => $this->getLevel(),
+            'file' => $this->getFile(),
+            'line' => $this->getLine(),
+        );
 
-		foreach($this->data as $key => $value) {
-			$messageAsArray[$key] = $value;
-		}
+        foreach($this->data as $key => $value) {
+            $messageAsArray[$key] = $value;
+        }
 
-		return $messageAsArray;
-	}
+        return $messageAsArray;
+    }
 }
