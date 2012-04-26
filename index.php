@@ -15,3 +15,4 @@ $message->setAdditional("something_else", "bar");
 
 $publisher = new GELFMessagePublisher('172.16.22.30');
 $publisher->publish($message);
+
