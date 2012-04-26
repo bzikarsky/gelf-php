@@ -2,3 +2,5 @@ nbproject
 .buildpath
 .project
 .settings/
+composer.phar
+vendor
