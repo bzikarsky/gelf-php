@@ -4,6 +4,14 @@
 
 PHP classes to send [GELF (Graylog extended log format)](http://www.graylog2.org/about/gelf) messages
 
+
+## Author
+
+[Lennart Koopman](https://github.com/lennartkoopmann)
+
+See [the list of contributors](https://github.com/Graylog2/gelf-php/contributors)
+
+
 ## Example
 
 ```php
