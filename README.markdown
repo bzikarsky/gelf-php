@@ -4,6 +4,7 @@
 
 PHP classes to send [GELF (Graylog extended log format)](http://www.graylog2.org/about/gelf) messages
 
+Issue tracker: [JIRA gelf-php](http://jira.graylog2.org/browse/GELFPHP)
 
 ## Author
 
