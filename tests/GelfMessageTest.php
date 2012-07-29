@@ -12,7 +12,7 @@ class GelfMessageTest extends PHPUnit_Framework_TestCase
         $message->setShortMessage('something is broken.');
         $message->setFullMessage("lol full message!");
         $message->setHost('somehost');
-        $message->setLevel(2);
+        $message->setLevel(GELFMessage::CRITICAL);
         $message->setFile('/var/www/example.php');
         $message->setLine(1337);
         $message->setAdditional("something", "foo");
@@ -26,7 +26,7 @@ class GelfMessageTest extends PHPUnit_Framework_TestCase
                 'full_message' => 'lol full message!',
                 'facility' => null,
                 'host' => 'somehost',
-                'level' => 2,
+                'level' => GELFMessage::CRITICAL,
                 'file' => '/var/www/example.php',
                 'line' => 1337,
                 '_something' => 'foo',
