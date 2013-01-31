@@ -36,6 +36,11 @@ class GELFMessagePublisher {
     protected $chunkSize = null;
 
     /**
+     * @var resource
+     */
+    protected $streamSocketClient = null;
+
+    /**
      * Creates a new publisher that sends errors to a Graylog2 server via UDP
      *
      * @throws InvalidArgumentException
@@ -138,7 +143,12 @@ class GELFMessagePublisher {
      * @return resource
      */
     protected function getSocketConnection() {
-        return stream_socket_client(sprintf('udp://%s:%d', gethostbyname($this->hostname), $this->port));
+        if (!$this->streamSocketClient) {
+            $this->streamSocketClient = stream_socket_client(sprintf('udp://%s:%d',
+                                                                     gethostbyname($this->hostname),
+                                                                     $this->port));
+        }
+        return $this->streamSocketClient;
     }
 
     /**
