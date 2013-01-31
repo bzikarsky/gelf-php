@@ -35,5 +35,11 @@ class GelfMessageTest extends PHPUnit_Framework_TestCase
             $message->toArray()
         );
     }
+
+    public function testAdditionalField() {
+        $message = new GELFMessage();
+        $message->setAdditional("something", "foo");
+        $this->assertEquals("foo", $message->getAdditional("something"));
+    }
 }
 
