@@ -221,7 +221,8 @@ class GELFMessage {
      * @return mixed
      */
     public function getAdditional($key) {
-        return isset($this->data["_" . trim($key)]) ? $this->data[$key] : null;
+        $additional_key = "_" . trim($key);
+        return isset($this->data[$additional_key]) ? $this->data[$additional_key] : null;
     }
 
     /**
