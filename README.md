@@ -10,3 +10,10 @@ and logging ([3](https://github.com/php-fig/fig-standards/blob/master/accepted/P
 It's a loosely based on the original [Graylog2 gelf-php](https://github.com/Graylog2/gelf-php)
 and [mlehner's fork](https://github.com/mlehner/gelf-php).
 
+development
+-----------
+1. git clone git@git.github.com:bzikarsky/gelf-php
+2. cd gelf-php
+3. Install [composer](http://getcomposer.org)
+4. composer install --dev
+5. phpunit
