@@ -1,0 +1,25 @@
+{
+    "name": "bzikarsky/gelf-php",
+    "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Benjamin Zikarsky",
+            "email": "benjamin@zikarsky.de"
+        }
+    ],
+    "config": {
+        "bin-dir": "bin"
+    },
+    "require": {
+        "php": "~5.3",
+        "psr/log": ">=1.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-0": {
+            "Gelf": "src/"
+        }
+    }
+}
