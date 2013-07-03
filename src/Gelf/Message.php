@@ -164,11 +164,14 @@ class Message implements MessageInterface
         $this->timestamp = $timestamp;
     }
 
-    public function getLevel($psrStyle = false)
+    public function getLevel()
     {
-        return $psrStyle
-            ? self::logLevelToPsr($this->level)
-            : self::logLevelToSyslog($this->level);
+        return self::logLevelToPsr($this->level);
+    }
+
+    public function getSyslogLevel()
+    {
+        return self::logLevelToSyslog($this->level);
     }
 
     public function setLevel($level)
@@ -238,7 +241,7 @@ class Message implements MessageInterface
             'host'          => $this->getHost(),
             'short_message' => $this->getShortMessage(),
             'full_message'  => $this->getFullMessage(),
-            'level'         => $this->getLevel(false),
+            'level'         => $this->getSyslogLevel(),
             'timestamp'     => $this->getTimestamp(),
             'facility'      => $this->getFacility(),
             'file'          => $this->getFile(),

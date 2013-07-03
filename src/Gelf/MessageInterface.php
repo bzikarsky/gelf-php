@@ -55,14 +55,18 @@ interface MessageInterface
     public function getTimestamp();
 
     /**
-     * Returns the log level of the message
-     * By setting $psrStyle to true the message will comply
-     * to the Psr\Log\LogLevel constants
+     * Returns the log level of the message as a Psr\Log\Level-constant
      *
-     * @param boolean $psrStyle
-     * @return integer|string
+     * @return string
      */
-    public function getLevel($psrStyle = false);
+    public function getLevel();
+
+    /**
+     * Returns the log level of the message as a numeric syslog level
+     *
+     * @return int
+     */
+    public function getSyslogLevel();
 
     /**
      * Returns the facility of the message

@@ -59,15 +59,16 @@ class MessageTest extends TestCase
 
     public function testLevel()
     {
-        $this->assertEquals(1, $this->message->getLevel());
-        $this->assertEquals(1, $this->message->getLevel(false));
-        $this->assertEquals(LogLevel::ALERT, $this->message->getLevel(true));
+        $this->assertEquals(1, $this->message->getSyslogLevel());
+        $this->assertEquals(LogLevel::ALERT, $this->message->getLevel());
 
         $this->message->setLevel(0);
-        $this->assertEquals(0, $this->message->getLevel());
+        $this->assertEquals(0, $this->message->getSyslogLevel());
+        $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
 
         $this->message->setLevel(LogLevel::EMERGENCY);
-        $this->assertEquals(0, $this->message->getLevel());
+        $this->assertEquals(0, $this->message->getSyslogLevel());
+        $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
     }
 
     /**
@@ -158,7 +159,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("foo", "bar");
         $data = $this->message->toArray();
         $this->assertTrue(is_array($data));
-        $this->assertArrayhasKey("_foo", $data);
+        $this->assertArrayHasKey("_foo", $data);
         $this->assertEquals("bar", $data["_foo"]);
 
         $map = [
@@ -170,7 +171,7 @@ class MessageTest extends TestCase
             "line"          => "getLine",
             "file"          => "getFile",
             "facility"      => "getFacility",
-            "level"         => "getLevel"
+            "level"         => "getSyslogLevel"
         ];
 
         foreach ($map as $k => $method) {
