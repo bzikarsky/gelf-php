@@ -40,6 +40,7 @@ class Publisher
      * Creates a Publisher for GELF-messages.
      *
      * @param TransportInterface $transport
+     * @param MessageValidatorInterface $messageValidator
      */
     public function __construct(
         TransportInterface $transport = null,
