@@ -16,6 +16,7 @@ use Gelf\MessageInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Psr\Log\LogLevel;
 use Exception;
+use Closure;
 
 class LoggerTest extends TestCase
 {
@@ -54,12 +55,14 @@ class LoggerTest extends TestCase
 
     public function testSimpleLog()
     {
+        $test = $this; 
+        $facility = $this->facility; 
         $this->validatePublish(
-            function (MessageInterface $message)
+            function (MessageInterface $message) use ($test, $facility)
             {
-                $this->assertEquals("test", $message->getShortMessage());
-                $this->assertEquals(LogLevel::ALERT, $message->getLevel());
-                $this->assertEquals($this->facility, $message->getFacility());
+                $test->assertEquals("test", $message->getShortMessage());
+                $test->assertEquals(LogLevel::ALERT, $message->getLevel());
+                $test->assertEquals($facility, $message->getFacility());
             }
         );
 
@@ -68,12 +71,13 @@ class LoggerTest extends TestCase
 
     public function testLogContext()
     {
-        $additionals = ['test' => 'bar', 'abc' => 'buz'];
+        $test = $this;
+        $additionals = array('test' => 'bar', 'abc' => 'buz');
         $this->validatePublish(
-            function (MessageInterface $message) use ($additionals)
+            function (MessageInterface $message) use ($test, $additionals)
             {
-                $this->assertEquals("foo bar", $message->getShortMessage());
-                $this->assertEquals($additionals, $message->getAllAdditionals());
+                $test->assertEquals("foo bar", $message->getShortMessage());
+                $test->assertEquals($additionals, $message->getAllAdditionals());
             }
         );
 
@@ -82,25 +86,26 @@ class LoggerTest extends TestCase
 
     public function testLogException()
     {
+        $test = $this; 
         $line = __LINE__ + 2; // careful, offset is the line-distance to the throw statement
         try {
             throw new Exception("test-message", 123);
         } catch (Exception $e) {
             $this->validatePublish(
-                function (MessageInterface $message) use ($e, $line)
+                function (MessageInterface $message) use ($e, $line, $test)
                 {
-                    $this->assertTrue(strstr($message->getFullMessage(), $e->getMessage()) !== false);
-                    $this->assertTrue(strstr($message->getFullMessage(), get_class($e)) !== false);
-                    $this->assertEquals($line, $message->getLine());
-                    $this->assertEquals(__FILE__, $message->getFile());
+                    $test->assertTrue(strstr($message->getFullMessage(), $e->getMessage()) !== false);
+                    $test->assertTrue(strstr($message->getFullMessage(), get_class($e)) !== false);
+                    $test->assertEquals($line, $message->getLine());
+                    $test->assertEquals(__FILE__, $message->getFile());
                 }
             );
 
-            $this->logger->log(LogLevel::ALERT, $e->getMessage(), ['exception' => $e]);
+            $this->logger->log(LogLevel::ALERT, $e->getMessage(), array('exception' => $e));
         }
     }
 
-    private function validatePublish(callable $validator)
+    private function validatePublish(Closure $validator)
     {
         $this->publisher->expects($this->once())->method('publish')->will(
             $this->returnCallback($validator)

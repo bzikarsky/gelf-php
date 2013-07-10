@@ -17,12 +17,12 @@ use Psr\Log\LogLevel;
 
 class MessageTest extends TestCase
 {
-    
+
     /**
      * @var Message
      */
     private $message;
-    
+
     public function setUp()
     {
         $this->message = new Message();
@@ -112,7 +112,7 @@ class MessageTest extends TestCase
 
     public function testOptionalMessageFields()
     {
-        $fields = ["Line", "File", "Facility", "FullMessage", "ShortMessage"];
+        $fields = array("Line", "File", "Facility", "FullMessage", "ShortMessage");
         foreach ($fields as $field) {
             $g = "get$field";
             $s = "set$field";
@@ -136,7 +136,7 @@ class MessageTest extends TestCase
         $this->assertEquals("buk", $this->message->getAdditional("foo"));
         $this->assertTrue(1 == count($this->message->getAllAdditionals()));
 
-        $this->assertEquals(["foo" => "buk"], $this->message->getAllAdditionals());
+        $this->assertEquals(array("foo" => "buk"), $this->message->getAllAdditionals());
     }
 
     /**
@@ -162,7 +162,7 @@ class MessageTest extends TestCase
         $this->assertArrayHasKey("_foo", $data);
         $this->assertEquals("bar", $data["_foo"]);
 
-        $map = [
+        $map = array(
             "version"       => "getVersion",
             "host"          => "getHost",
             "timestamp"     => "getTimestamp",
@@ -172,7 +172,7 @@ class MessageTest extends TestCase
             "file"          => "getFile",
             "facility"      => "getFacility",
             "level"         => "getSyslogLevel"
-        ];
+        );
 
         foreach ($map as $k => $method) {
             $r = $this->message->$method();

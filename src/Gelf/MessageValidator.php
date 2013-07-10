@@ -18,7 +18,7 @@ class MessageValidator implements MessageValidatorInterface
 {
     public function validate(MessageInterface $message)
     {
-        $errors = [];
+        $errors = array();
         switch ($message->getVersion()) {
             case "1.0":
                 return $this->validate0100($message);

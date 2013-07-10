@@ -31,7 +31,7 @@ class Message implements MessageInterface
     protected $facility;
     protected $file;
     protected $line;
-    protected $additionals = [];
+    protected $additionals = array();
 
     /**
      * A list of the PSR LogLevel constants which is also a mapping of 
@@ -39,7 +39,7 @@ class Message implements MessageInterface
      *
      * @var array
      */
-    private static $psrLevels = [
+    private static $psrLevels = array(
         LogLevel::EMERGENCY,    // 0
         LogLevel::ALERT,        // 1
         LogLevel::CRITICAL,     // 2
@@ -48,7 +48,7 @@ class Message implements MessageInterface
         LogLevel::NOTICE,       // 5
         LogLevel::INFO,         // 6
         LogLevel::DEBUG         // 7
-    ];
+    );
 
     /**
      * Creates a new message
@@ -236,7 +236,7 @@ class Message implements MessageInterface
 
     public function toArray()
     {
-        $message = [
+        $message = array(
             'version'       => $this->getVersion(),
             'host'          => $this->getHost(),
             'short_message' => $this->getShortMessage(),
@@ -246,7 +246,7 @@ class Message implements MessageInterface
             'facility'      => $this->getFacility(),
             'file'          => $this->getFile(),
             'line'          => $this->getLine()
-        ];
+        );
 
         foreach ($this->getAllAdditionals() as $key => $value) {
             $message["_" . $key] = $value;

@@ -12,18 +12,16 @@
 namespace Gelf;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
+use Psr\Log\AbstractLogger;
 use Exception;
 
 /**
- * A baisc PSR-3 compliant logger
+ * A basic PSR-3 compliant logger
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class Logger implements LoggerInterface
+class Logger extends AbstractLogger implements LoggerInterface
 {
-    use LoggerTrait;
-
     /**
      * @var string
      */
@@ -56,7 +54,7 @@ class Logger implements LoggerInterface
     public function log($level, $rawMessage, array $context = array())
     {
         $message = $this->initMessage($level, $rawMessage, $context);
-        
+
         // add exception data if present
         if (isset($context['exception']) && $context['exception'] instanceof Exception) {
             $this->initExceptionData($message, $context['exception']);
