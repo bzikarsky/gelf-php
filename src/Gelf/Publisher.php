@@ -45,8 +45,7 @@ class Publisher
     public function __construct(
         TransportInterface $transport = null,
         MessageValidatorInterface $messageValidator = null
-    )
-    {
+    ) {
         $this->transports = new Set();
         $this->messageValidator = $messageValidator ?: new DefaultMessageValidator();
 
