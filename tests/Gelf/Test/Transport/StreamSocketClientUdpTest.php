@@ -29,6 +29,10 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function setUp()
     {
+        // skip tests in travis
+        if (getenv('TRAVIS') == 'true') {
+            $this->markTestSkipped("Travis does not support test with UDP local sockets");
+        }
 
         $this->serverSocket = stream_socket_server(
             "udp://localhost:0",
