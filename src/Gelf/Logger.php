@@ -11,6 +11,7 @@
 
 namespace Gelf;
 
+use Gelf\Transport\UdpTransport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\AbstractLogger;
 use Exception;
@@ -38,8 +39,12 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param Publisher $publisher
      * @param string $facility
      */
-    public function __construct(Publisher $publisher, $facility = null)
+    public function __construct(Publisher $publisher = null, $facility = null)
     {
+	// if no publisher is provided build a "default" publisher
+        // which is logging via Gelf over UDP to localhost on the default port
+	$publisher = $publisher ?: new Publisher(new UdpTransport());
+
         $this->setPublisher($publisher);
         $this->setFacility($facility);
     }

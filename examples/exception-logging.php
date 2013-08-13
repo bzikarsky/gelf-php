@@ -11,10 +11,13 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$transport = new Gelf\Transport\UdpTransport();
-$publisher = new Gelf\Publisher($transport);
-$logger = new Gelf\Logger($publisher);
+// Logger takes an optional Publisher and a facility name
+// If the publisheris ommitted (or equals null) a default publisher 
+// is created which logs GELF to  udp://localhost:12201
+$logger = new Gelf\Logger(null, "test facility");
 
+// throw an exception, catch it immediatly and pass it 
+// to the logger
 try {
     throw new Exception("test exception");
 } catch (Exception $e) {
