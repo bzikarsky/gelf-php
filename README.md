@@ -10,10 +10,40 @@ and logging ([3](https://github.com/php-fig/fig-standards/blob/master/accepted/P
 It's a loosely based on the original [Graylog2 gelf-php](https://github.com/Graylog2/gelf-php)
 and [mlehner's fork](https://github.com/mlehner/gelf-php).
 
-development
+Usage
+-----
+
+### Recommended installation via composer:
+
+Add gelf-php to `composer.json`:
+
+    "require": {
+       // ...
+       "bzikarsky/gelf-php": "*"
+       // ...
+    }
+
+Reinstall dependencies: `composer install`
+
+### Examples
+
+For usage examples, go to [/examples](https://github.com/bzikarsky/gelf-php/tree/master/examples).
+
+
+Development
 -----------
-1. git clone git@git.github.com:bzikarsky/gelf-php
-2. cd gelf-php
-3. Install [composer](http://getcomposer.org)
-4. composer install --dev
-5. phpunit
+
+You are welcome to modify, extend and bugfix all you like. :-)
+In case you want to use the nifty [PhpStorm-IDE](http://www.jetbrains.com/phpstorm/), there is an OSS-license for this
+project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky).
+
+### Tools
+1. [composer](http://getcomposer.org), preferably a system-wide installation as `composer`
+2. [PHPUnit](http://phpunit.de/manual/current/en/installation.html)
+3. Optional: [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) for PSR-X-compatibility checks
+
+### Steps
+1. Clone repository and cd into it: `git clone git@github.com:bzikarsky/gelf-php && cd gelf-php`
+2. Install dependencies: `composer install --dev`
+3. Run unit-tests: `phpunit`
+4. Check PSR compatibility: `phpcs --standard=PSR2 src`
