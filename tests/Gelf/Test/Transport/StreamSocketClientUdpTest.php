@@ -68,6 +68,8 @@ class StreamSocketClientUdpTest extends TestCase
 
         echo "before socketClient unset\n";
         unset($this->socketClient);
+
+        echo "after tearDown\n";
     }
 
 
