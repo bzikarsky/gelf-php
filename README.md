@@ -29,9 +29,14 @@ Reinstall dependencies: `composer install`
 
 For usage examples, go to [/examples](https://github.com/bzikarsky/gelf-php/tree/master/examples).
 
+License
+-------
 
-Development
------------
+The library is licensed under the MIT license. For details check out the LICENSE file.
+
+
+Development & Contributing
+--------------------------
 
 You are welcome to modify, extend and bugfix all you like. :-)
 In case you want to use the nifty [PhpStorm-IDE](http://www.jetbrains.com/phpstorm/), there is an OSS-license for this
