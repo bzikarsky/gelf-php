@@ -55,11 +55,10 @@ class StreamSocketClient
      */
     public function __destruct()
     {
-        if (!$this->socket) {
-            return;
+        if (is_resource($this->socket)) {
+            echo "before fclose in StreamSocketClient\n";
+            fclose($this->socket);
         }
-
-        fclose($this->socket);
     }
 
     /**
