@@ -51,17 +51,6 @@ class StreamSocketClient
     }
 
     /**
-     * Destructor, closes socket if possible
-     */
-    public function __destruct()
-    {
-        if (is_resource($this->socket)) {
-            echo "before fclose in StreamSocketClient\n";
-            fclose($this->socket);
-        }
-    }
-
-    /**
      * Initializes socket-client
      *
      * @param string $scheme like "udp" or "tcp"
