@@ -29,10 +29,15 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function setUp()
     {
+
+        echo "\n";
+
 //        // skip tests in travis
 //        if (getenv('TRAVIS') == 'true') {
 //            $this->markTestSkipped("Travis seems to have no support for local UDP sockets");
 //        }
+
+        echo "before stream_socket_server\n";
 
         $this->serverSocket = stream_socket_server(
             "udp://localhost:0",
@@ -45,12 +50,26 @@ class StreamSocketClientUdpTest extends TestCase
             throw new \RuntimeException("Failed to create test-server-socket");
         }
 
+        echo "before stream_socket_get_name\n";
+
         // get random port
         $socketName = stream_socket_get_name($this->serverSocket, $peerName = false);
         list(, $port) = explode(":", $socketName);
 
+        echo "before new StreamSocketClient\n";
+
         $this->socketClient = new StreamSocketClient('udp', 'localhost', $port);
     }
+
+    public function tearDown()
+    {
+        echo "before fclose\n";
+        fclose($this->serverSocket);
+
+        echo "before socketClient unset\n";
+        unset($this->socketClient);
+    }
+
 
     public function testGetSocket()
     {
@@ -59,10 +78,14 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function testWrite()
     {
+        echo "before socketClient->write\n";
+
         $testData = "Hello World!";
         $numBytes = $this->socketClient->write($testData);
 
         $this->assertEquals(strlen($testData), $numBytes);
+
+        echo "before stream_socket_recvfrom\n";
 
         // check that message is sent to server
         $readData = stream_socket_recvfrom($this->serverSocket, $numBytes);
