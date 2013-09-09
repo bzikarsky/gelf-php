@@ -1,4 +1,4 @@
-gelf-php[ ![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php)
+gelf-php[ ![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2)
 ========
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
