@@ -29,8 +29,9 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function setUp()
     {
+        $host = "127.0.0.1";
         $this->serverSocket = stream_socket_server(
-            "udp://127.0.0.1:0",
+            "udp://$host:0",
             $errNo,
             $errMsg,
             $flags = STREAM_SERVER_BIND
@@ -44,7 +45,7 @@ class StreamSocketClientUdpTest extends TestCase
         $socketName = stream_socket_get_name($this->serverSocket, $peerName = false);
         list(, $port) = explode(":", $socketName);
 
-        $this->socketClient = new StreamSocketClient('udp', 'localhost', $port);
+        $this->socketClient = new StreamSocketClient('udp', $host, $port);
     }
 
     public function tearDown()
