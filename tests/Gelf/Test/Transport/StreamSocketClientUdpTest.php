@@ -49,7 +49,6 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function tearDown()
     {
-        stream_set_blocking($this->serverSocket, 0);
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
@@ -68,7 +67,7 @@ class StreamSocketClientUdpTest extends TestCase
         $this->assertEquals(strlen($testData), $numBytes);
 
         // check that message is sent to server
-        $readData = stream_socket_recvfrom($this->serverSocket, $numBytes);
+        $readData = fread($this->serverSocket, $numBytes);
 
         $this->assertEquals($testData, $readData);
     }
