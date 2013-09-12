@@ -49,6 +49,7 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function tearDown()
     {
+        stream_set_blocking($this->serverSocket, 0);
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
