@@ -40,6 +40,9 @@ class StreamSocketClientUdpTest extends TestCase
             throw new \RuntimeException("Failed to create test-server-socket");
         }
 
+        // UDP is better of non-blocking
+        stream_set_blocking($this->serverSocket, 0);
+        
         // get random port
         $socketName = stream_socket_get_name($this->serverSocket, $peerName = false);
         list(, $port) = explode(":", $socketName);
