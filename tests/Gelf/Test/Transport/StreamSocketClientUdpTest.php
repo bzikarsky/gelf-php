@@ -29,11 +29,6 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function setUp()
     {
-        // skip tests in travis
-//        if (getenv('TRAVIS') == 'true') {
-//            $this->markTestSkipped("Somehow test execution hangs after first tearDown of the first test execution");
-//        }
-
         $this->serverSocket = stream_socket_server(
             "udp://localhost:0",
             $errNo,
@@ -44,9 +39,6 @@ class StreamSocketClientUdpTest extends TestCase
         if (!$this->serverSocket) {
             throw new \RuntimeException("Failed to create test-server-socket");
         }
-
-        // set non-blocking
-        stream_set_blocking($this->serverSocket, 0);
 
         // get random port
         $socketName = stream_socket_get_name($this->serverSocket, $peerName = false);
