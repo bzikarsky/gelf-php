@@ -6,7 +6,9 @@ php:
 before_script:
   - composer self-update
   - composer install --dev
-script: phpunit --coverage-text
+script: phpunit --coverage-text --coverage-clover build/logs/clover.xml
+after_script: php vendor/bin/coveralls
+
 notifications:
-  email: 
+  email:
     - travis@b-zik.de
