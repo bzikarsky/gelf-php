@@ -19,7 +19,7 @@ Add gelf-php to `composer.json`:
 
     "require": {
        // ...
-       "bzikarsky/gelf-php": "*"
+       "bzikarsky/gelf-php": "1.0.*"
        // ...
     }
 
