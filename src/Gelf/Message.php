@@ -15,14 +15,14 @@ use Psr\Log\LogLevel;
 use RuntimeException;
 
 /**
- * A message complying to the GELF standard 
+ * A message complying to the GELF standard
  * <https://github.com/Graylog2/graylog2-docs/wiki/GELF>
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
 class Message implements MessageInterface
 {
- 
+
     protected $host;
     protected $shortMessage;
     protected $fullMessage;
@@ -34,7 +34,7 @@ class Message implements MessageInterface
     protected $additionals = array();
 
     /**
-     * A list of the PSR LogLevel constants which is also a mapping of 
+     * A list of the PSR LogLevel constants which is also a mapping of
      * syslog code to psr-value
      *
      * @var array
@@ -61,9 +61,9 @@ class Message implements MessageInterface
         $this->host = gethostname();
         $this->level = 1; //ALERT
     }
-    
+
     /**
-     * Trys to convert a given log-level (psr or syslog) to 
+     * Trys to convert a given log-level (psr or syslog) to
      * the psr representation
      *
      * @param mixed $level
@@ -132,6 +132,7 @@ class Message implements MessageInterface
     public function setHost($host)
     {
         $this->host = $host;
+        return $this;
     }
 
     public function getShortMessage()
@@ -142,6 +143,7 @@ class Message implements MessageInterface
     public function setShortMessage($shortMessage)
     {
         $this->shortMessage = $shortMessage;
+        return $this;
     }
 
     public function getFullMessage()
@@ -152,6 +154,7 @@ class Message implements MessageInterface
     public function setFullMessage($fullMessage)
     {
         $this->fullMessage = $fullMessage;
+        return $this;
     }
 
     public function getTimestamp()
@@ -161,7 +164,12 @@ class Message implements MessageInterface
 
     public function setTimestamp($timestamp)
     {
-        $this->timestamp = $timestamp;
+        if ($timestamp instanceof \DateTime) {
+            $timestamp = $timestamp->format("U");
+        }
+
+        $this->timestamp = floor($timestamp);
+        return $this;
     }
 
     public function getLevel()
@@ -177,6 +185,7 @@ class Message implements MessageInterface
     public function setLevel($level)
     {
         $this->level = self::logLevelToSyslog($level);
+        return $this;
     }
 
     public function getFacility()
@@ -187,6 +196,7 @@ class Message implements MessageInterface
     public function setFacility($facility)
     {
         $this->facility = $facility;
+        return $this;
     }
 
     public function getFile()
@@ -197,6 +207,7 @@ class Message implements MessageInterface
     public function setFile($file)
     {
         $this->file = $file;
+        return $this;
     }
 
     public function getLine()
@@ -207,6 +218,7 @@ class Message implements MessageInterface
     public function setLine($line)
     {
         $this->line = $line;
+        return $this;
     }
 
     public function getAdditional($key)
@@ -227,11 +239,13 @@ class Message implements MessageInterface
         }
 
         $this->additionals[$key] = $value;
+        return $this;
     }
 
     public function getAllAdditionals()
     {
         return $this->additionals;
+        return $this;
     }
 
     public function toArray()

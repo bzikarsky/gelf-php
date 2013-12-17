@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * This file is part of the php-gelf package.
  *
  * (c) Benjamin Zikarsky <http://benjamin-zikarsky.de>
@@ -20,7 +20,7 @@ use RuntimeException;
 
 /**
  * A GELF publisher functions as a hub for pushing out a GELF message
- * to a least one GELF endpoint 
+ * to a least one GELF endpoint
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
@@ -85,7 +85,7 @@ class Publisher
     }
 
     /**
-     * Returns all defined transports. 
+     * Returns all defined transports.
      *
      * @return TransportInterface[]
      */

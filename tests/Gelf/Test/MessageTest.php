@@ -154,6 +154,29 @@ class MessageTest extends TestCase
         $this->message->getAdditional("invalid");
     }
 
+    public function testSetTimestamp()
+    {
+        $dt = new \DateTime();
+        $this->message->setTimestamp($dt);
+
+        $this->assertEquals($dt->format("U"), $this->message->getTimestamp());
+    }
+
+    public function testMethodChaining()
+    {
+        $this->message
+            ->setTimestamp(new \DateTime())
+            ->setAdditional("test", "value")
+            ->setFacility("test")
+            ->setHost("test")
+            ->setFile("test")
+            ->setFullMessage("testtest")
+            ->setShortMessage("test")
+            ->setLevel("ERROR")
+            ->setLine(1)
+        ;
+    }
+
     public function testToArray()
     {
         $this->message->setAdditional("foo", "bar");
