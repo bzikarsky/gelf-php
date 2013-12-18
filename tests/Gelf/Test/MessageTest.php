@@ -40,7 +40,7 @@ class MessageTest extends TestCase
         $this->assertEquals(0, $this->message->getTimestamp());
 
         $this->message->setTimestamp("1.23");
-        $this->assertEquals(1.23, $this->message->getTimestamp());
+        $this->assertEquals(1, $this->message->getTimestamp());
     }
 
     public function testVersion()
