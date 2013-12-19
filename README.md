@@ -10,6 +10,24 @@ and logging ([3](https://github.com/php-fig/fig-standards/blob/master/accepted/P
 It's a loosely based on the original [Graylog2 gelf-php](https://github.com/Graylog2/gelf-php)
 and [mlehner's fork](https://github.com/mlehner/gelf-php).
 
+Stable release and deprecation of the original graylog2/gelf-php
+----------------------------------------------------------------
+
+This implementation became the official PHP GELF library on 2013-12-19 and is now released as `graylog2/gelf-php v1.0`.
+The old library became deprecated at the same time and it's recommended to upgrade.
+
+Since the deprecated library never got a stable release, we decided keep it available as `v0.1`. This means:
+If you have a project based on the deprecated library but no time to upgrade to version 1.0, we recommend to change your
+`composer.json` as following:
+
+        "require": {
+           // ...
+           "graylog2/gelf-php": "0.1.*"
+           // ...
+        }
+
+After running an additional `composer update` everything should work as expected.
+
 Usage
 -----
 
@@ -19,7 +37,7 @@ Add gelf-php to `composer.json`:
 
     "require": {
        // ...
-       "bzikarsky/gelf-php": "1.0.*"
+       "graylog2/gelf-php": "~1.0"
        // ...
     }
 
