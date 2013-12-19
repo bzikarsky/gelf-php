@@ -1,5 +1,5 @@
 {
-    "name": "bzikarsky/gelf-php",
+    "name": "graylog2/gelf-php",
     "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
     "license": "MIT",
     "authors": [
