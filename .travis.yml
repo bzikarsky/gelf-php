@@ -5,14 +5,12 @@ php:
   - 5.5
   - hhvm
 
-matrix:
-  allow_failures:
-    - php: hhvm
-
 before_script:
   - composer self-update
   - composer install --dev
-script: bin/phpunit --coverage-text --coverage-clover build/logs/clover.xml
+
+script: phpunit --coverage-text --coverage-clover build/logs/clover.xml
+
 after_script: bin/coveralls
 
 notifications:

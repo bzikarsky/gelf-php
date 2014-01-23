@@ -16,8 +16,7 @@
         "psr/log": ">=1.0"
     },
     "require-dev": {
-        "satooshi/php-coveralls": "dev-master",
-	"phpunit/phpunit": "3.7.*"
+        "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
         "psr-0": {
