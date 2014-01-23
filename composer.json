@@ -13,10 +13,10 @@
     },
     "require": {
         "php": "~5.3",
-        "psr/log": ">=1.0"
+        "psr/log": "~1.0"
     },
     "require-dev": {
-        "satooshi/php-coveralls": "dev-master"
+        "satooshi/php-coveralls": "~0.6"
     },
     "autoload": {
         "psr-0": {
