@@ -261,17 +261,12 @@ class Message implements MessageInterface
             'line'          => $this->getLine()
         );
 
+        // add additionals
         foreach ($this->getAllAdditionals() as $key => $value) {
             $message["_" . $key] = $value;
         }
 
-        // filter empty
-        foreach ($message as $k => $v) {
-            if (empty($v)) {
-                unset($message[$k]);
-            }
-        }
-
-        return $message;
+        // return after filtering false, null and empty strings
+        return array_filter($message, 'strlen');
     }
 }
