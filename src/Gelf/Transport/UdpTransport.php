@@ -14,15 +14,19 @@ namespace Gelf\Transport;
 use Gelf\Encoder\EncoderInterface;
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
+use Gelf\MessageInterface;
+use Gelf\PublisherInterface;
 use RuntimeException;
 
 /**
  * UdpTransport allows the transfer of GELF-messages to an compatible GELF-UDP-backend
  * as described in https://github.com/Graylog2/graylog2-docs/wiki/GELF
  *
+ * It can also act as a direct publisher
+ *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class UdpTransport implements TransportInterface
+class UdpTransport implements TransportInterface, PublisherInterface
 {
     const CHUNK_GELF_ID = "\x1e\x0f";
     const CHUNK_MAX_COUNT = 256; // sequence-size is stored in a CHAR
@@ -114,6 +118,11 @@ class UdpTransport implements TransportInterface
         // send message in one packet
         $this->socketClient->write($rawMessage);
         return 1;
+    }
+
+    public function publish(Message $message)
+    {
+        $this->send($message);
     }
 
     /**
