@@ -1,6 +1,10 @@
 gelf-php
 ========
-[ ![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php) [![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.png)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047) [![Coverage Status](https://coveralls.io/repos/bzikarsky/gelf-php/badge.png?branch=master)](https://coveralls.io/r/bzikarsky/gelf-php?branch=master) [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bzikarsky/gelf-php/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php)
+[![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.png)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
+[![Coverage Status](https://coveralls.io/repos/bzikarsky/gelf-php/badge.png?branch=master)](https://coveralls.io/r/bzikarsky/gelf-php?branch=master)
+[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/badges/quality-score.png?s=00d4030b7a35c75a6b27b426c0eb53fb23aed2d1)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2)
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
 This library conforms to the PSR standards in regards to structure ([0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)),
@@ -71,3 +75,6 @@ project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky
 2. Install dependencies: `composer install --dev`
 3. Run unit-tests: `phpunit`
 4. Check PSR compatibility: `phpcs --standard=PSR2 src`
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bzikarsky/gelf-php/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
