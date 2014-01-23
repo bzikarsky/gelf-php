@@ -13,6 +13,7 @@ namespace Gelf\Test;
 
 use Gelf\Logger;
 use Gelf\MessageInterface;
+use Gelf\PublisherInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Psr\Log\LogLevel;
 use Exception;
@@ -21,7 +22,14 @@ use Closure;
 class LoggerTest extends TestCase
 {
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|PublisherInterface
+     */
     protected $publisher;
+
+    /**
+     * @var Logger
+     */
     protected $logger;
     protected $facility = "test-facility";
 
@@ -55,11 +63,10 @@ class LoggerTest extends TestCase
 
     public function testSimpleLog()
     {
-        $test = $this; 
-        $facility = $this->facility; 
+        $test = $this;
+        $facility = $this->facility;
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $facility)
-            {
+            function (MessageInterface $message) use ($test, $facility) {
                 $test->assertEquals("test", $message->getShortMessage());
                 $test->assertEquals(LogLevel::ALERT, $message->getLevel());
                 $test->assertEquals($facility, $message->getFacility());
@@ -74,8 +81,7 @@ class LoggerTest extends TestCase
         $test = $this;
         $additionals = array('test' => 'bar', 'abc' => 'buz');
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $additionals)
-            {
+            function (MessageInterface $message) use ($test, $additionals) {
                 $test->assertEquals("foo bar", $message->getShortMessage());
                 $test->assertEquals($additionals, $message->getAllAdditionals());
             }
@@ -86,14 +92,13 @@ class LoggerTest extends TestCase
 
     public function testLogException()
     {
-        $test = $this; 
+        $test = $this;
         $line = __LINE__ + 2; // careful, offset is the line-distance to the throw statement
         try {
             throw new Exception("test-message", 123);
         } catch (Exception $e) {
             $this->validatePublish(
-                function (MessageInterface $message) use ($e, $line, $test)
-                {
+                function (MessageInterface $message) use ($e, $line, $test) {
                     $test->assertTrue(strstr($message->getFullMessage(), $e->getMessage()) !== false);
                     $test->assertTrue(strstr($message->getFullMessage(), get_class($e)) !== false);
                     $test->assertEquals($line, $message->getLine());

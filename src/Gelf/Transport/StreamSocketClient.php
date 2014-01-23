@@ -83,7 +83,7 @@ class StreamSocketClient
             throw new RuntimeException("Failed to create socket-client for $socketDescriptor");
         }
 
-	// set non-blocking for UDP
+        // set non-blocking for UDP
         if (strcasecmp("udp", $scheme) == 0) {
             stream_set_blocking($socket, 0);
         }
