@@ -245,7 +245,6 @@ class Message implements MessageInterface
     public function getAllAdditionals()
     {
         return $this->additionals;
-        return $this;
     }
 
     public function toArray()
