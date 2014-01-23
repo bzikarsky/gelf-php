@@ -12,8 +12,6 @@
 namespace Gelf;
 
 use Gelf\Transport\TransportInterface;
-use Gelf\MessageInterface;
-use Gelf\MessageValidatorInterface;
 use Gelf\MessageValidator as DefaultMessageValidator;
 use SplObjectStorage as Set;
 use RuntimeException;
@@ -24,7 +22,7 @@ use RuntimeException;
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class Publisher
+class Publisher implements PublisherInterface
 {
     /**
      * @var Set
@@ -70,6 +68,7 @@ class Publisher
         }
 
         foreach ($this->transports as $transport) {
+            /* @var $transport TransportInterface */
             $transport->send($message);
         }
     }
