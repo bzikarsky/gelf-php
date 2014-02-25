@@ -43,11 +43,22 @@ class MessageValidator implements MessageValidatorInterface
         if (!$message->getVersion()) {
             return false;
         }
-
-        if (!$message->getShortMessage()) {
+        
+        if (!$this->validateShortMessage($message)) {
             return false;
         }
 
         return true;
+    }
+    
+    /**
+     * Ensure the message can be converted to string with non-zero length
+     * 
+     * @param \Gelf\MessageInterface $message
+     * @return bool
+     */
+    private function validateShortMessage(MessageInterface $message)
+    {
+        return strlen($message->getShortMessage()) > 0;
     }
 }
