@@ -1,0 +1,6 @@
+imports:
+  - php
+
+before_commands:
+  - "composer install --dev"
+
