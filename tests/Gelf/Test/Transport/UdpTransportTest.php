@@ -41,7 +41,7 @@ class UdpTransportTest extends TestCase
 
     public function setUp()
     {
-        $this->testMessage = str_repeat("0123456789", 30); // 300 character string
+        $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
         $this->socketClient = $this->getMock(
             "\\Gelf\\Transport\\StreamSocketClient",
@@ -70,9 +70,9 @@ class UdpTransportTest extends TestCase
 
         // replace internal stream socket client with our mock
         $reflectedTransport = new \ReflectionObject($transport);
-        $reflectedSocketClient = $reflectedTransport->getProperty('socketClient');
-        $reflectedSocketClient->setAccessible(true);
-        $reflectedSocketClient->setValue($transport, $this->socketClient);
+        $reflectedClient = $reflectedTransport->getProperty('socketClient');
+        $reflectedClient->setAccessible(true);
+        $reflectedClient->setValue($transport, $this->socketClient);
 
         return $transport;
     }
@@ -88,12 +88,18 @@ class UdpTransportTest extends TestCase
     public function testGetEncoder()
     {
         $transport = new UdpTransport();
-        $this->assertInstanceOf("\\Gelf\\Encoder\\EncoderInterface", $transport->getMessageEncoder());
+        $this->assertInstanceOf(
+            "\\Gelf\\Encoder\\EncoderInterface", 
+            $transport->getMessageEncoder()
+        );
     }
 
     public function testSendUnchunked()
     {
-        $this->socketClient->expects($this->once())->method('write')->with($this->testMessage);
+        $this->socketClient
+            ->expects($this->once())
+            ->method('write')
+            ->with($this->testMessage);
 
         $this->transport->send($this->message);
     }

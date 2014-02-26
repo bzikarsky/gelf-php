@@ -43,9 +43,11 @@ class Publisher implements PublisherInterface
     public function __construct(
         TransportInterface $transport = null,
         MessageValidatorInterface $messageValidator = null
-    ) {
+    )
+    {
         $this->transports = new Set();
-        $this->messageValidator = $messageValidator ?: new DefaultMessageValidator();
+        $this->messageValidator = $messageValidator 
+            ?: new DefaultMessageValidator();
 
         if (null != $transport) {
             $this->addTransport($transport);
@@ -60,7 +62,9 @@ class Publisher implements PublisherInterface
     public function publish(MessageInterface $message)
     {
         if (count($this->transports) == 0) {
-            throw new RuntimeException("Publisher requires at least one transport");
+            throw new RuntimeException(
+                "Publisher requires at least one transport"
+            );
         }
 
         if (!$this->messageValidator->validate($message)) {

@@ -39,7 +39,10 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param Publisher $publisher
      * @param string $facility
      */
-    public function __construct(PublisherInterface $publisher = null, $facility = null)
+    public function __construct(
+        PublisherInterface $publisher = null, 
+        $facility = null
+    )
     {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
@@ -61,7 +64,10 @@ class Logger extends AbstractLogger implements LoggerInterface
         $message = $this->initMessage($level, $rawMessage, $context);
 
         // add exception data if present
-        if (isset($context['exception']) && $context['exception'] instanceof Exception) {
+        if (
+           isset($context['exception']) 
+           && $context['exception'] instanceof Exception
+        ) {
             $this->initExceptionData($message, $context['exception']);
         }
 

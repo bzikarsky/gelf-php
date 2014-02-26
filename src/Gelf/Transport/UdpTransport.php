@@ -19,8 +19,9 @@ use Gelf\PublisherInterface;
 use RuntimeException;
 
 /**
- * UdpTransport allows the transfer of GELF-messages to an compatible GELF-UDP-backend
- * as described in https://github.com/Graylog2/graylog2-docs/wiki/GELF
+ * UdpTransport allows the transfer of GELF-messages to an compatible 
+ * GELF-UDP-backend as described in 
+ * https://github.com/Graylog2/graylog2-docs/wiki/GELF
  *
  * It can also act as a direct publisher
  *
@@ -58,13 +59,15 @@ class UdpTransport implements TransportInterface, PublisherInterface
      *
      * @param string $host      when NULL or empty DEFAULT_HOST is used
      * @param int $port         when NULL or empty DEFAULT_PORT is used
-     * @param int $chunkSize    defaults to CHUNK_SIZE_WAN, 0 disables chunks completely
+     * @param int $chunkSize    defaults to CHUNK_SIZE_WAN, 
+     *                          0 disables chunks completely
      */
     public function __construct(
         $host = self::DEFAULT_HOST,
         $port = self::DEFAULT_PORT,
         $chunkSize = self::CHUNK_SIZE_WAN
-    ) {
+    )
+    {
         // allow NULL-like values for fallback on default
         $host = $host ?: self::DEFAULT_HOST;
         $port = $port ?: self::DEFAULT_PORT;
@@ -131,8 +134,8 @@ class UdpTransport implements TransportInterface, PublisherInterface
      * @param string $rawMessage
      * @return int
      *
-     * @throws RuntimeException on too large messages which would exceed the the maximum number
-     *                          of possible chunks
+     * @throws RuntimeException on too large messages which would exceed the 
+                                maximum number of possible chunks
      */
     protected function sendMessageInChunks($rawMessage)
     {
@@ -141,16 +144,21 @@ class UdpTransport implements TransportInterface, PublisherInterface
         $numChunks = count($chunks);
 
         if ($numChunks > self::CHUNK_MAX_COUNT) {
-            throw new RuntimeException("Message is to big. Chunk count exceeds " . self::CHUNK_MAX_COUNT);
+            throw new RuntimeException(
+                sprintf(
+                    "Message is to big. Chunk count exceeds %d",
+                    self::CHUNK_MAX_COUNT
+                )
+            );
         }
 
         // generate a random 8byte-message-id
         $messageId = substr(md5(uniqid(), true), 0, 8);
 
         // send chunks with a correct chunk-header
-        // @link https://github.com/Graylog2/graylog2-docs/wiki/GELF#structure-of-chunked-gelf-header
+        // @link http://graylog2.org/gelf#specs
         foreach ($chunks as $idx => $chunk) {
-            $data = self::CHUNK_GELF_ID            // identifies the packet as a GELF chunk
+            $data = self::CHUNK_GELF_ID            // GELF chunk magic bytes
                 . $messageId                       // unique message id
                 . pack('CC', $idx, $numChunks)     // sequence information
                 . $chunk                           // chunk-data

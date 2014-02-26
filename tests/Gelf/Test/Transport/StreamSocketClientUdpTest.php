@@ -42,7 +42,10 @@ class StreamSocketClientUdpTest extends TestCase
         }
 
         // get random port
-        $socketName = stream_socket_get_name($this->serverSocket, $peerName = false);
+        $socketName = stream_socket_get_name(
+            $this->serverSocket, 
+            $peerName = false
+        );
         list(, $port) = explode(":", $socketName);
 
         $this->socketClient = new StreamSocketClient('udp', $host, $port);

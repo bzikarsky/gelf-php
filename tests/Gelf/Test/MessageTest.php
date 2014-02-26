@@ -112,7 +112,14 @@ class MessageTest extends TestCase
 
     public function testOptionalMessageFields()
     {
-        $fields = array("Line", "File", "Facility", "FullMessage", "ShortMessage");
+        $fields = array(
+            "Line", 
+            "File", 
+            "Facility", 
+            "FullMessage", 
+            "ShortMessage"
+        );
+
         foreach ($fields as $field) {
             $g = "get$field";
             $s = "set$field";
@@ -136,7 +143,10 @@ class MessageTest extends TestCase
         $this->assertEquals("buk", $this->message->getAdditional("foo"));
         $this->assertTrue(1 == count($this->message->getAllAdditionals()));
 
-        $this->assertEquals(array("foo" => "buk"), $this->message->getAllAdditionals());
+        $this->assertEquals(
+            array("foo" => "buk"), 
+            $this->message->getAllAdditionals()
+        );
     }
 
     /**
@@ -200,10 +210,13 @@ class MessageTest extends TestCase
         foreach ($map as $k => $method) {
             $r = $this->message->$method();
             if (empty($r)) {
-                $this->assertFalse(
-                    array_key_exists($k, $data),
-                    "When method $method returns an empty value, $k should not be in array"
+                $error = sprintf(
+                    "When method %s returns an empty value, " .
+                    "%s should not be in array",
+                    $method,
+                    $k
                 );
+                $this->assertFalse(array_key_exists($k, $data), $error);
             } else {
                 $this->assertEquals($data[$k], $this->message->$method());
             }

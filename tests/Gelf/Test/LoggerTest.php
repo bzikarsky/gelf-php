@@ -79,34 +79,47 @@ class LoggerTest extends TestCase
     public function testLogContext()
     {
         $test = $this;
-        $additionals = array('test' => 'bar', 'abc' => 'buz');
+        $additional = array('test' => 'bar', 'abc' => 'buz');
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $additionals) {
+            function (MessageInterface $message) use ($test, $additional) {
                 $test->assertEquals("foo bar", $message->getShortMessage());
-                $test->assertEquals($additionals, $message->getAllAdditionals());
+                $test->assertEquals($additional, $message->getAllAdditionals());
             }
         );
 
-        $this->logger->log(LogLevel::NOTICE, "foo {test}", $additionals);
+        $this->logger->log(LogLevel::NOTICE, "foo {test}", $additional);
     }
 
     public function testLogException()
     {
         $test = $this;
-        $line = __LINE__ + 2; // careful, offset is the line-distance to the throw statement
+        
+        // offset is the line-distance to the throw statement!
+        $line = __LINE__ + 3; 
+        
         try {
             throw new Exception("test-message", 123);
         } catch (Exception $e) {
             $this->validatePublish(
                 function (MessageInterface $message) use ($e, $line, $test) {
-                    $test->assertTrue(strstr($message->getFullMessage(), $e->getMessage()) !== false);
-                    $test->assertTrue(strstr($message->getFullMessage(), get_class($e)) !== false);
+                    $test->assertContains(
+                        $e->getMessage(), 
+                        $message->getFullMessage()
+                    );
+                    $test->assertContains(
+                        get_class($e), 
+                        $message->getFullMessage()
+                    );
                     $test->assertEquals($line, $message->getLine());
                     $test->assertEquals(__FILE__, $message->getFile());
                 }
             );
 
-            $this->logger->log(LogLevel::ALERT, $e->getMessage(), array('exception' => $e));
+            $this->logger->log(
+                LogLevel::ALERT, 
+                $e->getMessage(), 
+                array('exception' => $e)
+            );
         }
     }
 

@@ -12,8 +12,8 @@
 namespace Gelf;
 
 /**
- * This interface defines the minimum amount of method any Message implementation
- * must provide to be used by the publisher or transports.
+ * This interface defines the minimum amount of method any Message 
+ * implementation must provide to be used by the publisher or transports.
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */

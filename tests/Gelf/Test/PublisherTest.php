@@ -25,12 +25,16 @@ class PublisherTest extends TestCase
 
     public function setUp()
     {
-        $this->transportA = $this->getMock('\Gelf\Transport\TransportInterface');
-        $this->transportB = $this->getMock('\Gelf\Transport\TransportInterface');
-        $this->messageValidator = $this->getMock('\Gelf\MessageValidatorInterface');
-        $this->message = $this->getMock('\Gelf\MessageInterface');
+        $this->transportA = $this->getMock('Gelf\Transport\TransportInterface');
+        $this->transportB = $this->getMock('Gelf\Transport\TransportInterface');
+        $this->messageValidator = 
+            $this->getMock('Gelf\MessageValidatorInterface');
+        $this->message = $this->getMock('Gelf\MessageInterface');
 
-        $this->publisher = new Publisher($this->transportA, $this->messageValidator);
+        $this->publisher = new Publisher(
+            $this->transportA, 
+            $this->messageValidator
+        );
     }
 
     public function testPublish()
@@ -106,6 +110,9 @@ class PublisherTest extends TestCase
     public function testInitWithDefaultValidator()
     {
         $pub = new Publisher();
-        $this->assertInstanceOf('\Gelf\MessageValidatorInterface', $pub->getMessageValidator());
+        $this->assertInstanceOf(
+            'Gelf\MessageValidatorInterface', 
+            $pub->getMessageValidator()
+        );
     }
 }
