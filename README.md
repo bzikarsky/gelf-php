@@ -2,7 +2,7 @@ gelf-php
 ========
 [![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php)
 [![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.png)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
-[![Coverage Status](https://coveralls.io/repos/bzikarsky/gelf-php/badge.png?branch=master)](https://coveralls.io/r/bzikarsky/gelf-php?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/badges/coverage.png?s=6de1dc7f14a8d01fd147d42fb341822b3d99d7b6)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/badges/quality-score.png?s=00d4030b7a35c75a6b27b426c0eb53fb23aed2d1)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2)
 
