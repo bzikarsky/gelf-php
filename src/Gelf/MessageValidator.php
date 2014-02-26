@@ -14,6 +14,12 @@ namespace Gelf;
 use Gelf\MessageInterface;
 use RuntimeException;
 
+/**
+ * Validates a given message according to the GELF standard
+ *
+ * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @author Joe Green
+ */
 class MessageValidator implements MessageValidatorInterface
 {
     public function validate(MessageInterface $message)
@@ -24,7 +30,10 @@ class MessageValidator implements MessageValidatorInterface
         }
 
         throw new RuntimeException(
-            sprintf("No validator for message version '%s'", $message->getVersion())
+            sprintf(
+                "No validator for message version '%s'", 
+                $message->getVersion()
+            )
         );
     }
 
@@ -36,29 +45,32 @@ class MessageValidator implements MessageValidatorInterface
      */
     public function validate0100(MessageInterface $message)
     {
-        if (!$message->getHost()) {
+        if (self::isEmpty($message->getHost())) {
             return false;
         }
 
-        if (!$message->getVersion()) {
+        if (self::isEmpty($message->getShortMessage())) {
             return false;
         }
-        
-        if (!$this->validateShortMessage($message)) {
+
+        if (self::isEmpty($message->getVersion())) {
             return false;
         }
 
         return true;
     }
-    
+
     /**
-     * Ensure the message can be converted to string with non-zero length
-     * 
-     * @param \Gelf\MessageInterface $message
+     * Checks that a given scalar will later translate
+     * to a non-empty message element
+     *
+     * Fails on null, false and empty strings
+     *
+     * @param string $string
      * @return bool
      */
-    private function validateShortMessage(MessageInterface $message)
+    public static function isEmpty($scalar)
     {
-        return strlen($message->getShortMessage()) > 0;
+        return strlen($scalar) < 1;
     }
 }

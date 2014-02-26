@@ -26,31 +26,17 @@ class MessageValidatorTest extends TestCase
 
     public function testValid()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->exactly(2))->method('getVersion')->will($this->returnValue("1.0"));
-        $msg->expects($this->once())->method('getHost')->will($this->returnValue("example.local"));
-        $msg->expects($this->once())->method('getShortMessage')->will($this->returnValue("lorem ipsum"));
-
-        $this->assertTrue($this->messageValidator->validate($msg));
+        $this->assertTrue(
+            $this->messageValidator->validate($this->getMessage())
+        );
     }
     
-    public function testZeroIntMessagesValidates()
+    public function testZeroMessagesValidates()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->exactly(2))->method('getVersion')->will($this->returnValue("1.0"));
-        $msg->expects($this->once())->method('getHost')->will($this->returnValue("example.local"));
-        $msg->expects($this->once())->method('getShortMessage')->will($this->returnValue(0));
-
+        $msg = $this->getMessage(0);
         $this->assertTrue($this->messageValidator->validate($msg));
-    }
     
-    public function testZeroStringMessagesValidates()
-    {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->exactly(2))->method('getVersion')->will($this->returnValue("1.0"));
-        $msg->expects($this->once())->method('getHost')->will($this->returnValue("example.local"));
-        $msg->expects($this->once())->method('getShortMessage')->will($this->returnValue("0"));
-
+        $msg = $this->getMessage("0");
         $this->assertTrue($this->messageValidator->validate($msg));
     }
 
@@ -59,38 +45,44 @@ class MessageValidatorTest extends TestCase
      */
     public function testInvalidVersion()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->atLeastOnce())->method('getVersion')->will($this->returnValue("0.1"));
-
+        $msg = $this->getMessage("lorem ipsum", "example.local", null);
         $this->messageValidator->validate($msg);
     }
     
     public function testMissingShortMessage()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->atLeastOnce())->method('getVersion')->will($this->returnValue("1.0"));
-        $msg->expects($this->any())->method('getHost')->will($this->returnValue("example.local"));
-
+        $msg = $this->getMessage(null, "example.local", "1.0");
         $this->assertFalse($this->messageValidator->validate($msg));
     }
 
     public function testMissingHost()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->atLeastOnce())->method('getVersion')->will($this->returnValue("1.0"));
-        $msg->expects($this->any())->method('getShortMessage')->will($this->returnValue("lorem ipsum"));
-
+        $msg = $this->getMessage("lorem ipsum", null, "1.0");
         $this->assertFalse($this->messageValidator->validate($msg));
     }
 
     public function testMissingVersion()
     {
-        $msg = $this->getMock('\Gelf\MessageInterface');
-        $msg->expects($this->any())->method('getHost')->will($this->returnValue("example.local"));
-        $msg->expects($this->any())->method('getShortMessage')->will($this->returnValue("lorem ipsum"));
-
+        $msg = $this->getMessage("lorem ipsum", "example.local", null);
 
         // direct into version validate, parent would throw invalid version
         $this->assertFalse($this->messageValidator->validate0100($msg));
+    }
+
+    private function getMessage(
+        $shortMessage = "lorem ipsum", 
+        $host = "example.local", 
+        $version = "1.0"
+    )
+    {
+        $msg = $this->getMock('Gelf\MessageInterface');
+        $msg->expects($this->any())->method('getHost')
+            ->will($this->returnValue($host));
+        $msg->expects($this->any())->method('getVersion')
+            ->will($this->returnValue($version));
+        $msg->expects($this->any())->method('getShortMessage')
+            ->will($this->returnValue($shortMessage));
+
+        return $msg;
     }
 }
