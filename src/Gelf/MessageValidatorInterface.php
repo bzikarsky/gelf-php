@@ -24,7 +24,8 @@ interface MessageValidatorInterface
      * Validate a the given message for validity.
      *
      * @param MessageInterface $message
+     * @param string           &$reason
      * @return bool
      */
-    public function validate(MessageInterface $message);
+    public function validate(MessageInterface $message, &$reason = "");
 }

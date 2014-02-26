@@ -32,6 +32,7 @@ class Message implements MessageInterface
     protected $file;
     protected $line;
     protected $additionals = array();
+    protected $version;
 
     /**
      * A list of the PSR LogLevel constants which is also a mapping of
@@ -60,6 +61,7 @@ class Message implements MessageInterface
         $this->timestamp = microtime(true);
         $this->host = gethostname();
         $this->level = 1; //ALERT
+        $this->version = "1.0";
     }
 
     /**
@@ -121,7 +123,12 @@ class Message implements MessageInterface
 
     public function getVersion()
     {
-        return "1.0";
+        return $this->version;
+    }
+
+    public function setVersion($version)
+    {
+        $this->version = $version;
     }
 
     public function getHost()
@@ -232,6 +239,11 @@ class Message implements MessageInterface
         return $this->additionals[$key];
     }
 
+    public function hasAdditional($key)
+    {
+        return isset($this->additionals[$key]);
+    }
+
     public function setAdditional($key, $value)
     {
         if (!$key) {
@@ -260,6 +272,15 @@ class Message implements MessageInterface
             'file'          => $this->getFile(),
             'line'          => $this->getLine()
         );
+
+        // Transform 1.1 deprecated fields to additionals
+        // @todo Refactor this in 2.0
+        if ($this->getVersion() == "1.1") {
+            foreach (array('line', 'facility', 'file') as $idx) {
+                $message["_$idx"] = $message[$idx];
+                unset($message[$idx]);
+            }
+        }
 
         // add additionals
         foreach ($this->getAllAdditionals() as $key => $value) {

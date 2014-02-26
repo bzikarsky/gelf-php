@@ -135,8 +135,10 @@ class MessageTest extends TestCase
         $this->assertTrue(is_array($this->message->getAllAdditionals()));
         $this->assertTrue(0 == count($this->message->getAllAdditionals()));
 
+        $this->assertFalse($this->message->hasAdditional("foo"));
         $this->message->setAdditional("foo", "bar");
         $this->assertEquals("bar", $this->message->getAdditional("foo"));
+        $this->assertTrue($this->message->hasAdditional("foo"));
         $this->assertTrue(1 == count($this->message->getAllAdditionals()));
 
         $this->message->setAdditional("foo", "buk");
@@ -187,7 +189,7 @@ class MessageTest extends TestCase
         ;
     }
 
-    public function testToArray()
+    public function testToArrayV10()
     {
         $this->message->setAdditional("foo", "bar");
         $data = $this->message->toArray();
@@ -221,5 +223,36 @@ class MessageTest extends TestCase
                 $this->assertEquals($data[$k], $this->message->$method());
             }
         }
+    }
+
+    public function testToArrayV11()
+    {
+        $this->message->setVersion("1.1");
+        $this->message->setShortMessage("lorem ipsum");
+        $this->message->setAdditional("foo", "bar");
+
+        // check that deperacted behaviour is overridden in 1.1
+        $this->message->setLine(50);
+        $this->message->setAdditional("line", 100);
+
+        $this->message->setFile("foo/bar");
+
+        $data = $this->message->toArray();
+
+
+        $this->assertSame('1.1', $data['version']);
+        $this->assertSame('lorem ipsum', $data['short_message']);
+
+        $this->assertArrayHasKey('_line', $data);
+        $this->assertSame(100, $data['_line']);
+        $this->assertArrayNotHasKey('line', $data);
+
+        $this->assertArrayHasKey('_file', $data);
+        $this->assertSame('foo/bar', $data['_file']);
+        $this->assertArrayNotHasKey('file', $data);
+
+        $this->assertArrayHasKey('_foo', $data);
+        $this->assertSame('bar', $data['_foo']);
+
     }
 }

@@ -98,6 +98,14 @@ interface MessageInterface
     public function getAdditional($key);
 
     /**
+     * Checks if a additional fields is set
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function hasAdditional($key);
+
+    /**
      * Returns all additional fields as an array
      *
      * @return array

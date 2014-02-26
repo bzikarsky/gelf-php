@@ -24,19 +24,24 @@ class MessageValidatorTest extends TestCase
         $this->messageValidator = new MessageValidator();
     }
 
-    public function testValid()
+    /**
+     * @dataProvider versions    
+     */
+    public function testValid($version)
     {
-        $this->assertTrue(
-            $this->messageValidator->validate($this->getMessage())
-        );
+        $msg = $this->getMessage("lorem", "example.local", $version);
+        $this->assertTrue($this->messageValidator->validate($msg, $reason));
     }
     
-    public function testZeroMessagesValidates()
+    /**
+     * @dataProvider versions    
+     */
+    public function testZeroMessagesValidates($version)
     {
-        $msg = $this->getMessage(0);
+        $msg = $this->getMessage(0, "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg));
     
-        $msg = $this->getMessage("0");
+        $msg = $this->getMessage("0", "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg));
     }
 
@@ -48,17 +53,25 @@ class MessageValidatorTest extends TestCase
         $msg = $this->getMessage("lorem ipsum", "example.local", null);
         $this->messageValidator->validate($msg);
     }
-    
-    public function testMissingShortMessage()
+
+    /**
+     * @dataProvider versions    
+     */
+    public function testMissingShortMessage($version)
     {
-        $msg = $this->getMessage(null, "example.local", "1.0");
-        $this->assertFalse($this->messageValidator->validate($msg));
+        $msg = $this->getMessage(null, "example.local", $version);
+        $this->assertFalse($this->messageValidator->validate($msg, $reason));
+        $this->assertContains('short-message', $reason);
     }
 
-    public function testMissingHost()
+    /**
+     * @dataProvider versions    
+     */
+    public function testMissingHost($version)
     {
-        $msg = $this->getMessage("lorem ipsum", null, "1.0");
-        $this->assertFalse($this->messageValidator->validate($msg));
+        $msg = $this->getMessage("lorem ipsum", null, $version);
+        $this->assertFalse($this->messageValidator->validate($msg, $reason));
+        $this->assertContains('host', $reason);
     }
 
     public function testMissingVersion()
@@ -66,13 +79,45 @@ class MessageValidatorTest extends TestCase
         $msg = $this->getMessage("lorem ipsum", "example.local", null);
 
         // direct into version validate, parent would throw invalid version
-        $this->assertFalse($this->messageValidator->validate0100($msg));
+        $this->assertFalse($this->messageValidator->validate0100($msg, $r));
+        $this->assertContains('version', $r);
+    }
+
+
+    /**
+     * @dataProvider versions    
+     */
+    public function testInvalidAddtionalFieldID($version)
+    {
+        $msg = $this->getMessage(
+            "lorem ipsum", 
+            "example.local", 
+            $version,
+            array('id' => 1)
+        );
+
+        $this->assertFalse($this->messageValidator->validate($msg, $reason));
+        $this->assertContains('id', $reason);
+    }
+
+    public function testInvalidAddtionalKeyV11()
+    {
+        $msg = $this->getMessage(
+            "lorem", 
+            "example.local", 
+            "1.1", 
+            array('foo?' => 1)
+        );
+
+        $this->assertFalse($this->messageValidator->validate($msg, $reason));
+        $this->assertContains('additional', $reason);
     }
 
     private function getMessage(
         $shortMessage = "lorem ipsum", 
         $host = "example.local", 
-        $version = "1.0"
+        $version = "1.0",
+        $additionals = array()
     )
     {
         $msg = $this->getMock('Gelf\MessageInterface');
@@ -83,6 +128,22 @@ class MessageValidatorTest extends TestCase
         $msg->expects($this->any())->method('getShortMessage')
             ->will($this->returnValue($shortMessage));
 
+        $msg->expects($this->any())->method('getAllAdditionals')
+            ->will($this->returnValue($additionals));
+
+        $msg->expects($this->any())->method('hasAdditional')
+            ->will($this->returnCallback(
+                function($key) use ($additionals)
+                {
+                    return isset($additionals[$key]);
+                }
+            ));
+
         return $msg;
+    }
+
+    public static function versions()
+    {
+        return array(array('1.0'), array('1.1'));
     }
 }

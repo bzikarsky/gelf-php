@@ -67,8 +67,8 @@ class Publisher implements PublisherInterface
             );
         }
 
-        if (!$this->messageValidator->validate($message)) {
-            throw new RuntimeException("Message is invalid");
+        if (!$this->messageValidator->validate($message, $reason)) {
+            throw new RuntimeException("Message is invalid: $reason");
         }
 
         foreach ($this->transports as $transport) {
