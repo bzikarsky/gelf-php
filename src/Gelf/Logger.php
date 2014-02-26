@@ -77,7 +77,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Returns the currently used publisher
      *
-     * @return Publisher
+     * @return PublisherInterface
      */
     public function getPublisher()
     {
@@ -87,9 +87,9 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Sets a new publisher
      *
-     * @param Publisher $publisher
+     * @param PublisherInterface $publisher
      */
-    public function setPublisher(Publisher $publisher)
+    public function setPublisher(PublisherInterface $publisher)
     {
         $this->publisher = $publisher;
     }
