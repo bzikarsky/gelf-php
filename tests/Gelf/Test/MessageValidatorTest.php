@@ -33,6 +33,26 @@ class MessageValidatorTest extends TestCase
 
         $this->assertTrue($this->messageValidator->validate($msg));
     }
+    
+    public function testZeroIntMessagesValidates()
+    {
+        $msg = $this->getMock('\Gelf\MessageInterface');
+        $msg->expects($this->exactly(2))->method('getVersion')->will($this->returnValue("1.0"));
+        $msg->expects($this->once())->method('getHost')->will($this->returnValue("example.local"));
+        $msg->expects($this->once())->method('getShortMessage')->will($this->returnValue(0));
+
+        $this->assertTrue($this->messageValidator->validate($msg));
+    }
+    
+    public function testZeroStringMessagesValidates()
+    {
+        $msg = $this->getMock('\Gelf\MessageInterface');
+        $msg->expects($this->exactly(2))->method('getVersion')->will($this->returnValue("1.0"));
+        $msg->expects($this->once())->method('getHost')->will($this->returnValue("example.local"));
+        $msg->expects($this->once())->method('getShortMessage')->will($this->returnValue("0"));
+
+        $this->assertTrue($this->messageValidator->validate($msg));
+    }
 
     /**
      * @expectedException RuntimeException
@@ -44,7 +64,7 @@ class MessageValidatorTest extends TestCase
 
         $this->messageValidator->validate($msg);
     }
-
+    
     public function testMissingShortMessage()
     {
         $msg = $this->getMock('\Gelf\MessageInterface');
