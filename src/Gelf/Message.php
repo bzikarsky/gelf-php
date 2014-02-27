@@ -277,7 +277,7 @@ class Message implements MessageInterface
         // @todo Refactor this in 2.0
         if ($this->getVersion() == "1.1") {
             foreach (array('line', 'facility', 'file') as $idx) {
-                $message["_$idx"] = $message[$idx];
+                $message["_" . $idx"] = $message[$idx];
                 unset($message[$idx]);
             }
         }
