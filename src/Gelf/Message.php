@@ -172,10 +172,11 @@ class Message implements MessageInterface
     public function setTimestamp($timestamp)
     {
         if ($timestamp instanceof \DateTime) {
-            $timestamp = $timestamp->format("U");
+            $timestamp = $timestamp->format("U.u");
         }
 
-        $this->timestamp = floor($timestamp);
+        $this->timestamp = (float) $timestamp;
+        
         return $this;
     }
 
