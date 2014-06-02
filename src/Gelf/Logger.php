@@ -122,7 +122,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param array $context
      * @return Message
      */
-    private function initMessage($level, $message, $context)
+    protected function initMessage($level, $message, $context)
     {
         // assert that message is a string, and interpolate placeholders
         $message = (string) $message;
@@ -147,7 +147,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param Message $message
      * @param Exception $e
      */
-    private function initExceptionData(Message $message, Exception $e)
+    protected function initExceptionData(Message $message, Exception $e)
     {
         $message->setLine($e->getLine());
         $message->setFile($e->getFile());
