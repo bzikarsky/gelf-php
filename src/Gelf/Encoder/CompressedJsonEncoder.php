@@ -15,11 +15,11 @@ use Gelf\MessageInterface;
 
 /**
  * The CompressedJsonEncoder allows the encoding of GELF messages as described 
- * in https://github.com/Graylog2/graylog2-docs/wiki/GELF
+ * in http://www.graylog2.org/resources/documentation/sending/gelfhttp
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class CompressedJsonEncoder implements EncoderInterface
+class CompressedJsonEncoder extends JsonEncoder
 {
     const DEFAULT_COMPRESSION_LEVEL = -1;
 
@@ -50,7 +50,7 @@ class CompressedJsonEncoder implements EncoderInterface
      */
     public function encode(MessageInterface $message)
     {
-        $json = json_encode($message->toArray());
+        $json = parent::encode($message);
         return gzcompress($json, $this->compressionLevel);
     }
 }

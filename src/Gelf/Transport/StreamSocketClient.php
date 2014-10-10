@@ -44,6 +44,11 @@ class StreamSocketClient
      */
     protected $socket;
 
+    /**
+     * @param string $scheme
+     * @param string $host
+     * @param integer $port
+     */
     public function __construct($scheme, $host, $port)
     {
         $this->scheme = $scheme;
@@ -143,5 +148,30 @@ class StreamSocketClient
         }
 
         return $byteCount;
+    }
+
+    /**
+     * Reads a given number of bytes from the socket
+     *
+     * @param integer $byteCount
+     *
+     * @return string
+     */
+    public function read($byteCount)
+    {
+        return fread($this->getSocket(), $byteCount);
+    }
+
+    /**
+     * Closes underlying socket explicitly, right now only
+     * proxy method for __destruct()
+     *
+     * @see __destruct()
+     *
+     * @return null
+     */
+    public function close()
+    {
+        return $this->__destruct();
     }
 }
