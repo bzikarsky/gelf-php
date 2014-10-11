@@ -73,7 +73,7 @@ project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky
 ### Steps
 1. Clone repository and cd into it: `git clone git@github.com:bzikarsky/gelf-php && cd gelf-php`
 2. Install dependencies: `composer install --dev`
-3. Run unit-tests: `phpunit`
+3. Run unit-tests: `vendor/bin/phpunit`
 4. Check PSR compatibility: `vendor/bin/phpcs --standard=PSR src tests`
 
 
