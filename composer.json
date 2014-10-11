@@ -13,8 +13,8 @@
         "psr/log": "~1.0"
     },
     "autoload": {
-        "psr-0": {
-            "Gelf": "src/"
+        "psr-4": {
+            "Gelf\\": "src/Gelf"
         }
     },
     "require-dev": {
