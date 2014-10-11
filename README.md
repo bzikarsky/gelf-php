@@ -1,4 +1,4 @@
-gelf-php
+gelf-php [![Latest Stable Version](https://poser.pugx.org/graylog2/gelf-php/v/stable.svg)](https://packagist.org/packages/graylog2/gelf-php) [![Total Downloads](https://poser.pugx.org/graylog2/gelf-php/downloads.svg)](https://packagist.org/packages/graylog2/gelf-php)
 ========
 [![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php)
 [![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.png)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
