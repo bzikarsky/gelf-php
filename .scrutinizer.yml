@@ -5,4 +5,4 @@ before_commands:
   - "composer install --dev"
 
 tools:
-  php_code_coverage: true
+  external_code_coverage: true
