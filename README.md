@@ -75,6 +75,3 @@ project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky
 2. Install dependencies: `composer install --dev`
 3. Run unit-tests: `phpunit`
 4. Check PSR compatibility: `phpcs --standard=PSR src tests`
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bzikarsky/gelf-php/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
