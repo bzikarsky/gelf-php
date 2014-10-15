@@ -123,6 +123,15 @@ class UdpTransport implements TransportInterface, PublisherInterface
         return 1;
     }
 
+    /**
+     * Alias to send() without return value 
+     * Required to fulfill the PublisherInterface
+     *
+     * @deprecated deprecated since 1.1
+     * @codeCoverageIgnore
+     *
+     * @param Message $message
+     */
     public function publish(Message $message)
     {
         $this->send($message);

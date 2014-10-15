@@ -49,7 +49,7 @@ class Publisher implements PublisherInterface
         $this->messageValidator = $messageValidator 
             ?: new DefaultMessageValidator();
 
-        if (null != $transport) {
+        if (null !== $transport) {
             $this->addTransport($transport);
         }
     }

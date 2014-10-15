@@ -275,7 +275,7 @@ class Message implements MessageInterface
         );
 
         // Transform 1.1 deprecated fields to additionals
-        // @todo Refactor this in 2.0
+        // Will be refactored for 2.0, see #23
         if ($this->getVersion() == "1.1") {
             foreach (array('line', 'facility', 'file') as $idx) {
                 $message["_" . $idx] = $message[$idx];

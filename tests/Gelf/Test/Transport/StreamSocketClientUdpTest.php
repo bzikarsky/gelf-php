@@ -57,6 +57,16 @@ class StreamSocketClientUdpTest extends TestCase
         fclose($this->serverSocket);
     }
 
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testInvalidConstructorArguments()
+    {
+        \PHPUnit_Framework_Error_Warning::$enabled = false; 
+        $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
+        $client->getSocket();
+    }
+
 
     public function testGetSocket()
     {
@@ -74,6 +84,15 @@ class StreamSocketClientUdpTest extends TestCase
         $readData = fread($this->serverSocket, $numBytes);
 
         $this->assertEquals($testData, $readData);
+    }
+    
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testInvalidWrite()
+    {
+        \PHPUnit_Framework_Error_Warning::$enabled = false;
+        $this->socketClient->write(new \stdclass());
     }
 
     public function testDestructorWithoutSocket()

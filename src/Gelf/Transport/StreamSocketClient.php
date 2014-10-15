@@ -78,7 +78,7 @@ class StreamSocketClient
     protected static function initSocket($scheme, $host, $port)
     {
         $socketDescriptor = sprintf("%s://%s:%d", $scheme, $host, $port);
-        $socket = stream_socket_client(
+        $socket = @stream_socket_client(
             $socketDescriptor, 
             $errNo, 
             $errStr, 
@@ -88,8 +88,10 @@ class StreamSocketClient
         if ($socket === false) {
             throw new RuntimeException(
                 sprintf(
-                    "Failed to create socket-client for %s",
-                    $socketDescriptor
+                    "Failed to create socket-client for %si: %s (%s)",
+                    $socketDescriptor, 
+                    $errStr,
+                    $errNo
                 )
             );
         }
@@ -134,10 +136,10 @@ class StreamSocketClient
     public function write($buffer)
     {
         $socket = $this->getSocket();
-        $byteCount = fwrite($socket, $buffer);
+        $byteCount = @fwrite($socket, $buffer); 
 
         if ($byteCount === false) {
-            throw new RuntimeException("Failed to write to socket");
+            throw new \RuntimeException("Failed to write to socket");
         }
 
         return $byteCount;
