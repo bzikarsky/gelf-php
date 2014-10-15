@@ -14,8 +14,8 @@ namespace Gelf\Transport;
 use RuntimeException;
 
 /**
- * StreamSocketClient is a very simple OO-Wrapper around the PHP 
- * stream_socket-library and some specific stream-functions like 
+ * StreamSocketClient is a very simple OO-Wrapper around the PHP
+ * stream_socket-library and some specific stream-functions like
  * fwrite, etc.
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -78,10 +78,10 @@ class StreamSocketClient
     protected static function initSocket($scheme, $host, $port)
     {
         $socketDescriptor = sprintf("%s://%s:%d", $scheme, $host, $port);
-        $socket = stream_socket_client(
-            $socketDescriptor, 
-            $errNo, 
-            $errStr, 
+        $socket = @stream_socket_client(
+            $socketDescriptor,
+            $errNo,
+            $errStr,
             static::SOCKET_TIMEOUT
         );
 
@@ -112,8 +112,8 @@ class StreamSocketClient
         // lazy initializing of socket-descriptor
         if (!$this->socket) {
             $this->socket = self::initSocket(
-                $this->scheme, 
-                $this->host, 
+                $this->scheme,
+                $this->host,
                 $this->port
             );
         }
