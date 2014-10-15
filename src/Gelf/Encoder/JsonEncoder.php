@@ -14,7 +14,7 @@ namespace Gelf\Encoder;
 use Gelf\MessageInterface;
 
 /**
- * The JsonEncoder allows the encoding of GELF messages as described 
+ * The JsonEncoder allows the encoding of GELF messages as described
  * in http://www.graylog2.org/resources/documentation/sending/gelfhttp
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -24,7 +24,7 @@ class JsonEncoder implements EncoderInterface
     /**
      * Encodes a given message
      *
-     * @param MessageInterface $message
+     * @param  MessageInterface $message
      * @return string
      */
     public function encode(MessageInterface $message)

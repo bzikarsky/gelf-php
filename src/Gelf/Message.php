@@ -68,7 +68,7 @@ class Message implements MessageInterface
      * Trys to convert a given log-level (psr or syslog) to
      * the psr representation
      *
-     * @param mixed $level
+     * @param  mixed  $level
      * @return string
      */
     final public static function logLevelToPsr($level)
@@ -139,6 +139,7 @@ class Message implements MessageInterface
     public function setHost($host)
     {
         $this->host = $host;
+
         return $this;
     }
 
@@ -150,6 +151,7 @@ class Message implements MessageInterface
     public function setShortMessage($shortMessage)
     {
         $this->shortMessage = $shortMessage;
+
         return $this;
     }
 
@@ -161,6 +163,7 @@ class Message implements MessageInterface
     public function setFullMessage($fullMessage)
     {
         $this->fullMessage = $fullMessage;
+
         return $this;
     }
 
@@ -176,7 +179,7 @@ class Message implements MessageInterface
         }
 
         $this->timestamp = (float) $timestamp;
-        
+
         return $this;
     }
 
@@ -193,6 +196,7 @@ class Message implements MessageInterface
     public function setLevel($level)
     {
         $this->level = self::logLevelToSyslog($level);
+
         return $this;
     }
 
@@ -204,6 +208,7 @@ class Message implements MessageInterface
     public function setFacility($facility)
     {
         $this->facility = $facility;
+
         return $this;
     }
 
@@ -215,6 +220,7 @@ class Message implements MessageInterface
     public function setFile($file)
     {
         $this->file = $file;
+
         return $this;
     }
 
@@ -226,6 +232,7 @@ class Message implements MessageInterface
     public function setLine($line)
     {
         $this->line = $line;
+
         return $this;
     }
 
@@ -252,6 +259,7 @@ class Message implements MessageInterface
         }
 
         $this->additionals[$key] = $value;
+
         return $this;
     }
 

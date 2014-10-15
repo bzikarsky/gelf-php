@@ -16,7 +16,7 @@ use Gelf\MessageInterface;
 use Gelf\PublisherInterface;
 
 /**
- * The CompressedJsonEncoder allows the encoding of GELF messages as described 
+ * The CompressedJsonEncoder allows the encoding of GELF messages as described
  * in http://www.graylog2.org/resources/documentation/sending/gelfhttp
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -37,6 +37,7 @@ abstract class AbstractTransport implements TransportInterface, PublisherInterfa
     public function setMessageEncoder(EncoderInterface $encoder)
     {
         $this->messageEncoder = $encoder;
+
         return $this;
     }
 
@@ -60,7 +61,7 @@ abstract class AbstractTransport implements TransportInterface, PublisherInterfa
     abstract public function send(MessageInterface $message);
 
     /**
-     * Alias to send() without return value 
+     * Alias to send() without return value
      * Required to fulfill the PublisherInterface
      *
      * @deprecated deprecated since 1.1

@@ -26,7 +26,7 @@ interface EncoderInterface
     /**
      * Encodes a given message
      *
-     * @param MessageInterface $message
+     * @param  MessageInterface $message
      * @return mixed
      */
     public function encode(MessageInterface $message);

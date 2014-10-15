@@ -89,7 +89,7 @@ class HttpTransportTest extends TestCase
     {
         $transport = new HttpTransport();
         $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface", 
+            "\\Gelf\\Encoder\\EncoderInterface",
             $transport->getMessageEncoder()
         );
     }
@@ -193,7 +193,7 @@ class HttpTransportTest extends TestCase
             ->expects($this->once())
             ->method("close");
 
-        $this->transport->send($this->message);        
+        $this->transport->send($this->message);
     }
 
     public function testCloseSocketOnConnectionClose()
@@ -207,6 +207,6 @@ class HttpTransportTest extends TestCase
             ->expects($this->once())
             ->method("close");
 
-        $this->transport->send($this->message);        
+        $this->transport->send($this->message);
     }
 }

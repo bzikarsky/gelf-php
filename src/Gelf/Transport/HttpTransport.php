@@ -17,8 +17,8 @@ use Gelf\Encoder\JsonEncoder as DefaultEncoder;
 use RuntimeException;
 
 /**
- * HttpTransport allows the transfer of GELF-messages to an compatible 
- * GELF-HTTP-backend as described in 
+ * HttpTransport allows the transfer of GELF-messages to an compatible
+ * GELF-HTTP-backend as described in
  * http://www.graylog2.org/resources/documentation/sending/gelfhttp
  *
  * It can also act as a direct publisher
@@ -50,9 +50,9 @@ class HttpTransport extends AbstractTransport
     /**
      * Class constructor
      *
-     * @param string $host      when NULL or empty default-host is used
-     * @param int $port         when NULL or empty default-port is used
-     * @param string $path      when NULL or empty default-path is used
+     * @param string $host when NULL or empty default-host is used
+     * @param int    $port when NULL or empty default-port is used
+     * @param string $path when NULL or empty default-path is used
      */
     public function __construct($host = null, $port = null, $path = null)
     {
@@ -95,10 +95,7 @@ class HttpTransport extends AbstractTransport
         $request = implode($request, "\r\n");
 
         $byteCount = $this->socketClient->write($request);
-
-        // read in 1024 byte-chunks from the response until we have all headers
-        $headers = '';
-        while (!strpos($headers, "\r\n\r\n") && $headers .= $this->socketClient->read(1024));
+        $headers = $this->readResponseHeaders();
 
         // if we don't have a HTTP/1.1 connection, or the server decided to close the connection
         // we should do so as well. next read/write-attempt will open a new socket in this case.
@@ -116,5 +113,20 @@ class HttpTransport extends AbstractTransport
         }
 
         return $byteCount;
+    }
+
+    private function readResponseHeaders()
+    {
+        $chunkSize = 1024; // number of bytes to read at once
+        $delimiter = "\r\n\r\n"; // delimiter between headers and rsponse
+        $response = "";
+
+        do {
+            $chunk = $this->socketClient->read($chunkSize);
+            $response .= $chunk;
+        } while (false === strpos($chunk, $delimiter) && strlen($chunk) > 0);
+
+        $elements = explode($delimiter, $response, 2);
+        return $elements[0];
     }
 }

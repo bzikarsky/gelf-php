@@ -113,10 +113,10 @@ class MessageTest extends TestCase
     public function testOptionalMessageFields()
     {
         $fields = array(
-            "Line", 
-            "File", 
-            "Facility", 
-            "FullMessage", 
+            "Line",
+            "File",
+            "Facility",
+            "FullMessage",
             "ShortMessage"
         );
 
@@ -146,7 +146,7 @@ class MessageTest extends TestCase
         $this->assertTrue(1 == count($this->message->getAllAdditionals()));
 
         $this->assertEquals(
-            array("foo" => "buk"), 
+            array("foo" => "buk"),
             $this->message->getAllAdditionals()
         );
     }
@@ -238,7 +238,6 @@ class MessageTest extends TestCase
         $this->message->setFile("foo/bar");
 
         $data = $this->message->toArray();
-
 
         $this->assertSame('1.1', $data['version']);
         $this->assertSame('lorem ipsum', $data['short_message']);

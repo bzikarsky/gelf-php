@@ -37,16 +37,15 @@ class Publisher implements PublisherInterface
     /**
      * Creates a Publisher for GELF-messages.
      *
-     * @param TransportInterface $transport
+     * @param TransportInterface        $transport
      * @param MessageValidatorInterface $messageValidator
      */
     public function __construct(
         TransportInterface $transport = null,
         MessageValidatorInterface $messageValidator = null
-    )
-    {
+    ) {
         $this->transports = new Set();
-        $this->messageValidator = $messageValidator 
+        $this->messageValidator = $messageValidator
             ?: new DefaultMessageValidator();
 
         if (null !== $transport) {

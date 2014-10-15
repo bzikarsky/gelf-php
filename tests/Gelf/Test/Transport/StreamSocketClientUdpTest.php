@@ -43,7 +43,7 @@ class StreamSocketClientUdpTest extends TestCase
 
         // get random port
         $socketName = stream_socket_get_name(
-            $this->serverSocket, 
+            $this->serverSocket,
             $peerName = false
         );
         list(, $port) = explode(":", $socketName);
@@ -66,7 +66,6 @@ class StreamSocketClientUdpTest extends TestCase
         $client->getSocket();
     }
 
-
     public function testGetSocket()
     {
         $this->assertTrue(is_resource($this->socketClient->getSocket()));
@@ -84,7 +83,7 @@ class StreamSocketClientUdpTest extends TestCase
 
         $this->assertEquals($testData, $readData);
     }
-    
+
     public function testInvalidWrite()
     {
         if (defined('HHVM_VERSION')) {

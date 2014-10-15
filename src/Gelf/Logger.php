@@ -37,13 +37,12 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Creates a PSR-3 Logger for GELF/Graylog2
      *
      * @param Publisher $publisher
-     * @param string $facility
+     * @param string    $facility
      */
     public function __construct(
-        PublisherInterface $publisher = null, 
+        PublisherInterface $publisher = null,
         $facility = null
-    )
-    {
+    ) {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
         $publisher = $publisher ?: new Publisher(new UdpTransport());
@@ -65,7 +64,7 @@ class Logger extends AbstractLogger implements LoggerInterface
 
         // add exception data if present
         if (
-           isset($context['exception']) 
+           isset($context['exception'])
            && $context['exception'] instanceof Exception
         ) {
             $this->initExceptionData($message, $context['exception']);
@@ -117,9 +116,9 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Initializes message-object
      *
-     * @param mixed $level
-     * @param mixed $rawMessage
-     * @param array $context
+     * @param  mixed   $level
+     * @param  mixed   $rawMessage
+     * @param  array   $context
      * @return Message
      */
     protected function initMessage($level, $message, $context)
@@ -144,7 +143,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Initializes Exceptiondata with given message
      *
-     * @param Message $message
+     * @param Message   $message
      * @param Exception $e
      */
     protected function initExceptionData(Message $message, Exception $e)
@@ -171,7 +170,7 @@ class Logger extends AbstractLogger implements LoggerInterface
 
     /**
      * Interpolates context values into the message placeholders.
-     * 
+     *
      * Reference implementation
      * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#12-message
      *
