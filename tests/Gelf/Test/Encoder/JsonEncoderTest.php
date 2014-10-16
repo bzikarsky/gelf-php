@@ -27,7 +27,6 @@ class JsonEncoderTest extends TestCase
      */
     protected $encoder;
 
-
     public function setUp()
     {
         $this->message = $this->getMock('\\Gelf\\Message');

@@ -29,7 +29,6 @@ $message->setShortMessage("Foobar!")
 ;
 $publisher->publish($message);
 
-
 // The implementation of PSR-3 is encapsulated in the Logger-class.
 // It provides high-level logging methods, such as alert(), info(), etc.
 $logger = new Gelf\Logger($publisher, "example-facility");

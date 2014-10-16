@@ -55,7 +55,7 @@ class LoggerTest extends TestCase
         $newFacility = "foobar-facil";
         $this->logger->setFacility($newFacility);
         $this->assertEquals($newFacility, $this->logger->getFacility());
-        
+
         $newFacility = null;
         $this->logger->setFacility($newFacility);
         $this->assertEquals($newFacility, $this->logger->getFacility());
@@ -93,21 +93,21 @@ class LoggerTest extends TestCase
     public function testLogException()
     {
         $test = $this;
-        
+
         // offset is the line-distance to the throw statement!
-        $line = __LINE__ + 3; 
-        
+        $line = __LINE__ + 3;
+
         try {
             throw new Exception("test-message", 123);
         } catch (Exception $e) {
             $this->validatePublish(
                 function (MessageInterface $message) use ($e, $line, $test) {
                     $test->assertContains(
-                        $e->getMessage(), 
+                        $e->getMessage(),
                         $message->getFullMessage()
                     );
                     $test->assertContains(
-                        get_class($e), 
+                        get_class($e),
                         $message->getFullMessage()
                     );
                     $test->assertEquals($line, $message->getLine());
@@ -116,8 +116,8 @@ class LoggerTest extends TestCase
             );
 
             $this->logger->log(
-                LogLevel::ALERT, 
-                $e->getMessage(), 
+                LogLevel::ALERT,
+                $e->getMessage(),
                 array('exception' => $e)
             );
         }

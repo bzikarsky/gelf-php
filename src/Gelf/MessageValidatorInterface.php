@@ -11,10 +11,8 @@
 
 namespace Gelf;
 
-use Gelf\MessageInterface;
-
 /**
- * A message validator validates a message for validity 
+ * A message validator validates a message for validity
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
@@ -23,8 +21,8 @@ interface MessageValidatorInterface
     /**
      * Validate a the given message for validity.
      *
-     * @param MessageInterface $message
-     * @param string           &$reason
+     * @param  MessageInterface $message
+     * @param  string           &$reason
      * @return bool
      */
     public function validate(MessageInterface $message, &$reason = "");

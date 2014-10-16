@@ -18,29 +18,29 @@ class MessageValidatorTest extends TestCase
 {
 
     protected $messageValidator;
-    
+
     public function setUp()
     {
         $this->messageValidator = new MessageValidator();
     }
 
     /**
-     * @dataProvider versions    
+     * @dataProvider versions
      */
     public function testValid($version)
     {
         $msg = $this->getMessage("lorem", "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg, $reason));
     }
-    
+
     /**
-     * @dataProvider versions    
+     * @dataProvider versions
      */
     public function testZeroMessagesValidates($version)
     {
         $msg = $this->getMessage(0, "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg));
-    
+
         $msg = $this->getMessage("0", "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg));
     }
@@ -55,7 +55,7 @@ class MessageValidatorTest extends TestCase
     }
 
     /**
-     * @dataProvider versions    
+     * @dataProvider versions
      */
     public function testMissingShortMessage($version)
     {
@@ -65,7 +65,7 @@ class MessageValidatorTest extends TestCase
     }
 
     /**
-     * @dataProvider versions    
+     * @dataProvider versions
      */
     public function testMissingHost($version)
     {
@@ -83,15 +83,14 @@ class MessageValidatorTest extends TestCase
         $this->assertContains('version', $r);
     }
 
-
     /**
-     * @dataProvider versions    
+     * @dataProvider versions
      */
     public function testInvalidAddtionalFieldID($version)
     {
         $msg = $this->getMessage(
-            "lorem ipsum", 
-            "example.local", 
+            "lorem ipsum",
+            "example.local",
             $version,
             array('id' => 1)
         );
@@ -103,9 +102,9 @@ class MessageValidatorTest extends TestCase
     public function testInvalidAddtionalKeyV11()
     {
         $msg = $this->getMessage(
-            "lorem", 
-            "example.local", 
-            "1.1", 
+            "lorem",
+            "example.local",
+            "1.1",
             array('foo?' => 1)
         );
 
@@ -114,8 +113,8 @@ class MessageValidatorTest extends TestCase
     }
 
     private function getMessage(
-        $shortMessage = "lorem ipsum", 
-        $host = "example.local", 
+        $shortMessage = "lorem ipsum",
+        $host = "example.local",
         $version = "1.0",
         $additionals = array()
     )
@@ -133,8 +132,7 @@ class MessageValidatorTest extends TestCase
 
         $msg->expects($this->any())->method('hasAdditional')
             ->will($this->returnCallback(
-                function($key) use ($additionals)
-                {
+                function ($key) use ($additionals) {
                     return isset($additionals[$key]);
                 }
             ));

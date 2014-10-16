@@ -14,8 +14,8 @@ namespace Gelf\Transport;
 use RuntimeException;
 
 /**
- * StreamSocketClient is a very simple OO-Wrapper around the PHP 
- * stream_socket-library and some specific stream-functions like 
+ * StreamSocketClient is a very simple OO-Wrapper around the PHP
+ * stream_socket-library and some specific stream-functions like
  * fwrite, etc.
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -45,8 +45,8 @@ class StreamSocketClient
     protected $socket;
 
     /**
-     * @param string $scheme
-     * @param string $host
+     * @param string  $scheme
+     * @param string  $host
      * @param integer $port
      */
     public function __construct($scheme, $host, $port)
@@ -72,8 +72,8 @@ class StreamSocketClient
     /**
      * Initializes socket-client
      *
-     * @param string $scheme like "udp" or "tcp"
-     * @param string $host
+     * @param string  $scheme like "udp" or "tcp"
+     * @param string  $host
      * @param integer $port
      *
      * @return resource
@@ -84,9 +84,9 @@ class StreamSocketClient
     {
         $socketDescriptor = sprintf("%s://%s:%d", $scheme, $host, $port);
         $socket = @stream_socket_client(
-            $socketDescriptor, 
-            $errNo, 
-            $errStr, 
+            $socketDescriptor,
+            $errNo,
+            $errStr,
             static::SOCKET_TIMEOUT
         );
 
@@ -94,7 +94,7 @@ class StreamSocketClient
             throw new RuntimeException(
                 sprintf(
                     "Failed to create socket-client for %si: %s (%s)",
-                    $socketDescriptor, 
+                    $socketDescriptor,
                     $errStr,
                     $errNo
                 )
@@ -119,8 +119,8 @@ class StreamSocketClient
         // lazy initializing of socket-descriptor
         if (!$this->socket) {
             $this->socket = self::initSocket(
-                $this->scheme, 
-                $this->host, 
+                $this->scheme,
+                $this->host,
                 $this->port
             );
         }
@@ -141,7 +141,7 @@ class StreamSocketClient
     public function write($buffer)
     {
         $socket = $this->getSocket();
-        $byteCount = @fwrite($socket, $buffer); 
+        $byteCount = @fwrite($socket, $buffer);
 
         if ($byteCount === false) {
             throw new \RuntimeException("Failed to write to socket");

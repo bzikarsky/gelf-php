@@ -14,7 +14,7 @@ namespace Gelf\Encoder;
 use Gelf\MessageInterface;
 
 /**
- * The CompressedJsonEncoder allows the encoding of GELF messages as described 
+ * The CompressedJsonEncoder allows the encoding of GELF messages as described
  * in http://www.graylog2.org/resources/documentation/sending/gelfhttp
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -37,20 +37,20 @@ class CompressedJsonEncoder extends JsonEncoder
      */
     public function __construct(
         $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL
-    )
-    {
+    ) {
         $this->compressionLevel = $compressionLevel;
     }
 
     /**
      * Encodes a given message
      *
-     * @param MessageInterface $message
+     * @param  MessageInterface $message
      * @return string
      */
     public function encode(MessageInterface $message)
     {
         $json = parent::encode($message);
+
         return gzcompress($json, $this->compressionLevel);
     }
 }

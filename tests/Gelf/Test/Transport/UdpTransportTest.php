@@ -89,7 +89,7 @@ class UdpTransportTest extends TestCase
     {
         $transport = new UdpTransport();
         $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface", 
+            "\\Gelf\\Encoder\\EncoderInterface",
             $transport->getMessageEncoder()
         );
     }

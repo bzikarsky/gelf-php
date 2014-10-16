@@ -12,7 +12,7 @@
 namespace Gelf;
 
 /**
- * This interface defines the minimum amount of method any Message 
+ * This interface defines the minimum amount of method any Message
  * implementation must provide to be used by the publisher or transports.
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
@@ -21,7 +21,7 @@ interface MessageInterface
 {
     /**
      * Returns the GELF version of the message
-     * 
+     *
      * @return string
      */
     public function getVersion();
@@ -92,7 +92,7 @@ interface MessageInterface
     /**
      * Returns the value of the additional field of the message
      *
-     * @param string $key
+     * @param  string $key
      * @return mixed
      */
     public function getAdditional($key);
@@ -100,7 +100,7 @@ interface MessageInterface
     /**
      * Checks if a additional fields is set
      *
-     * @param string $key
+     * @param  string $key
      * @return bool
      */
     public function hasAdditional($key);

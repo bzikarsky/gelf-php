@@ -27,12 +27,12 @@ class PublisherTest extends TestCase
     {
         $this->transportA = $this->getMock('Gelf\Transport\TransportInterface');
         $this->transportB = $this->getMock('Gelf\Transport\TransportInterface');
-        $this->messageValidator = 
+        $this->messageValidator =
             $this->getMock('Gelf\MessageValidatorInterface');
         $this->message = $this->getMock('Gelf\MessageInterface');
 
         $this->publisher = new Publisher(
-            $this->transportA, 
+            $this->transportA,
             $this->messageValidator
         );
     }
@@ -42,7 +42,7 @@ class PublisherTest extends TestCase
         $this->transportA->expects($this->once())
             ->method('send')
             ->with($this->equalTo($this->message));
-        
+
         $this->messageValidator->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(true));
@@ -58,7 +58,7 @@ class PublisherTest extends TestCase
         $this->messageValidator->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(false));
- 
+
         $this->publisher->publish($this->message);
     }
 
@@ -111,7 +111,7 @@ class PublisherTest extends TestCase
     {
         $pub = new Publisher();
         $this->assertInstanceOf(
-            'Gelf\MessageValidatorInterface', 
+            'Gelf\MessageValidatorInterface',
             $pub->getMessageValidator()
         );
     }

@@ -42,7 +42,7 @@ class StreamSocketClientTcpTest extends TestCase
 
         // get random port
         $socketName = stream_socket_get_name(
-            $this->serverSocket, 
+            $this->serverSocket,
             $peerName = false
         );
         list(, $port) = explode(":", $socketName);
@@ -55,7 +55,6 @@ class StreamSocketClientTcpTest extends TestCase
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
-
 
     public function testGetSocket()
     {
@@ -118,12 +117,11 @@ class StreamSocketClientTcpTest extends TestCase
         stream_set_timeout($this->serverSocket, 0, 100);
 
         $connection = stream_socket_accept($this->serverSocket);
-        
+
         // return input as output
-        stream_copy_to_stream($connection, $connection);
+        stream_copy_to_stream($connection, $connection, strlen($testData));
 
         fclose($connection);
-
         $readData = $this->socketClient->read($numBytes);
 
         $this->assertEquals($testData, $readData);
@@ -140,9 +138,9 @@ class StreamSocketClientTcpTest extends TestCase
         stream_set_timeout($this->serverSocket, 0, 100);
 
         $connection = stream_socket_accept($this->serverSocket);
-        
+
         // return input as output
-        stream_copy_to_stream($connection, $connection);
+        stream_copy_to_stream($connection, $connection, strlen($testData));
 
         fclose($connection);
 

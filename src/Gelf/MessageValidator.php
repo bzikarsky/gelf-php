@@ -11,7 +11,6 @@
 
 namespace Gelf;
 
-use Gelf\MessageInterface;
 use RuntimeException;
 
 /**
@@ -33,7 +32,7 @@ class MessageValidator implements MessageValidatorInterface
 
         throw new RuntimeException(
             sprintf(
-                "No validator for message version '%s'", 
+                "No validator for message version '%s'",
                 $message->getVersion()
             )
         );
@@ -42,29 +41,33 @@ class MessageValidator implements MessageValidatorInterface
     /**
      * Validates a message according to 1.0 standard
      *
-     * @param MessageInterface  $message
-     * @param string            &$reason reason for the validation fail
+     * @param  MessageInterface $message
+     * @param  string           &$reason reason for the validation fail
      * @return bool
      */
     public function validate0100(MessageInterface $message, &$reason = "")
     {
         if (self::isEmpty($message->getHost())) {
             $reason = "host not set";
+
             return false;
         }
 
         if (self::isEmpty($message->getShortMessage())) {
             $reason = "short-message not set";
+
             return false;
         }
 
         if (self::isEmpty($message->getVersion())) {
             $reason = "version not set";
+
             return false;
         }
 
         if ($message->hasAdditional('id')) {
             $reason = "addtional field 'id' is not allowed";
+
             return false;
         }
 
@@ -74,8 +77,8 @@ class MessageValidator implements MessageValidatorInterface
     /**
      * Validates a message according to 1.1 standard
      *
-     * @param MessageInterface $message
-     * @param string           &$reason
+     * @param  MessageInterface $message
+     * @param  string           &$reason
      * @return bool
      */
     public function validate0101(MessageInterface $message, &$reason = "")
@@ -88,9 +91,10 @@ class MessageValidator implements MessageValidatorInterface
         foreach ($message->getAllAdditionals() as $key => $value) {
             if (!preg_match('#^[\w\.\-]*$#', $key)) {
                 $reason = sprintf(
-                    "additional key '%s' contains invalid characters", 
+                    "additional key '%s' contains invalid characters",
                     $key
                 );
+
                 return false;
             }
         }
@@ -104,7 +108,7 @@ class MessageValidator implements MessageValidatorInterface
      *
      * Fails on null, false and empty strings
      *
-     * @param string $string
+     * @param  string $string
      * @return bool
      */
     public static function isEmpty($scalar)
