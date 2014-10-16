@@ -11,7 +11,6 @@
 
 namespace Gelf\Transport;
 
-use Gelf\Encoder\EncoderInterface;
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
 use Gelf\MessageInterface;
@@ -27,7 +26,7 @@ use RuntimeException;
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class UdpTransport implements TransportInterface, PublisherInterface
+class UdpTransport extends AbstractTransport
 {
     const CHUNK_GELF_ID = "\x1e\x0f";
     const CHUNK_MAX_COUNT = 256; // sequence-size is stored in a CHAR
@@ -43,11 +42,6 @@ class UdpTransport implements TransportInterface, PublisherInterface
      * @var int
      */
     protected $chunkSize;
-
-    /**
-     * @var EncoderInterface
-     */
-    protected $messageEncoder;
 
     /**
      * @var StreamSocketClient
@@ -74,30 +68,8 @@ class UdpTransport implements TransportInterface, PublisherInterface
 
         $this->socketClient = new StreamSocketClient('udp', $host, $port);
         $this->chunkSize = $chunkSize;
-    }
 
-    /**
-     * Sets a message encoder
-     *
-     * @param EncoderInterface $encoder
-     */
-    public function setMessageEncoder(EncoderInterface $encoder)
-    {
-        $this->messageEncoder = $encoder;
-    }
-
-    /**
-     * Returns the current message encoder
-     *
-     * @return EncoderInterface
-     */
-    public function getMessageEncoder()
-    {
-        if (!$this->messageEncoder) {
-            $this->messageEncoder = new DefaultEncoder();
-        }
-
-        return $this->messageEncoder;
+        $this->messageEncoder = new DefaultEncoder();
     }
 
     /**
@@ -121,20 +93,6 @@ class UdpTransport implements TransportInterface, PublisherInterface
         // send message in one packet
         $this->socketClient->write($rawMessage);
         return 1;
-    }
-
-    /**
-     * Alias to send() without return value 
-     * Required to fulfill the PublisherInterface
-     *
-     * @deprecated deprecated since 1.1
-     * @codeCoverageIgnore
-     *
-     * @param Message $message
-     */
-    public function publish(Message $message)
-    {
-        $this->send($message);
     }
 
     /**
