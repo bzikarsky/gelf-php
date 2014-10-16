@@ -1,13 +1,11 @@
-gelf-php 
-[![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
-[![Total Downloads](https://img.shields.io/packagist/dt/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
-[![HHVM Status](https://img.shields.io/hhvm/graylog2/gelf-php.svg?style=flat-square)](http://hhvm.h4cc.de/package/graylog2/gelf-php)
+gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php) [![Total Downloads](https://img.shields.io/packagist/dt/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php) 
 ========
 [![Build Status](https://img.shields.io/travis/bzikarsky/gelf-php.svg?style=flat-square)](https://travis-ci.org/bzikarsky/gelf-php)
+[![HHVM Status](https://img.shields.io/hhvm/graylog2/gelf-php.svg?style=flat-square)](http://hhvm.h4cc.de/package/graylog2/gelf-php)
 [![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![Scrutinizer Quality Score](https://img.shields.io/scrutinizer/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2)
+
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
 This library conforms to the PSR standards in regards to structure ([0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)),
