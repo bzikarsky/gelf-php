@@ -1,4 +1,7 @@
-gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php) [![Total Downloads](https://img.shields.io/packagist/dt/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
+gelf-php 
+[![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
+[![Total Downloads](https://img.shields.io/packagist/dt/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
+[![HHVM Status](https://img.shields.io/hhvm/graylog2/gelf-php.svg?style=flat-square)](http://hhvm.h4cc.de/package/graylog2/gelf-php)
 ========
 [![Build Status](https://img.shields.io/travis/bzikarsky/gelf-php.svg?style=flat-square)](https://travis-ci.org/bzikarsky/gelf-php)
 [![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
