@@ -1,9 +1,9 @@
-gelf-php [![Latest Stable Version](https://poser.pugx.org/graylog2/gelf-php/v/stable.svg)](https://packagist.org/packages/graylog2/gelf-php) [![Total Downloads](https://poser.pugx.org/graylog2/gelf-php/downloads.svg)](https://packagist.org/packages/graylog2/gelf-php)
+gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php) [![Total Downloads](https://img.shields.io/packagist/dt/graylog2/gelf-php.svg?style=flat-square)](https://packagist.org/packages/graylog2/gelf-php)
 ========
-[![Build Status](https://travis-ci.org/bzikarsky/gelf-php.png?branch=master)](https://travis-ci.org/bzikarsky/gelf-php)
-[![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.png)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
-[![Code Coverage](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/badges/coverage.png?s=6de1dc7f14a8d01fd147d42fb341822b3d99d7b6)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
-[![Scrutinizer Quality Score](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/badges/quality-score.png?s=00d4030b7a35c75a6b27b426c0eb53fb23aed2d1)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
+[![Build Status](https://img.shields.io/travis/bzikarsky/gelf-php.svg?style=flat-square)](https://travis-ci.org/bzikarsky/gelf-php)
+[![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
+[![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
+[![Scrutinizer Quality Score](https://img.shields.io/scrutinizer/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2/mini.png)](https://insight.sensiolabs.com/projects/5aaa17f2-cc43-49bf-a23e-cc1585eaa3c2)
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
@@ -75,6 +75,3 @@ project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky
 2. Install dependencies: `composer install --dev`
 3. Run unit-tests: `vendor/bin/phpunit`
 4. Check PSR compatibility: `vendor/bin/phpcs --standard=PSR2 src tests`
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/bzikarsky/gelf-php/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
