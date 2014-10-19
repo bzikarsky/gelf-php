@@ -48,20 +48,32 @@ class HttpTransport extends AbstractTransport
     protected $socketClient;
 
     /**
+     * @var SslOptions|null
+     */
+    protected $sslOptions = null;
+
+    /**
      * Class constructor
      *
      * @param string $host when NULL or empty default-host is used
      * @param int    $port when NULL or empty default-port is used
      * @param string $path when NULL or empty default-path is used
+     * @param SslOptions|null $sslOptions when null not SSL is used
      */
-    public function __construct($host = null, $port = null, $path = null)
+    public function __construct($host = null, $port = null, $path = null, SslOptions $sslOptions = null)
     {
         $this->host = $host ?: $this->host;
         $this->port = $port ?: $this->port;
         $this->path = $path ?: $this->path;
+        $this->sslOptions = $sslOptions;
 
-        $this->socketClient = new StreamSocketClient("tcp", $this->host, $this->port);
         $this->messageEncoder = new DefaultEncoder();
+        $this->socketClient = new StreamSocketClient(
+            $this->getScheme(),
+            $this->host,
+            $this->port,
+            $this->getContext()
+        );
     }
 
     /**
@@ -115,6 +127,9 @@ class HttpTransport extends AbstractTransport
         return $byteCount;
     }
 
+    /**
+     * @return string
+     */
     private function readResponseHeaders()
     {
         $chunkSize = 1024; // number of bytes to read at once
@@ -127,6 +142,40 @@ class HttpTransport extends AbstractTransport
         } while (false === strpos($chunk, $delimiter) && strlen($chunk) > 0);
 
         $elements = explode($delimiter, $response, 2);
+
         return $elements[0];
+    }
+
+    /**
+     * @return string
+     */
+    private function getScheme()
+    {
+        return null === $this->sslOptions ? 'tcp' : 'ssl';
+    }
+
+    /**
+     * @return array
+     */
+    private function getContext()
+    {
+        if (null === $this->sslOptions) {
+            return array();
+        }
+
+        $context = $this->sslOptions->toStreamContext();
+        
+        // If SNI is available hint on server-name
+        if (defined('HHVM_VERSION') ||  defined('OPENSSL_TLSEXT_SERVER_NAME')) {
+            $context['ssl']['SNI_enabled'] = true;
+            $context['ssl']['SNI_server_name'] = $this->host;
+        }
+        
+        // If verify_peer is active we also check for a valid CN
+        if ($this->sslOptions->getVerifyPeer()) {
+            $context['ssl']['CN_match'] = $this->host;
+        }
+
+        return $context;
     }
 }

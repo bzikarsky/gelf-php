@@ -40,6 +40,11 @@ class StreamSocketClient
     protected $scheme;
 
     /**
+     * @var array
+     */
+    protected $context;
+
+    /**
      * @var resource
      */
     protected $socket;
@@ -48,12 +53,14 @@ class StreamSocketClient
      * @param string  $scheme
      * @param string  $host
      * @param integer $port
+     * @param array   $context
      */
-    public function __construct($scheme, $host, $port)
+    public function __construct($scheme, $host, $port, array $context = array())
     {
         $this->scheme = $scheme;
         $this->host = $host;
         $this->port = $port;
+        $this->context = $context;
     }
 
     /**
@@ -67,22 +74,25 @@ class StreamSocketClient
     /**
      * Initializes socket-client
      *
-     * @param string  $scheme like "udp" or "tcp"
+     * @param string  $scheme  like "udp" or "tcp"
      * @param string  $host
      * @param integer $port
+     * @param array   $context
      *
      * @return resource
      *
      * @throws RuntimeException on connection-failure
      */
-    protected static function initSocket($scheme, $host, $port)
+    protected static function initSocket($scheme, $host, $port, array $context)
     {
         $socketDescriptor = sprintf("%s://%s:%d", $scheme, $host, $port);
         $socket = @stream_socket_client(
             $socketDescriptor,
             $errNo,
             $errStr,
-            static::SOCKET_TIMEOUT
+            static::SOCKET_TIMEOUT,
+            \STREAM_CLIENT_CONNECT,
+            stream_context_create($context)
         );
 
         if ($socket === false) {
@@ -116,7 +126,8 @@ class StreamSocketClient
             $this->socket = self::initSocket(
                 $this->scheme,
                 $this->host,
-                $this->port
+                $this->port,
+                $this->context
             );
         }
 
@@ -158,7 +169,7 @@ class StreamSocketClient
     }
 
     /**
-     * Closes underlying socket explicitly 
+     * Closes underlying socket explicitly
      */
     public function close()
     {

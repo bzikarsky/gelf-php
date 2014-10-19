@@ -77,6 +77,22 @@ class HttpTransportTest extends TestCase
         return $transport;
     }
 
+    public function testSslOptionsAreUsed()
+    {
+        $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions->expects($this->exactly(2))->method('toStreamContext')->will($this->returnValue(array()));
+        $sslOptions->expects($this->exactly(2))->method('getVerifyPeer')->will($this->returnValue(true));
+
+        $transport = new HttpTransport("localhost", "12345", "/gelf", $sslOptions);
+
+        $reflectedTransport = new \ReflectionObject($transport);
+        $reflectedGetContext = $reflectedTransport->getMethod('getContext');
+        $reflectedGetContext->setAccessible(true);
+        $context = $reflectedGetContext->invoke($transport);
+
+        $this->assertEquals("localhost", $context['ssl']['CN_match']);
+    }
+
     public function testSetEncoder()
     {
         $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
