@@ -61,12 +61,7 @@ class StreamSocketClient
      */
     public function __destruct()
     {
-        if (!is_resource($this->socket)) {
-            return;
-        }
-
-        fclose($this->socket);
-        $this->socket = null;
+        $this->close();
     }
 
     /**
@@ -163,15 +158,15 @@ class StreamSocketClient
     }
 
     /**
-     * Closes underlying socket explicitly, right now only
-     * proxy method for __destruct()
-     *
-     * @see __destruct()
-     *
-     * @return null
+     * Closes underlying socket explicitly 
      */
     public function close()
     {
-        return $this->__destruct();
+        if (!is_resource($this->socket)) {
+            return;
+        }
+
+        fclose($this->socket);
+        $this->socket = null;
     }
 }

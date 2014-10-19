@@ -159,4 +159,26 @@ class StreamSocketClientTcpTest extends TestCase
         $this->socketClient->getSocket();
         unset($this->socketClient);
     }
+
+    public function testCloseWithoutConnectionWrite()
+    {
+        // close unopened stream
+        $this->socketClient->close();
+        $this->socketClient->write("abcd");
+        $client = stream_socket_accept($this->serverSocket);
+        $this->assertEquals("abcd", fread($client, 4));
+    }
+
+    public function testCloseWrite()
+    {
+        $this->socketClient->write("abcd");
+        $client = stream_socket_accept($this->serverSocket);
+        $this->assertEquals("abcd", fread($client, 4));
+         
+        $this->socketClient->close();
+        
+        $this->socketClient->write("efgh");
+        $client2 = stream_socket_accept($this->serverSocket);
+        $this->assertEquals("efgh", fread($client2, 4));
+    }
 }
