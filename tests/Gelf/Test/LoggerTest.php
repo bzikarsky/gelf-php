@@ -123,6 +123,32 @@ class LoggerTest extends TestCase
         }
     }
 
+    // @see https://github.com/bzikarsky/gelf-php/issues/9
+    public function testStringZeroMessage()
+    {
+        $test = $this;
+        $this->validatePublish(
+             function (MessageInterface $message) use ($test) {
+                 $test->assertEquals("0", $message->getShortMessage());
+             }
+        );
+
+        $this->logger->info('0');
+    }
+
+    // @see https://github.com/bzikarsky/gelf-php/issues/9
+    public function testNumericZeroMessage()
+    {
+        $test = $this;
+        $this->validatePublish(
+             function (MessageInterface $message) use ($test) {
+                 $test->assertEquals(0, $message->getShortMessage());
+             }
+        );
+
+        $this->logger->alert(0);
+    }
+
     private function validatePublish(Closure $validator)
     {
         $this->publisher->expects($this->once())->method('publish')->will(
