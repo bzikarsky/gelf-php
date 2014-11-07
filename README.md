@@ -2,7 +2,7 @@ gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/g
 ========
 [![Build Status](https://img.shields.io/travis/bzikarsky/gelf-php.svg?style=flat-square)](https://travis-ci.org/bzikarsky/gelf-php)
 [![HHVM Status](https://img.shields.io/hhvm/graylog2/gelf-php.svg?style=flat-square)](http://hhvm.h4cc.de/package/graylog2/gelf-php)
-[![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
+[![Dependency Status](https://www.versioneye.com/user/projects/52591e23632bac78d0000047/badge.svg?style=flat-square)](https://www.versioneye.com/php/bzikarsky:gelf-php)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![Scrutinizer Quality Score](https://img.shields.io/scrutinizer/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 
@@ -43,7 +43,7 @@ Add gelf-php to `composer.json`:
 
     "require": {
        // ...
-       "graylog2/gelf-php": "~1.0"
+       "graylog2/gelf-php": "~1.1"
        // ...
     }
 
