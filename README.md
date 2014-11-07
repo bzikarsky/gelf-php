@@ -63,8 +63,7 @@ Development & Contributing
 --------------------------
 
 You are welcome to modify, extend and bugfix all you like. :-)
-In case you want to use the nifty [PhpStorm-IDE](http://www.jetbrains.com/phpstorm/), there is an OSS-license for this
-project, you can use. Just contact me [@bzikarsky](https://twitter.com/bzikarsky).
+If you have any questions/proposals/etc. you can contact me on Twitter ([@bzikarsky](https://twitter.com/bzikarsky)) or message me on [freenode#graylog2](irc://irc.freenode.net#graylog2).
 
 ### Tools
 1. [composer](http://getcomposer.org), preferably a system-wide installation as `composer`
