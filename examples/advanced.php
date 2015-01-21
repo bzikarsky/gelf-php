@@ -25,7 +25,6 @@ $message = new Gelf\Message();
 $message->setShortMessage("Foobar!")
     ->setLevel(\Psr\Log\LogLevel::ALERT)
     ->setFullMessage("There was a foo in bar")
-    ->setFacility("example-facility")
 ;
 $publisher->publish($message);
 
