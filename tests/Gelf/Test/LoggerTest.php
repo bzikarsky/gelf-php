@@ -124,28 +124,6 @@ class LoggerTest extends TestCase
         }
     }
     
-    public function testLogMessage()
-    {
-        $test = $this;
-        $message = new Message();
-        $message->setLine(10)
-            ->setShortMessage("foo bar")
-            ->setAdditional("all", "nothing")
-            ->setAdditional("foo", "bar");
-        $additional = array(
-            "all" => "nothing",
-            "foo"=> "bar"
-        );
-        
-        $this->validatePublish(
-            function (MessageInterface $publishedMessage) use ($message, $test) {
-                $test->assertEquals($message, $publishedMessage);
-            }
-        );
-
-        $this->logger->log(LogLevel::NOTICE, $message);
-    }
-    
     // @see https://github.com/bzikarsky/gelf-php/issues/9
     public function testStringZeroMessage()
     {
