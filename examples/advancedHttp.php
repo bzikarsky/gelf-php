@@ -22,9 +22,5 @@ $message->setShortMessage("Foobar!")
         ->setAdditional('ta', 'ma')
         ->setAdditional("foo", "bar")
 ;
-
-// The implementation of PSR-3 is encapsulated in the Logger-class.
-// It provides high-level logging methods, such as alert(), info(), etc.
-$logger = new Gelf\Logger($publisher, "example-facility");
-// Now we can log...
-$logger->log(1, $message);
+// Publish to gray log
+$publisher->publish($message);
