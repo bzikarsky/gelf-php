@@ -60,7 +60,11 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     public function log($level, $rawMessage, array $context = array())
     {
-        $message = $this->initMessage($level, $rawMessage, $context);
+        if (!($rawMessage instanceof MessageInterface)) {
+            $message = $this->initMessage($level, $rawMessage, $context);
+        } else {
+            $message = $rawMessage;
+        }
 
         // add exception data if present
         if (
