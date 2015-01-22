@@ -55,15 +55,13 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Publishes a given message and context with given level
      *
      * @param mixed $level
-     * @param mixed $rawMessage
+     * @param mixed $message
      * @param array $context
      */
-    public function log($level, $rawMessage, array $context = array())
+    public function log($level, $message, array $context = array())
     {
-        if (!($rawMessage instanceof MessageInterface)) {
-            $message = $this->initMessage($level, $rawMessage, $context);
-        } else {
-            $message = $rawMessage;
+        if (!($message instanceof MessageInterface)) {
+            $message = $this->initMessage($level, $message, $context);
         }
 
         // add exception data if present
