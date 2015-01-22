@@ -136,11 +136,10 @@ class LoggerTest extends TestCase
             "all" => "nothing",
             "foo"=> "bar"
         );
+        
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $additional) {
-                $test->assertEquals("foo bar", $message->getShortMessage());
-                $test->assertEquals(10, $message->getLine());
-                $test->assertEquals($additional, $message->getAllAdditionals());
+            function (MessageInterface $publishedMessage) use ($message) {
+                $this->assertEquals($message, $publishedMessage);
             }
         );
 

@@ -17,7 +17,6 @@ $publisher->addTransport($transport);
 // Now we can create custom messages and publish them
 $message = new Gelf\Message();
 $message->setShortMessage("Foobar!")
-        ->setLevel(\Psr\Log\LogLevel::ALERT)
         ->setFullMessage("There was a foo in bar")
         ->setLine(10)
         ->setAdditional('ta', 'ma')
