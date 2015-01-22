@@ -51,13 +51,13 @@ class Logger extends AbstractLogger implements LoggerInterface
         $this->setFacility($facility);
     }
 
-     /**
-    * Publishes a given message and context with given level
-    *
-    * @param mixed $level
-    * @param mixed $rawMessage
-    * @param array $context
-    */
+    /**
+     * Publishes a given message and context with given level
+     *
+     * @param mixed $level
+     * @param mixed $rawMessage
+     * @param array $context
+     */
     public function log($level, $rawMessage, array $context = array())
     {
         $message = $this->initMessage($level, $rawMessage, $context);
