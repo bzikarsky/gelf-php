@@ -138,8 +138,8 @@ class LoggerTest extends TestCase
         );
         
         $this->validatePublish(
-            function (MessageInterface $publishedMessage) use ($message) {
-                $this->assertEquals($message, $publishedMessage);
+            function (MessageInterface $publishedMessage) use ($message, $test) {
+                $test->assertEquals($message, $publishedMessage);
             }
         );
 
