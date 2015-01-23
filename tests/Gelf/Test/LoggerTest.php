@@ -123,7 +123,7 @@ class LoggerTest extends TestCase
             );
         }
     }
-    
+
     // @see https://github.com/bzikarsky/gelf-php/issues/9
     public function testStringZeroMessage()
     {

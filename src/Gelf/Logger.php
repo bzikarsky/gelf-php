@@ -68,7 +68,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         ) {
             $this->initExceptionData($message, $context['exception']);
         }
-        
+
         $this->publisher->publish($message);
     }
 
