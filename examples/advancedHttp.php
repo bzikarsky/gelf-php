@@ -21,6 +21,7 @@ $message->setShortMessage("Foobar!")
         ->setLine(10)
         ->setAdditional('ta', 'ma')
         ->setAdditional("foo", "bar")
+        ->setFacility("default-facility")
 ;
 // Publish to gray log
 $publisher->publish($message);

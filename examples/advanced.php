@@ -25,12 +25,13 @@ $message = new Gelf\Message();
 $message->setShortMessage("Foobar!")
     ->setLevel(\Psr\Log\LogLevel::ALERT)
     ->setFullMessage("There was a foo in bar")
-    ->setFacility("example-facility")
+    ->setFacility("default-facility")
 ;
 $publisher->publish($message);
 
 // The implementation of PSR-3 is encapsulated in the Logger-class.
 // It provides high-level logging methods, such as alert(), info(), etc.
+// Message is logged with facility = example-facility
 $logger = new Gelf\Logger($publisher, "example-facility");
 
 // Now we can log...
