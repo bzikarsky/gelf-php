@@ -84,16 +84,11 @@ class StreamSocketClientUdpTest extends TestCase
         $this->assertEquals($testData, $readData);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
     public function testInvalidWrite()
     {
-        if (defined('HHVM_VERSION')) {
-            // HHVM's fwrite behaves differently than PHP's as of 2014-10-15:
-            // No exception will be thrown
-        } else {
-            $this->setExpectedException('\RuntimeException');
-
-        }
-
         $this->socketClient->write(array());
     }
 
