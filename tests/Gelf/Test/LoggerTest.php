@@ -13,6 +13,7 @@ namespace Gelf\Test;
 
 use Gelf\Logger;
 use Gelf\MessageInterface;
+use Gelf\Message;
 use Gelf\PublisherInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use Psr\Log\LogLevel;
@@ -128,9 +129,9 @@ class LoggerTest extends TestCase
     {
         $test = $this;
         $this->validatePublish(
-             function (MessageInterface $message) use ($test) {
-                 $test->assertEquals("0", $message->getShortMessage());
-             }
+            function (MessageInterface $message) use ($test) {
+                $test->assertEquals("0", $message->getShortMessage());
+            }
         );
 
         $this->logger->info('0');
@@ -141,9 +142,9 @@ class LoggerTest extends TestCase
     {
         $test = $this;
         $this->validatePublish(
-             function (MessageInterface $message) use ($test) {
-                 $test->assertEquals(0, $message->getShortMessage());
-             }
+            function (MessageInterface $message) use ($test) {
+                $test->assertEquals(0, $message->getShortMessage());
+            }
         );
 
         $this->logger->alert(0);
