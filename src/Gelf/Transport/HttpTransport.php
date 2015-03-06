@@ -43,9 +43,24 @@ class HttpTransport extends AbstractTransport
     protected $path = "/gelf";
 
     /**
+     * @var string
+     */
+    protected $scheme = "tcp";
+
+    /**
      * @var StreamSocketClient
      */
     protected $socketClient;
+
+    /**
+     * @var username
+     */
+    protected $username;
+
+    /**
+     * @var password
+     */
+    protected $password;
 
     /**
      * Class constructor
@@ -53,14 +68,15 @@ class HttpTransport extends AbstractTransport
      * @param string $host when NULL or empty default-host is used
      * @param int    $port when NULL or empty default-port is used
      * @param string $path when NULL or empty default-path is used
+     * @param string $scheme when NULL or empty default-path is used
      */
-    public function __construct($host = null, $port = null, $path = null)
+    public function __construct($host = null, $port = null, $path = null, $scheme = null)
     {
         $this->host = $host ?: $this->host;
         $this->port = $port ?: $this->port;
         $this->path = $path ?: $this->path;
-
-        $this->socketClient = new StreamSocketClient("tcp", $this->host, $this->port);
+        $this->scheme = $scheme ?: $this->scheme;
+        $this->socketClient = new StreamSocketClient($this->scheme, $this->host, $this->port);
         $this->messageEncoder = new DefaultEncoder();
     }
 
@@ -80,6 +96,7 @@ class HttpTransport extends AbstractTransport
             sprintf("POST %s HTTP/1.1", $this->path),
             sprintf("Host: %s:%d", $this->host, $this->port),
             sprintf("Content-Length: %d", strlen($rawMessage)),
+            sprintf("Authorization: Basic %s", base64_encode($this->username . ":" . $this->password)),
             "Content-Type: application/json",
             "Connection: Keep-Alive",
             "Accept: */*"
@@ -113,6 +130,21 @@ class HttpTransport extends AbstractTransport
         }
 
         return $byteCount;
+    }
+
+    /**
+     * Set the basic authentication header
+     *
+     * @param $user
+     * @param $password
+     * @return $this
+     */
+    public function setAuthentication($user, $password)
+    {
+        $this->username = $user;
+        $this->password = $password;
+
+        return $this;
     }
 
     private function readResponseHeaders()
