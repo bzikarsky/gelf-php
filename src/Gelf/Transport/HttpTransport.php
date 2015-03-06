@@ -96,7 +96,7 @@ class HttpTransport extends AbstractTransport
             sprintf("POST %s HTTP/1.1", $this->path),
             sprintf("Host: %s:%d", $this->host, $this->port),
             sprintf("Content-Length: %d", strlen($rawMessage)),
-            'Authorization: Basic '. base64_encode($this->username.":".$this->password),
+            sprintf("Authorization: Basic %s", base64_encode($this->username . ":" . $this->password)),
             "Content-Type: application/json",
             "Connection: Keep-Alive",
             "Accept: */*"
