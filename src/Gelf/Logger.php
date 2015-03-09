@@ -63,8 +63,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         $message = $this->initMessage($level, $rawMessage, $context);
 
         // add exception data if present
-        if (
-           isset($context['exception'])
+        if (isset($context['exception'])
            && $context['exception'] instanceof Exception
         ) {
             $this->initExceptionData($message, $context['exception']);

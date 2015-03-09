@@ -132,11 +132,17 @@ class HttpTransportTest extends TestCase
         $this->validateTransport($transport, 'localhost', 443, '', $sslOptions, null);
     }
 
-    public function validateTransport(HttpTransport $transport, $host, $port, $path, $sslOptions = null, $authentication = null)
-    {
+    public function validateTransport(
+        HttpTransport $transport,
+        $host,
+        $port,
+        $path,
+        $sslOptions = null,
+        $authentication = null
+    ) {
         $r = new \ReflectionObject($transport);
 
-        foreach(array('host', 'port', 'path', 'sslOptions', 'authentication') as $test) {
+        foreach (array('host', 'port', 'path', 'sslOptions', 'authentication') as $test) {
             $p = $r->getProperty($test);
             $p->setAccessible(true);
             $this->assertEquals(${$test}, $p->getValue($transport));
@@ -216,7 +222,7 @@ class HttpTransportTest extends TestCase
         $test = $this;
         $this->socketClient->expects($this->once())
             ->method("write")
-            ->will($this->returnCallback(function($data) use ($test) {
+            ->will($this->returnCallback(function ($data) use ($test) {
                 $test->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
             }));
             
