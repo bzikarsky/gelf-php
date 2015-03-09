@@ -143,6 +143,24 @@ class HttpTransportTest extends TestCase
         $this->transport->send($this->message);
     }
 
+    public function testAuthentication()
+    {
+        $this->transport->setAuthentication("test", "test");
+
+        $this->socketClient->expects($this->once())
+            ->method("write")
+            ->will($this->returnCallback(function($data) {
+                $this->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
+            }));
+            
+        $this->socketClient
+            ->expects($this->once())
+            ->method("read")
+            ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
+
+        $this->transport->send($this->message);
+    }
+
     public function testSendCompressed()
     {
         $request = "POST /gelf HTTP/1.1"."\r\n"

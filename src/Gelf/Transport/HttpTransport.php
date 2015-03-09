@@ -53,6 +53,11 @@ class HttpTransport extends AbstractTransport
     protected $sslOptions = null;
 
     /**
+     * @var string|null
+     */
+    protected $authentication = null;
+
+    /**
      * Class constructor
      *
      * @param string $host when NULL or empty default-host is used
@@ -77,6 +82,17 @@ class HttpTransport extends AbstractTransport
     }
 
     /**
+     * Sets HTTP basic authentication
+     *
+     * @param string $username
+     * @param string $password
+     */
+    public function setAuthentication($username, $password)
+    {
+        $this->authentication = $username . ":" . $password;
+    }
+
+    /**
      * Sends a Message over this transport
      *
      * @param MessageInterface $message
@@ -96,6 +112,10 @@ class HttpTransport extends AbstractTransport
             "Connection: Keep-Alive",
             "Accept: */*"
         );
+
+        if (null !== $this->authentication) {
+            $request[] = "Authorization: Basic " . base64_encode($this->authentication);
+        }
 
         if ($messageEncoder instanceof CompressedJsonEncoder) {
             $request[] = "Content-Encoding: gzip";
