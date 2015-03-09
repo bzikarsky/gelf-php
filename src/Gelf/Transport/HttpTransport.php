@@ -98,30 +98,34 @@ class HttpTransport extends AbstractTransport
     public static function fromUrl($url, SslOptions $sslOptions = null)
     {
         $parsed = parse_url($url);
-        if (false === $parsed || !isset($parsed['host'])) {
+        
+        // check it's a valid URL
+        if (false === $parsed || !isset($parsed['host']) || !isset($parsed['scheme'])) {
             throw new \InvalidArgumentException("$url is not a valid URL");
         }
         
-        $scheme = strtolower(isset($parsed['scheme']) ? $parsed['scheme'] : '');
+        // check it's http or https 
+        $scheme = strtolower($parsed['scheme']);
         if (!in_array($scheme, array('http', 'https'))) {
             throw new \InvalidArgumentException("$url is not a valid http/https URL");
         }
-        $host = $parsed['host'];
-        $ssl  = $scheme == 'https';
-        $port = isset($parsed['port']) ? $parsed['port'] : ($ssl ? 443 : 80);
-        $path = isset($parsed['path']) ? $parsed['path'] : '';
 
-        if ($ssl) {
+        // setup defaults
+        $defaults = array('port' => 80, 'path' => '', 'user' => null, 'pass' => '');
+
+        // change some defaults for https
+        if ($scheme == 'https') {
             $sslOptions = $sslOptions ?: new SslOptions();
+            $defaults['port'] = 443;
         }
+         
+        // merge defaults and real data and build transport   
+        $parsed = array_merge($defaults, $parsed);
+        $transport = new self($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
 
-        $transport = new self($host, $port, $path, $sslOptions);
-
-        if (isset($parsed['user'])) {
-            $user = $parsed['user'];
-            $pass = isset($parsed['pass']) ? $parsed['pass'] : '';
-
-            $transport->setAuthentication($user, $pass);
+        // add optional authentication
+        if ($parsed['user']) {
+            $transport->setAuthentication($parsed['user'], $parsed['pass']);
         }
 
         return $transport;
