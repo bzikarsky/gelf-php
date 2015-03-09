@@ -147,10 +147,11 @@ class HttpTransportTest extends TestCase
     {
         $this->transport->setAuthentication("test", "test");
 
+        $test = $this;
         $this->socketClient->expects($this->once())
             ->method("write")
-            ->will($this->returnCallback(function($data) {
-                $this->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
+            ->will($this->returnCallback(function($data) use ($test) {
+                $test->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
             }));
             
         $this->socketClient
