@@ -69,7 +69,7 @@ class HttpTransport extends AbstractTransport
     {
         $this->host = $host ?: $this->host;
         $this->port = $port ?: $this->port;
-        $this->path = $path ?: $this->path;
+        $this->path = ($path === null) ? $this->path : $path;
         $this->sslOptions = $sslOptions;
 
         $this->messageEncoder = new DefaultEncoder();
@@ -79,6 +79,52 @@ class HttpTransport extends AbstractTransport
             $this->port,
             $this->getContext()
         );
+    }
+
+    /**
+     * Creates a HttpTransport from a URI
+     *
+     * Supports http and https schemes, port-, path- and auth-definitions
+     * If the port is ommitted 80 and 443 are used respectively.
+     * If a username but no password is given, and empty password is used.
+     * If a https URI is given, the provided SslOptions (with a fallback to
+     * the default SslOptions) are used.
+     *
+     * @param  string          $url
+     * @param  SslOptions|null $sslOptions
+     *
+     * @return HttpTransport
+     */
+    public static function fromUrl($url, SslOptions $sslOptions = null)
+    {
+        $parsed = parse_url($url);
+        if (false === $parsed || !isset($parsed['host'])) {
+            throw new \InvalidArgumentException("$url is not a valid URL");
+        }
+        
+        $scheme = strtolower(isset($parsed['scheme']) ? $parsed['scheme'] : '');
+        if (!in_array($scheme, array('http', 'https'))) {
+            throw new \InvalidArgumentException("$url is not a valid http/https URL");
+        }
+        $host = $parsed['host'];
+        $ssl  = $scheme == 'https';
+        $port = isset($parsed['port']) ? $parsed['port'] : ($ssl ? 443 : 80);
+        $path = isset($parsed['path']) ? $parsed['path'] : '';
+
+        if ($ssl) {
+            $sslOptions = $sslOptions ?: new SslOptions();
+        }
+
+        $transport = new self($host, $port, $path, $sslOptions);
+
+        if (isset($parsed['user'])) {
+            $user = $parsed['user'];
+            $pass = isset($parsed['pass']) ? $parsed['pass'] : '';
+
+            $transport->setAuthentication($user, $pass);
+        }
+
+        return $transport;
     }
 
     /**

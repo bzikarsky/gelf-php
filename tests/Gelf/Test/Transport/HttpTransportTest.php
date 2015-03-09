@@ -12,6 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\HttpTransport;
+use Gelf\Transport\SslOptions;
 use PHPUnit_Framework_TestCase as TestCase;
 
 class HttpTransportTest extends TestCase
@@ -75,6 +76,71 @@ class HttpTransportTest extends TestCase
         $reflectedClient->setValue($transport, $this->socketClient);
 
         return $transport;
+    }
+
+    public function testConstructor()
+    {
+        $transport = new HttpTransport();
+        $this->validateTransport($transport, '127.0.0.1', 12202, '/gelf');
+
+        $transport = new HttpTransport('test.local', 80, '');
+        $this->validateTransport($transport, 'test.local', 80, '');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFromUrlConstructorInvalidUri()
+    {
+        $transport = HttpTransport::fromUrl('-://:-');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFromUrlConstructorInvalidScheme()
+    {
+        $transport = HttpTransport::fromUrl('ftp://foobar');
+    }
+
+    public function testFromUrlConstructor()
+    {
+        $transport = HttpTransport::fromUrl('HTTP://localhost');
+        $this->validateTransport($transport, 'localhost', 80, '', null, null);
+
+        $transport = HttpTransport::fromUrl('http://localhost:1234');
+        $this->validateTransport($transport, 'localhost', 1234, '', null, null);
+        
+        $transport = HttpTransport::fromUrl('http://localhost/abc');
+        $this->validateTransport($transport, 'localhost', 80, '/abc', null, null);
+        
+        $transport = HttpTransport::fromUrl('http://localhost:1234/abc');
+        $this->validateTransport($transport, 'localhost', 1234, '/abc', null, null);
+
+        $transport = HttpTransport::fromUrl('http://user@localhost');
+        $this->validateTransport($transport, 'localhost', 80, '', null, 'user:');
+
+        $transport = HttpTransport::fromUrl('http://user:pass@localhost');
+        $this->validateTransport($transport, 'localhost', 80, '', null, 'user:pass');
+
+        $transport = HttpTransport::fromUrl('https://localhost');
+        $this->validateTransport($transport, 'localhost', 443, '', new SslOptions(), null);
+        
+        $sslOptions = new SslOptions();
+        $sslOptions->setVerifyPeer(false);
+        $transport = HttpTransport::fromUrl('HTTPS://localhost', $sslOptions);
+        $this->validateTransport($transport, 'localhost', 443, '', $sslOptions, null);
+    }
+
+    public function validateTransport(HttpTransport $transport, $host, $port, $path, $sslOptions = null, $authentication = null)
+    {
+        $r = new \ReflectionObject($transport);
+
+        foreach(array('host', 'port', 'path', 'sslOptions', 'authentication') as $test) {
+            $p = $r->getProperty($test);
+            $p->setAccessible(true);
+            $this->assertEquals(${$test}, $p->getValue($transport));
+        }
     }
 
     public function testSslOptionsAreUsed()
