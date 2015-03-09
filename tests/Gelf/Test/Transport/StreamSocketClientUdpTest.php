@@ -12,7 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
-use PHPUnit_Framework_TestCase as TestCase;
+use Gelf\TestCase;
 
 class StreamSocketClientUdpTest extends TestCase
 {

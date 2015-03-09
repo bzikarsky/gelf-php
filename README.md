@@ -53,6 +53,20 @@ Reinstall dependencies: `composer install`
 
 For usage examples, go to [/examples](https://github.com/bzikarsky/gelf-php/tree/master/examples).
 
+HHVM
+----
+
+While HHVM is supported/tested, there are some restrictions to look out for:
+- Stream-context support is very limited - especially regarding SSL, some things might work as expected (or at all...)
+- `fwrite` does behave a little different
+
+The failing unit-tests are skipped by default when running on HHVM. They are also all annotated with `@group hhvm-failures`.
+You can force to run those failures by setting `FORCE_HHVM_TESTS=1` in the environment. Therefore you can specifically check
+the state of HHVM failures by running:
+
+    `FORCE_HHVM_TESTS=1 hhvm vendor/bin/phpunit --group hhvm-failures`
+
+
 License
 -------
 

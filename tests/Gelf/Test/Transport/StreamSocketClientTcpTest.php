@@ -12,7 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
-use PHPUnit_Framework_TestCase as TestCase;
+use Gelf\TestCase;
 
 class StreamSocketClientTcpTest extends TestCase
 {
@@ -27,9 +27,12 @@ class StreamSocketClientTcpTest extends TestCase
      */
     protected $serverSocket;
 
+    protected $host = "127.0.0.1";
+    protected $port;
+
     public function setUp()
     {
-        $host = "127.0.0.1";
+        $host = $this->host;
         $this->serverSocket = stream_socket_server(
             "tcp://$host:0",
             $errNo,
@@ -48,6 +51,7 @@ class StreamSocketClientTcpTest extends TestCase
         list(, $port) = explode(":", $socketName);
 
         $this->socketClient = new StreamSocketClient('tcp', $host, $port);
+        $this->port = $port;
     }
 
     public function tearDown()
@@ -174,11 +178,30 @@ class StreamSocketClientTcpTest extends TestCase
         $this->socketClient->write("abcd");
         $client = stream_socket_accept($this->serverSocket);
         $this->assertEquals("abcd", fread($client, 4));
-         
+
         $this->socketClient->close();
-        
+
         $this->socketClient->write("efgh");
         $client2 = stream_socket_accept($this->serverSocket);
         $this->assertEquals("efgh", fread($client2, 4));
+    }
+
+    /**
+     * @group hhvm-failures
+     */
+    public function testStreamContext()
+    {
+        $this->failsOnHHVM();
+
+        $testName = '127.0.0.1:12345';
+        $context = array(
+            'socket' => array(
+                'bindto' => $testName
+            )
+        );
+
+        $client = new StreamSocketClient("tcp", $this->host, $this->port, $context);
+        $this->assertEquals($testName, stream_socket_get_name($client->getSocket(), false));
+        $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
     }
 }
