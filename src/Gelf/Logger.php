@@ -116,7 +116,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Initializes message-object
      *
      * @param  mixed   $level
-     * @param  mixed   $rawMessage
+     * @param  mixed   $message
      * @param  array   $context
      * @return Message
      */

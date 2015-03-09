@@ -108,7 +108,7 @@ class MessageValidator implements MessageValidatorInterface
      *
      * Fails on null, false and empty strings
      *
-     * @param  string $string
+     * @param  string $scalar
      * @return bool
      */
     public static function isEmpty($scalar)
