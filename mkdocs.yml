@@ -1,0 +1,14 @@
+site_name: gelf-php
+docs_dir: docs
+repo_url: https://github.com/bzikarsky/gelf-php
+theme: yeti
+
+pages:
+- [index.md, Home]
+- [history.md, History]
+- [installation.md, Installation]
+- [examples.md, Examples]
+- [integrations.md, Integrations]
+- [contributing.md, Contributing]
+- [license.md, License]
+

@@ -1,0 +1,5 @@
+# Installation
+
+## Composer (preferred)
+
+## Alternatives
