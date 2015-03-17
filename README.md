@@ -19,7 +19,7 @@ and [mlehner's fork](https://github.com/mlehner/gelf-php).
 Stable release and deprecation of the original graylog2/gelf-php
 ----------------------------------------------------------------
 
-This implementation became the official PHP GELF library on 2013-12-19 and is now released as `graylog2/gelf-php v1.0`.
+This implementation became the official PHP GELF library on 2013-12-19 and is now released as `graylog2/gelf-php`.
 The old library became deprecated at the same time and it's recommended to upgrade.
 
 Since the deprecated library never got a stable release, we decided keep it available as `v0.1`. This means:
