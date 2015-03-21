@@ -17,7 +17,7 @@
             "Gelf\\": "src/Gelf"
         }
     },
-    "provides": {
+    "provide": {
         "psr/log-implementation": "~1.0"
     },
     "require-dev": {
