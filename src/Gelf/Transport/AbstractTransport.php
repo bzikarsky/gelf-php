@@ -58,7 +58,7 @@ abstract class AbstractTransport implements TransportInterface, PublisherInterfa
      *
      * @return int the number of bytes sent
      */
-    abstract public function send(MessageInterface $message);
+    public function send(MessageInterface $message){}
 
     /**
      * Alias to send() without return value
