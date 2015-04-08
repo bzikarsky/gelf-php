@@ -8,7 +8,7 @@ gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/g
 
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
-This library conforms to the PSR standards in regards to structure ([0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md)),
+This library conforms to the PSR standards in regards to structure ([4](http://www.php-fig.org/psr/psr-4/)),
 coding-style ([1](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md),
 [2](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md))
 and logging ([3](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md)).
@@ -39,11 +39,11 @@ Usage
 
 ### Recommended installation via composer:
 
-Add gelf-php to `composer.json`:
+Add gelf-php to `composer.json` either by running `composer require graylog2/gelf-php` or by definint it manually:
 
     "require": {
        // ...
-       "graylog2/gelf-php": "~1.1"
+       "graylog2/gelf-php": "~1.2"
        // ...
     }
 
