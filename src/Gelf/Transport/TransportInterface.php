@@ -25,6 +25,7 @@ interface TransportInterface
      * Sends a Message over this transport.
      *
      * @param Message $message
+     * @return int the number of bytes sent
      */
     public function send(Message $message);
 }
