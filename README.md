@@ -57,7 +57,7 @@ HHVM
 ----
 
 While HHVM is supported/tested, there are some restrictions to look out for:
-- Stream-context support is very limited - especially regarding SSL, some things might work as expected (or at all...)
+- Stream-context support is very limited (as of 2014) - especially regarding SSL - many use-cases might not work as expected (or not at all...)
 - `fwrite` does behave a little different
 
 The failing unit-tests are skipped by default when running on HHVM. They are also all annotated with `@group hhvm-failures`.
