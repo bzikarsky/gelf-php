@@ -300,8 +300,12 @@ class Message implements MessageInterface
         return array_filter($message, array($this, 'filter'));
     }
 
+    /**
+     * @param mixed $var
+     * @return bool
+     */
     protected function filter($var)
     {
-        return !is_string($var) || strlen($var);
+        return ($var !== null) && (!is_string($var) || strlen($var));
     }
 }
