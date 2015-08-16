@@ -39,7 +39,7 @@ Usage
 
 ### Recommended installation via composer:
 
-Add gelf-php to `composer.json` either by running `composer require graylog2/gelf-php` or by definint it manually:
+Add gelf-php to `composer.json` either by running `composer require graylog2/gelf-php` or by defining it manually:
 
     "require": {
        // ...
