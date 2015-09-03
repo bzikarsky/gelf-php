@@ -175,6 +175,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      *
      * @param mixed $message
      * @param array $context
+     * @return string
      */
     private static function interpolate($message, array $context)
     {
