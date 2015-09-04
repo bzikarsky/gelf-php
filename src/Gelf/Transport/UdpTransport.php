@@ -13,7 +13,6 @@ namespace Gelf\Transport;
 
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
-use Gelf\MessageInterface;
 use RuntimeException;
 
 /**
