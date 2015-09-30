@@ -1,11 +1,15 @@
 {
-    "name": "graylog2/gelf-php",
-    "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
+    "name": "proximedia/gelf-php",
+    "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2. Added TCP support.",
     "license": "MIT",
     "authors": [
         {
             "name": "Benjamin Zikarsky",
             "email": "benjamin@zikarsky.de"
+        },
+        {
+            "name": "Ahmed Trabelsi",
+            "email": "ahmed.trabelsi@proximedia.fr"
         }
     ],
     "require": {
