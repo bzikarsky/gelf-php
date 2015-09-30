@@ -93,36 +93,4 @@ class TcpTransportTest extends TestCase
             $transport->getMessageEncoder()
         );
     }
-
-    public function testSendUnchunked()
-    {
-        $this->socketClient
-            ->expects($this->once())
-            ->method('write')
-            ->with($this->testMessage);
-
-        $this->transport->send($this->message);
-    }
-
-    public function testSendChunked()
-    {
-        $chunkSize = 10;
-        $transport = $this->getTransport(10);
-        $expectedMessageCount =  strlen($this->testMessage) / $chunkSize;
-
-        $this->socketClient
-            ->expects($this->exactly($expectedMessageCount))
-            ->method('write');
-
-        $transport->send($this->message);
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testInvalidChunkNumber()
-    {
-        $transport = $this->getTransport(1);
-        $transport->send($this->message);
-    }
 }
