@@ -58,14 +58,14 @@ class TcpTransportTest extends TestCase
             $this->returnValue($this->testMessage)
         );
 
-        $this->transport = $this->getTransport(0);
+        $this->transport = $this->getTransport();
     }
 
-    protected function getTransport($chunkSize)
+    protected function getTransport()
     {
         // initialize transport with an unlimited packet-size
         // and the mocked message encoder
-        $transport = new TcpTransport(null, null, $chunkSize);
+        $transport = new TcpTransport(null, null);
         $transport->setMessageEncoder($this->encoder);
 
         // replace internal stream socket client with our mock
