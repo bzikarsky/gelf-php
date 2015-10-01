@@ -33,6 +33,8 @@ abstract class AbstractTransport implements TransportInterface, PublisherInterfa
      * Sets a message encoder
      *
      * @param EncoderInterface $encoder
+     *
+     * @return $this
      */
     public function setMessageEncoder(EncoderInterface $encoder)
     {
