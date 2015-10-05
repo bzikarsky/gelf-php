@@ -8,8 +8,8 @@
             "email": "benjamin@zikarsky.de"
         },
         {
-            "name": "Ahmed Trabelsi",
-            "email": "ahmed.trabelsi@proximedia.fr"
+            "name": "gelf-php contributors",
+            "homepage": "https://github.com/bzikarsky/gelf-php/contributors"
         }
     ],
     "require": {
