@@ -6,6 +6,10 @@
         {
             "name": "Benjamin Zikarsky",
             "email": "benjamin@zikarsky.de"
+        },
+        {
+            "name": "gelf-php contributors",
+            "homepage": "https://github.com/bzikarsky/gelf-php/contributors"
         }
     ],
     "require": {

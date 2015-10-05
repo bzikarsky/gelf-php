@@ -104,7 +104,7 @@ class HttpTransport extends AbstractTransport
             throw new \InvalidArgumentException("$url is not a valid URL");
         }
         
-        // check it's http or https 
+        // check it's http or https
         $scheme = strtolower($parsed['scheme']);
         if (!in_array($scheme, array('http', 'https'))) {
             throw new \InvalidArgumentException("$url is not a valid http/https URL");
@@ -119,7 +119,7 @@ class HttpTransport extends AbstractTransport
             $defaults['port'] = 443;
         }
          
-        // merge defaults and real data and build transport   
+        // merge defaults and real data and build transport
         $parsed = array_merge($defaults, $parsed);
         $transport = new self($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
 
