@@ -98,7 +98,7 @@ class StreamSocketClient
         if ($socket === false) {
             throw new RuntimeException(
                 sprintf(
-                    "Failed to create socket-client for %si: %s (%s)",
+                    "Failed to create socket-client for %s: %s (%s)",
                     $socketDescriptor,
                     $errStr,
                     $errNo
