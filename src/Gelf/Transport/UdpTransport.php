@@ -27,7 +27,7 @@ use RuntimeException;
 class UdpTransport extends AbstractTransport
 {
     const CHUNK_GELF_ID = "\x1e\x0f";
-    const CHUNK_MAX_COUNT = 256; // sequence-size is stored in a CHAR
+    const CHUNK_MAX_COUNT = 128; // as per GELF spec
     const CHUNK_SIZE_LAN = 8154;
     const CHUNK_SIZE_WAN = 1420;
 
