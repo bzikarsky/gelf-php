@@ -120,10 +120,11 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param  array   $context
      * @return Message
      */
-    protected function initMessage($level, $message, $context)
+    protected function initMessage($level, $message, array $context)
     {
         // assert that message is a string, and interpolate placeholders
         $message = (string) $message;
+        $context = $this->initContext($context);
         $message = self::interpolate($message, $context);
 
         // create message object
@@ -137,6 +138,44 @@ class Logger extends AbstractLogger implements LoggerInterface
         }
 
         return $messageObj;
+    }
+
+    /**
+     * Initializes context array, ensuring all values are string-safe
+     *
+     * @param array $context
+     * @return array
+     */
+    protected function initContext($context)
+    {
+        foreach ($context as $key => &$value) {
+            switch (gettype($value)) {
+                case 'string':
+                case 'integer':
+                case 'double':
+                    // These types require no conversion
+                    break;
+                case 'array':
+                case 'boolean':
+                    $value = json_encode($value);
+                    break;
+                case 'object':
+                    if (method_exists($value, '__toString')) {
+                        $value = (string)$value;
+                    } else {
+                        $value = '[object (' . get_class($value) . ')]';
+                    }
+                    break;
+                case 'NULL':
+                    $value = 'NULL';
+                    break;
+                default:
+                    $value = '[' . gettype($value) . ']';
+                    break;
+            }
+        }
+
+        return $context;
     }
 
     /**

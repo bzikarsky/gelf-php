@@ -90,6 +90,58 @@ class LoggerTest extends TestCase
         $this->logger->log(LogLevel::NOTICE, "foo {test}", $additional);
     }
 
+    /**
+     * @see https://github.com/bzikarsky/gelf-php/issues/50
+     * @dataProvider providerLogContextWithStructuralValues
+     */
+    public function testLogContextWithStructuralValues($contextValue, $expected)
+    {
+        $test = $this;
+        $additional = array('context' => $contextValue);
+        $this->validatePublish(
+            function (MessageInterface $message) use ($test, $expected) {
+                // Use Message::toArray() as it filters invalid values
+                $final = $message->toArray();
+                if (!isset($final['_context'])) {
+                    $test->fail("Expected context key missing");
+                }
+                $actual = $final['_context'];
+                // Only scalar values are allowed, with exception of boolean
+                $test->assertTrue(
+                    is_scalar($actual) && !is_bool($actual),
+                    'Unexpected context value of type: ' . gettype($actual)
+                );
+                $test->assertSame($expected, $actual);
+            }
+        );
+
+        // Log message length must exceed longest context key length + 2
+        // to cause strtr() in Logger::interpolate() to throw notices for nested arrays
+        $this->logger->log(LogLevel::NOTICE, 'test message', $additional);
+    }
+
+    public function providerLogContextWithStructuralValues()
+    {
+        $stdClass = new \stdClass();
+        $stdClass->prop1 = 'val1';
+
+        $toString = $this->getMock('dummyClass', array('__toString'));
+        $toString->method('__toString')
+            ->willReturn('toString');
+
+        return array(
+            'array'     => array(array('bar' => 'buz'), '{"bar":"buz"}'),
+            'boolTrue'  => array(true, 'true'),
+            'boolFalse' => array(false, 'false'),
+            'integer'   => array(123, 123),
+            'float'     => array(123.456, 123.456),
+            'object'    => array($stdClass, '[object (stdClass)]'),
+            'toString'  => array($toString, 'toString'),
+            'resource'  => array(fopen('php://memory', 'r'), '[resource]'),
+            'null'      => array(null, 'NULL')
+        );
+    }
+
     public function testLogException()
     {
         $test = $this;
