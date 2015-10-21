@@ -137,9 +137,9 @@ class StreamSocketClient
     private function buildSocket()
     {
         $socketDescriptor = sprintf(
-            "%s://%s:%d", 
-            $this->scheme, 
-            $this->host, 
+            "%s://%s:%d",
+            $this->scheme,
+            $this->host,
             $this->port
         );
 
@@ -180,12 +180,7 @@ class StreamSocketClient
     {
         // lazy initializing of socket-descriptor
         if (!$this->socket) {
-            $this->socket = $this->buildSocket(
-                $this->scheme,
-                $this->host,
-                $this->port,
-                $this->context
-            );
+            $this->socket = $this->buildSocket();
         }
 
         return $this->socket;
@@ -252,7 +247,7 @@ class StreamSocketClient
      * Sets the connect-timeout
      *
      * @param int $timeout
-     */      
+     */
     public function setConnectTimeout($timeout)
     {
         $this->connectTimeout = $timeout;

@@ -41,16 +41,13 @@ class TcpTransport extends AbstractTransport
      * @param string $host      when NULL or empty DEFAULT_HOST is used
      * @param int    $port      when NULL or empty DEFAULT_PORT is used
      */
-    public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT
-    ) {
+    public function __construct($host = self::DEFAULT_HOST, $port = self::DEFAULT_PORT)
+    {
         // allow NULL-like values for fallback on default
         $host = $host ?: self::DEFAULT_HOST;
         $port = $port ?: self::DEFAULT_PORT;
 
         $this->socketClient = new StreamSocketClient('tcp', $host, $port);
-
         $this->messageEncoder = new DefaultEncoder();
     }
 

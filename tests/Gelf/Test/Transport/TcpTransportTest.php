@@ -104,7 +104,7 @@ class TcpTransportTest extends TestCase
             ->with($this->testMessage . "\0");
 
         $this->transport->send($this->message);
-    }    
+    }
 
     public function testConnectTimeout()
     {
