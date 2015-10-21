@@ -192,11 +192,19 @@ class MessageTest extends TestCase
     public function testToArrayV10()
     {
         $this->message->setAdditional("foo", "bar");
+        $this->message->setAdditional("bool-true", true);
+        $this->message->setAdditional("bool-false", false);
         $data = $this->message->toArray();
         $this->assertTrue(is_array($data));
+
+        // test additionals
         $this->assertArrayHasKey("_foo", $data);
         $this->assertEquals("bar", $data["_foo"]);
-
+        $this->assertArrayHasKey("_bool-true", $data);
+        $this->assertTrue($data["_bool-true"]);
+        $this->assertArrayHasKey("_bool-false", $data);
+        $this->assertFalse($data["_bool-false"]);
+        
         $map = array(
             "version"       => "getVersion",
             "host"          => "getHost",
@@ -230,6 +238,8 @@ class MessageTest extends TestCase
         $this->message->setVersion("1.1");
         $this->message->setShortMessage("lorem ipsum");
         $this->message->setAdditional("foo", "bar");
+        $this->message->setAdditional("bool-true", true);
+        $this->message->setAdditional("bool-false", false);
 
         // check that deperacted behaviour is overridden in 1.1
         $this->message->setLine(50);
@@ -252,6 +262,9 @@ class MessageTest extends TestCase
 
         $this->assertArrayHasKey('_foo', $data);
         $this->assertSame('bar', $data['_foo']);
-
+        $this->assertArrayHasKey("_bool-true", $data);
+        $this->assertTrue($data["_bool-true"]);
+        $this->assertArrayHasKey("_bool-false", $data);
+        $this->assertFalse($data["_bool-false"]);
     }
 }
