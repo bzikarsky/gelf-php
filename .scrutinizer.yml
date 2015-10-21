@@ -104,7 +104,7 @@ checks:
         function_in_camel_caps: true
         foreach_usable_as_reference: true
         foreach_traversable: true
-        encourage_single_quotes: true
+        encourage_single_quotes: false
         encourage_shallow_comparison: true
         encourage_postdec_operator: true
         duplication: true
