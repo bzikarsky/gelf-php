@@ -34,8 +34,6 @@ class UdpTransport extends AbstractTransport
     const DEFAULT_HOST = "127.0.0.1";
     const DEFAULT_PORT = 12201;
 
-    const CONNECTION_TIMEOUT = 60;
-
     /**
      * @var int
      */
