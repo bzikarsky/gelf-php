@@ -22,6 +22,7 @@ interface PublisherInterface
      * Publish a message
      *
      * @param MessageInterface $message
+     * @return void
      */
     public function publish(MessageInterface $message);
 }

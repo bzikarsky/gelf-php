@@ -35,7 +35,7 @@ class SslOptions
     /**
      * Path to custom CA
      *
-     * @param string
+     * @param string|null
      */
     protected $caFile = null;
 
@@ -44,7 +44,7 @@ class SslOptions
      *
      * Formatted as specified in `ciphers(1)`
      *
-     * @param string
+     * @param string|null
      */
     protected $ciphers = null;
 
@@ -133,7 +133,7 @@ class SslOptions
     /**
      * Returns a stream-context representation of this config
      *
-     * @return array
+     * @return array<string,mixed>
      */
     public function toStreamContext()
     {

@@ -24,7 +24,7 @@ use Exception;
 class Logger extends AbstractLogger implements LoggerInterface
 {
     /**
-     * @var string
+     * @var string|null
      */
     protected $facility;
 
@@ -36,8 +36,8 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Creates a PSR-3 Logger for GELF/Graylog2
      *
-     * @param Publisher $publisher
-     * @param string    $facility
+     * @param Publisher|null $publisher
+     * @param string|null    $facility
      */
     public function __construct(
         PublisherInterface $publisher = null,
@@ -45,9 +45,8 @@ class Logger extends AbstractLogger implements LoggerInterface
     ) {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
-        $publisher = $publisher ?: new Publisher(new UdpTransport());
+        $this->publisher = $publisher ?: new Publisher(new UdpTransport());
 
-        $this->setPublisher($publisher);
         $this->setFacility($facility);
     }
 
@@ -105,7 +104,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Sets the facility for GELF messages
      *
-     * @param string $facility
+     * @param string|null $facility
      */
     public function setFacility($facility = null)
     {
@@ -143,26 +142,26 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Initializes Exceptiondata with given message
      *
      * @param Message   $message
-     * @param Exception $e
+     * @param Exception $exception
      */
-    protected function initExceptionData(Message $message, Exception $e)
+    protected function initExceptionData(Message $message, Exception $exception)
     {
-        $message->setLine($e->getLine());
-        $message->setFile($e->getFile());
+        $message->setLine($exception->getLine());
+        $message->setFile($exception->getFile());
 
         $longText = "";
 
         do {
             $longText .= sprintf(
                 "%s: %s (%d)\n\n%s\n",
-                get_class($e),
-                $e->getMessage(),
-                $e->getCode(),
-                $e->getTraceAsString()
+                get_class($exception),
+                $exception->getMessage(),
+                $exception->getCode(),
+                $exception->getTraceAsString()
             );
 
-            $e = $e->getPrevious();
-        } while ($e && $longText .= "\n--\n\n");
+            $exception = $exception->getPrevious();
+        } while ($exception && $longText .= "\n--\n\n");
 
         $message->setFullMessage($longText);
     }
