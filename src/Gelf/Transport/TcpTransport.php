@@ -72,4 +72,24 @@ class TcpTransport extends AbstractTransport
 
         return 1;
     }
+
+    /**
+     * Sets the connect-timeout
+     *
+     * @param int $timeout
+     */
+    public function setConnectTimeout($timeout)
+    {
+        $this->socketClient->setConnectTimeout($timeout);
+    }
+
+    /**
+     * Returns the connect-timeout
+     *
+     * @return int
+     */
+    public function getConnectTimeout()
+    {
+        return $this->socketClient->getConnectTimeout();
+    }
 }

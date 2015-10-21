@@ -204,4 +204,11 @@ class StreamSocketClientTcpTest extends TestCase
         $this->assertEquals($testName, stream_socket_get_name($client->getSocket(), false));
         $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
     }
+
+    public function testConnectTimeout()
+    {
+        $this->assertEquals(StreamSocketClient::SOCKET_TIMEOUT, $this->socketClient->getConnectTimeout());
+        $this->socketClient->setConnectTimeout(1);
+        $this->assertEquals(1, $this->socketClient->getConnectTimeout());
+    }
 }

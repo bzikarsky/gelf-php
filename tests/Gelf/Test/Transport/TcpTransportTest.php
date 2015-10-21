@@ -93,4 +93,21 @@ class TcpTransportTest extends TestCase
             $transport->getMessageEncoder()
         );
     }
+
+    public function testConnectTimeout()
+    {
+        $this->socketClient
+            ->expects($this->once())
+            ->method('getConnectTimeout')
+            ->will($this->returnValue(123));
+
+        $this->assertEquals(123, $this->transport->getConnectTimeout());
+
+        $this->socketClient
+            ->expects($this->once())
+            ->method('setConnectTimeout')
+            ->with(123);
+
+        $this->transport->setConnectTimeout(123);
+    }
 }

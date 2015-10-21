@@ -22,6 +22,9 @@ use RuntimeException;
  */
 class StreamSocketClient
 {
+    /**
+     * @deprecated deprecated since v1.4.0
+     */
     const SOCKET_TIMEOUT = 30;
 
     /**
@@ -50,6 +53,11 @@ class StreamSocketClient
     protected $socket;
 
     /**
+     * @var int
+     */
+    protected $connectTimeout = self::SOCKET_TIMEOUT;
+
+    /**
      * @param string  $scheme
      * @param string  $host
      * @param integer $port
@@ -73,6 +81,8 @@ class StreamSocketClient
 
     /**
      * Initializes socket-client
+     *
+     * @deprecated deprecated since v1.4.0
      *
      * @param string  $scheme  like "udp" or "tcp"
      * @param string  $host
@@ -114,6 +124,53 @@ class StreamSocketClient
         return $socket;
     }
 
+
+    /**
+     * Internal function mimicking the behaviour of static::initSocket
+     * which will get new functionality instead of the deprecated
+     * "factory"
+     *
+     * @return resource
+     *
+     * @throws RuntimeException on connection-failure
+     */
+    private function buildSocket()
+    {
+        $socketDescriptor = sprintf(
+            "%s://%s:%d", 
+            $this->scheme, 
+            $this->host, 
+            $this->port
+        );
+
+        $socket = @stream_socket_client(
+            $socketDescriptor,
+            $errNo,
+            $errStr,
+            $this->connectTimeout,
+            \STREAM_CLIENT_CONNECT,
+            stream_context_create($this->context)
+        );
+
+        if ($socket === false) {
+            throw new RuntimeException(
+                sprintf(
+                    "Failed to create socket-client for %s: %s (%s)",
+                    $socketDescriptor,
+                    $errStr,
+                    $errNo
+                )
+            );
+        }
+
+        // set non-blocking for UDP
+        if (strcasecmp("udp", $this->scheme) == 0) {
+            stream_set_blocking($socket, 0);
+        }
+
+        return $socket;
+    }
+
     /**
      * Returns raw-socket-resource
      *
@@ -123,7 +180,7 @@ class StreamSocketClient
     {
         // lazy initializing of socket-descriptor
         if (!$this->socket) {
-            $this->socket = self::initSocket(
+            $this->socket = $this->buildSocket(
                 $this->scheme,
                 $this->host,
                 $this->port,
@@ -179,5 +236,25 @@ class StreamSocketClient
 
         fclose($this->socket);
         $this->socket = null;
+    }
+
+    /**
+     * Returns the current connect-timeout
+     *
+     * @return int
+     */
+    public function getConnectTimeout()
+    {
+        return $this->connectTimeout;
+    }
+
+    /**
+     * Sets the connect-timeout
+     *
+     * @param int $timeout
+     */      
+    public function setConnectTimeout($timeout)
+    {
+        $this->connectTimeout = $timeout;
     }
 }

@@ -316,4 +316,21 @@ class HttpTransportTest extends TestCase
 
         $this->transport->send($this->message);
     }
+
+    public function testConnectTimeout()
+    {
+        $this->socketClient
+            ->expects($this->once())
+            ->method('getConnectTimeout')
+            ->will($this->returnValue(123));
+
+        $this->assertEquals(123, $this->transport->getConnectTimeout());
+
+        $this->socketClient
+            ->expects($this->once())
+            ->method('setConnectTimeout')
+            ->with(123);
+
+        $this->transport->setConnectTimeout(123);
+    }
 }
