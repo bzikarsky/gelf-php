@@ -63,7 +63,7 @@ class TcpTransport extends AbstractTransport
      */
     public function send(Message $message)
     {
-        $rawMessage = $this->getMessageEncoder()->encode($message)."\0";
+        $rawMessage = $this->getMessageEncoder()->encode($message) . "\0";
         
         // send message in one packet
         $this->socketClient->write($rawMessage);

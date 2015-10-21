@@ -94,6 +94,18 @@ class TcpTransportTest extends TestCase
         );
     }
 
+    public function testSend()
+    {
+        $this->socketClient
+            ->expects($this->once())
+            ->method('write')
+            // TCP protocol requires every message to be
+            // terminated with \0
+            ->with($this->testMessage . "\0");
+
+        $this->transport->send($this->message);
+    }    
+
     public function testConnectTimeout()
     {
         $this->socketClient
