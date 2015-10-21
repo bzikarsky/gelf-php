@@ -182,7 +182,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         // build a replacement array with braces around the context keys
         $replace = array();
         foreach ($context as $key => $val) {
-            $replace['{' . $key . '}'] = $val;
+            $replace['{' . $key . '}'] = is_string($val) ? $val : 'Array';
         }
 
         // interpolate replacement values into the message and return

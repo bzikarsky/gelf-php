@@ -297,6 +297,15 @@ class Message implements MessageInterface
         }
 
         // return after filtering false, null and empty strings
-        return array_filter($message, 'strlen');
+        return array_filter($message, array($this, 'filter'));
+    }
+
+    /**
+     * @param mixed $var
+     * @return bool
+     */
+    protected function filter($var)
+    {
+        return ($var !== null) && (!is_string($var) || strlen($var));
     }
 }
