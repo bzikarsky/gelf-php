@@ -46,6 +46,8 @@ class MessageTest extends TestCase
     public function testVersion()
     {
         $this->assertEquals("1.0", $this->message->getVersion());
+        $this->assertEquals($this->message, $this->message->setVersion("1.1"));
+        $this->assertEquals("1.1", $this->message->getVersion());
     }
 
     public function testHost()
@@ -176,7 +178,7 @@ class MessageTest extends TestCase
 
     public function testMethodChaining()
     {
-        $this->message
+        $message = $this->message
             ->setTimestamp(new \DateTime())
             ->setAdditional("test", "value")
             ->setFacility("test")
@@ -186,7 +188,10 @@ class MessageTest extends TestCase
             ->setShortMessage("test")
             ->setLevel("ERROR")
             ->setLine(1)
+            ->setVersion("1.1")
         ;
+
+        $this->assertEquals($this->message, $message);
     }
 
     public function testToArrayV10()
