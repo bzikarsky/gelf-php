@@ -36,8 +36,8 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Creates a PSR-3 Logger for GELF/Graylog2
      *
-     * @param Publisher|null $publisher
-     * @param string|null    $facility
+     * @param PublisherInterface|null $publisher
+     * @param string|null             $facility
      */
     public function __construct(
         PublisherInterface $publisher = null,
@@ -94,7 +94,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     /**
      * Returns the faciilty-name used in GELF
      *
-     * @return string
+     * @return string|null
      */
     public function getFacility()
     {
