@@ -129,6 +129,8 @@ class Message implements MessageInterface
     public function setVersion($version)
     {
         $this->version = $version;
+        
+        return $this;
     }
 
     public function getHost()
