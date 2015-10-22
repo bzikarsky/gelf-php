@@ -28,4 +28,3 @@ $message->setShortMessage("It works in TCP!")
         ->setFacility("local8")
 ;
 $publisher->publish($message);
-
