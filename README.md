@@ -64,7 +64,7 @@ The failing unit-tests are skipped by default when running on HHVM. They are als
 You can force to run those failures by setting `FORCE_HHVM_TESTS=1` in the environment. Therefore you can specifically check
 the state of HHVM failures by running:
 
-    `FORCE_HHVM_TESTS=1 hhvm vendor/bin/phpunit --group hhvm-failures`
+    FORCE_HHVM_TESTS=1 hhvm vendor/bin/phpunit --group hhvm-failures
 
 
 License
@@ -86,6 +86,6 @@ If you have any questions/proposals/etc. you can contact me on Twitter ([@bzikar
 
 ### Steps
 1. Clone repository and cd into it: `git clone git@github.com:bzikarsky/gelf-php && cd gelf-php`
-2. Install dependencies: `composer install --dev`
+2. Install dependencies: `composer install`
 3. Run unit-tests: `vendor/bin/phpunit`
-4. Check PSR compatibility: `vendor/bin/phpcs --standard=PSR2 src tests`
+4. Check PSR compatibility: `vendor/bin/phpcs --standard=PSR2 src tests examples`
