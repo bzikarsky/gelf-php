@@ -109,7 +109,7 @@ class UdpTransport extends AbstractTransport
         if ($numChunks > self::CHUNK_MAX_COUNT) {
             throw new RuntimeException(
                 sprintf(
-                    "Message is to big. Chunk count exceeds %d",
+                    "Message is too big. Chunk count exceeds %d",
                     self::CHUNK_MAX_COUNT
                 )
             );
