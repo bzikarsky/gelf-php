@@ -17,6 +17,11 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
     private $transport;
 
     /**
+     * @var \Exception|null
+     */
+    private $lastError = null;
+
+    /**
      * IgnoreErrorTransportWrapper constructor.
      *
      * @param AbstractTransport $transport
@@ -38,7 +43,17 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
         try {
             return $this->transport->send($message);
         } catch (\Exception $e) {
+            $this->lastError = $e;
             return 0;
         }
+    }
+
+    /**
+     * Returns the last error
+     * @return \Exception
+     */
+    public function getLastError()
+    {
+        return $this->lastError;
     }
 }

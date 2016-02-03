@@ -12,7 +12,8 @@ class IgnoreErrorTransportWrapperTest extends TestCase
 {
     public function testSend()
     {
-        $expectedMessage = $this->buildMessage();
+        $expectedMessage   = $this->buildMessage();
+        $expectedException = new \RuntimeException();
 
         $transport = $this->buildTransport();
         $wrapper   = new IgnoreErrorTransportWrapper($transport);
@@ -20,11 +21,13 @@ class IgnoreErrorTransportWrapperTest extends TestCase
         $transport->expects($this->once())
                   ->method('send')
                   ->with($expectedMessage)
-                  ->willThrowException(new \RuntimeException());
+                  ->willThrowException($expectedException);
 
         $bytes = $wrapper->send($expectedMessage);
+        $lastError = $wrapper->getLastError();
 
         $this->assertEquals(0, $bytes);
+        $this->assertSame($expectedException, $lastError);
     }
 
     /**
