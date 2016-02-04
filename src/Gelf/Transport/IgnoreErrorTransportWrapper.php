@@ -50,7 +50,7 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
 
     /**
      * Returns the last error
-     * @return \Exception
+     * @return \Exception|null
      */
     public function getLastError()
     {
