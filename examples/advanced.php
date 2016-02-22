@@ -15,7 +15,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $transport = new Gelf\Transport\UdpTransport("127.0.0.1", 12201, Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN);
 
 // While the UDP transport is itself a publisher, we wrap it in a real Publisher for convenience.
-// A publisher allows for message validation before transmission, and also supports sending messages to multiple backends at once.
+// A publisher allows for message validation before transmission, and also supports sending 
+// messages to multiple backends at once.
 $publisher = new Gelf\Publisher();
 $publisher->addTransport($transport);
 
