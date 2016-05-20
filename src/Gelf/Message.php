@@ -176,7 +176,7 @@ class Message implements MessageInterface
 
     public function setTimestamp($timestamp)
     {
-        if ($timestamp instanceof \DateTime) {
+        if ($timestamp instanceof \DateTime || $timestamp instanceof \DateTimeInterface) {
             $timestamp = $timestamp->format("U.u");
         }
 
