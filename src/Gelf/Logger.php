@@ -112,6 +112,9 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
+     * Override this function to inject a different
+     * \Gelf\Message instance into the logger
+     *
      * @return Message
      */
     protected function createMessage()
