@@ -45,15 +45,15 @@ class LoggerTest extends TestCase
     public function testCustomMessageClass()
     {
         $message = $this->getMockBuilder('\Gelf\Test\Message\CustomMessage')
-            ->setMethods(['getAdditionalPrefix'])
+            ->setMethods(array('getAdditionalPrefix'))
             ->getMock();
 
         $message->method('getAdditionalPrefix')
             ->willReturn('myprefix_');
 
         $logger = $this->getMockBuilder('\Gelf\Logger')
-                ->setConstructorArgs([$this->publisher, $this->facility])
-                ->setMethods(['publish', 'createMessage'])
+                ->setConstructorArgs(array($this->publisher, $this->facility))
+                ->setMethods(array('publish', 'createMessage'))
                 ->getMock();
 
         $logger->method('createMessage')
@@ -70,7 +70,7 @@ class LoggerTest extends TestCase
         );
 
         /** @var Logger $logger */
-        $logger->log(LogLevel::ALERT, "test", ["foo" => "bar"]);
+        $logger->log(LogLevel::ALERT, "test", array("foo" => "bar"));
     }
 
     public function testPublisher()
