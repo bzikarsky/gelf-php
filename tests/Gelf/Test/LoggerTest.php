@@ -11,9 +11,12 @@
 
 namespace Gelf\Test;
 
+require_once __DIR__.'/Message/CustomMessage.php';
+
 use Gelf\Logger;
 use Gelf\MessageInterface;
 use Gelf\PublisherInterface;
+use Gelf\Test\Message\CustomMessage;
 use PHPUnit_Framework_TestCase as TestCase;
 use Psr\Log\LogLevel;
 use Exception;
@@ -37,6 +40,37 @@ class LoggerTest extends TestCase
     {
         $this->publisher = $this->getMock('\Gelf\PublisherInterface');
         $this->logger = new Logger($this->publisher, $this->facility);
+    }
+
+    public function testCustomMessageClass()
+    {
+        $message = $this->getMockBuilder('\Gelf\Test\Message\CustomMessage')
+            ->setMethods(['getAdditionalPrefix'])
+            ->getMock();
+
+        $message->method('getAdditionalPrefix')
+            ->willReturn('myprefix_');
+
+        $logger = $this->getMockBuilder('\Gelf\Logger')
+                ->setConstructorArgs([$this->publisher, $this->facility])
+                ->setMethods(['publish', 'createMessage'])
+                ->getMock();
+
+        $logger->method('createMessage')
+                ->willReturn($message);
+
+        $test = $this;
+        $this->validatePublish(
+            function ($message) use ($test) {
+                /** @var CustomMessage $message */
+                $test->assertInstanceOf('Gelf\Test\Message\CustomMessage', $message);
+                $test->assertArrayNotHasKey("foo", $message->getAllAdditionals());
+                $test->assertArrayHasKey($message->getAdditionalPrefix()."foo", $message->getAllAdditionals());
+            }
+        );
+
+        /** @var Logger $logger */
+        $logger->log(LogLevel::ALERT, "test", ["foo" => "bar"]);
     }
 
     public function testPublisher()
