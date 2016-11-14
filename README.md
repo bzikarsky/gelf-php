@@ -43,7 +43,7 @@ Add gelf-php to `composer.json` either by running `composer require graylog2/gel
 
     "require": {
        // ...
-       "graylog2/gelf-php": "~1.2"
+       "graylog2/gelf-php": "~1.5"
        // ...
     }
 
