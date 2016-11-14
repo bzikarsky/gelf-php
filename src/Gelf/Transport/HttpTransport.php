@@ -121,7 +121,7 @@ class HttpTransport extends AbstractTransport
          
         // merge defaults and real data and build transport
         $parsed = array_merge($defaults, $parsed);
-        $transport = new self($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
+        $transport = new static($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
 
         // add optional authentication
         if ($parsed['user']) {
