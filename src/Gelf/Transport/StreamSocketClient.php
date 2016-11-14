@@ -198,6 +198,7 @@ class StreamSocketClient
      */
     public function write($buffer)
     {
+        $buffer = (string) $buffer;
         $socket = $this->getSocket();
         $byteCount = @fwrite($socket, $buffer);
         $bufLen = strlen($buffer);

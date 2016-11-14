@@ -84,14 +84,6 @@ class StreamSocketClientUdpTest extends TestCase
         $this->assertEquals($testData, $readData);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testInvalidWrite()
-    {
-        $this->socketClient->write(array());
-    }
-
     public function testDestructorWithoutSocket()
     {
         unset($this->socketClient);
