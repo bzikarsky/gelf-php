@@ -133,9 +133,10 @@ class SslOptions
     /**
      * Returns a stream-context representation of this config
      *
+     * @param string|null $serverName
      * @return array<string,mixed>
      */
-    public function toStreamContext()
+    public function toStreamContext($serverName = null)
     {
         $sslContext = array(
             'verify_peer'       => (bool) $this->verifyPeer,
@@ -148,6 +149,15 @@ class SslOptions
 
         if (null !== $this->ciphers) {
             $sslContext['ciphers'] = $this->ciphers;
+        }
+
+        if (null !== $serverName) {
+            $sslContext['SNI_enabled'] = true;
+            $sslContext[PHP_VERSION_ID < 50600 ? 'SNI_server_name' : 'peer_name'] = $serverName;
+
+            if ($this->verifyPeer) {
+                $sslContext['CN_match'] = $serverName;
+            }
         }
 
         return array('ssl' => $sslContext);

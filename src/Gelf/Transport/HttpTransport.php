@@ -238,20 +238,7 @@ class HttpTransport extends AbstractTransport
             return array();
         }
 
-        $context = $this->sslOptions->toStreamContext();
-        
-        // If SNI is available hint on server-name
-        if (defined('HHVM_VERSION') ||  defined('OPENSSL_TLSEXT_SERVER_NAME')) {
-            $context['ssl']['SNI_enabled'] = true;
-            $context['ssl']['SNI_server_name'] = $this->host;
-        }
-        
-        // If verify_peer is active we also check for a valid CN
-        if ($this->sslOptions->getVerifyPeer()) {
-            $context['ssl']['CN_match'] = $this->host;
-        }
-
-        return $context;
+        return $this->sslOptions->toStreamContext($this->host);
     }
 
     /**
