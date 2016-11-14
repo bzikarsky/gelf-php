@@ -57,7 +57,10 @@ class StreamSocketClientTcpTest extends TestCase
     public function tearDown()
     {
         unset($this->socketClient);
-        fclose($this->serverSocket);
+        if ($this->serverSocket !== null) {
+            fclose($this->serverSocket);
+            $this->serverSocket = null;
+        }
     }
 
     public function testGetSocket()
@@ -77,6 +80,17 @@ class StreamSocketClientTcpTest extends TestCase
         $readData = fread($connection, $numBytes);
 
         $this->assertEquals($testData, $readData);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testBadWrite()
+    {
+        $this->socketClient->write("Hello ");
+        fclose($this->serverSocket);
+        $this->serverSocket = null;
+        $this->socketClient->write("world!");
     }
 
     public function testMultiWrite()

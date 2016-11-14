@@ -200,9 +200,14 @@ class StreamSocketClient
     {
         $socket = $this->getSocket();
         $byteCount = @fwrite($socket, $buffer);
+        $bufLen = strlen($buffer);
 
         if ($byteCount === false) {
             throw new \RuntimeException("Failed to write to socket");
+        }
+
+        if ($byteCount !== $bufLen) {
+            throw new \RuntimeException("Incomplete write: Only $byteCount of $bufLen written");
         }
 
         return $byteCount;
