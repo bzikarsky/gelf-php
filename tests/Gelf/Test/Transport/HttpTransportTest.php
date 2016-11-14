@@ -85,6 +85,12 @@ class HttpTransportTest extends TestCase
 
         $transport = new HttpTransport('test.local', 80, '');
         $this->validateTransport($transport, 'test.local', 80, '');
+
+        // test defaults:
+        //   path NULL                                   => path: /gelf
+        //   port 443 without explicit SSL options       => sslOptions: default
+        $transport = new HttpTransport('localhost', 443);
+        $this->validateTransport($transport, 'localhost', 443, '/gelf', new SslOptions());
     }
 
     /**

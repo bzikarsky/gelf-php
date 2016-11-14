@@ -70,6 +70,11 @@ class HttpTransport extends AbstractTransport
         $this->host = $host ?: $this->host;
         $this->port = $port ?: $this->port;
         $this->path = ($path === null) ? $this->path : $path;
+
+        if ($port == 443 && $sslOptions == null) {
+            $sslOptions = new SslOptions();
+        }
+
         $this->sslOptions = $sslOptions;
 
         $this->messageEncoder = new DefaultEncoder();
