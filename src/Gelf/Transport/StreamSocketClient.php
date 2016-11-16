@@ -201,7 +201,7 @@ class StreamSocketClient
         $buffer = (string) $buffer;
         $socket = $this->getSocket();
         $byteCount = @fwrite($socket, $buffer);
-        $bufLen = strlen($buffer);
+        $bufLen = strlen(bin2hex($buffer))/2;
 
         if ($byteCount === false) {
             throw new \RuntimeException("Failed to write to socket");
