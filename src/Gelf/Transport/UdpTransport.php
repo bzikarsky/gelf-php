@@ -13,6 +13,7 @@ namespace Gelf\Transport;
 
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
+use ParagonIE\ConstantTime\Binary;
 use RuntimeException;
 
 /**
@@ -81,7 +82,7 @@ class UdpTransport extends AbstractTransport
         // test if we need to split the message to multiple chunks
         // chunkSize == 0 allows for an unlimited packet-size, and therefore
         // disables chunking
-        if ($this->chunkSize && strlen($rawMessage) > $this->chunkSize) {
+        if ($this->chunkSize && Binary::safeStrlen($rawMessage) > $this->chunkSize) {
             return $this->sendMessageInChunks($rawMessage);
         }
 
@@ -116,7 +117,13 @@ class UdpTransport extends AbstractTransport
         }
 
         // generate a random 8byte-message-id
-        $messageId = substr(md5(uniqid(), true), 0, 8);
+        try {
+            // Attempt to use a CSPRNG (native or random_compat) first:
+            $messageId = random_bytes(8);
+        } catch (\Exception $ex) {
+            // If it can't be used safely, fall back to the old method:
+            $messageId = substr(md5(uniqid(), true), 0, 8);
+        }
 
         // send chunks with a correct chunk-header
         // @link http://graylog2.org/gelf#specs

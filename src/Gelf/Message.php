@@ -11,6 +11,7 @@
 
 namespace Gelf;
 
+use ParagonIE\ConstantTime\Binary;
 use Psr\Log\LogLevel;
 use RuntimeException;
 
@@ -300,7 +301,7 @@ class Message implements MessageInterface
 
         // return after filtering empty strings and null values
         return array_filter($message, function ($message) {
-            return is_bool($message) || strlen($message);
+            return is_bool($message) || Binary::safeStrlen($message);
         });
     }
 }

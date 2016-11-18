@@ -14,6 +14,8 @@ namespace Gelf\Transport;
 use Gelf\MessageInterface;
 use Gelf\Encoder\CompressedJsonEncoder;
 use Gelf\Encoder\JsonEncoder as DefaultEncoder;
+use ParagonIE\ConstantTime\Base64;
+use ParagonIE\ConstantTime\Binary;
 use RuntimeException;
 
 /**
@@ -162,14 +164,14 @@ class HttpTransport extends AbstractTransport
         $request = array(
             sprintf("POST %s HTTP/1.1", $this->path),
             sprintf("Host: %s:%d", $this->host, $this->port),
-            sprintf("Content-Length: %d", strlen($rawMessage)),
+            sprintf("Content-Length: %d", Binary::safeStrlen($rawMessage)),
             "Content-Type: application/json",
             "Connection: Keep-Alive",
             "Accept: */*"
         );
 
         if (null !== $this->authentication) {
-            $request[] = "Authorization: Basic " . base64_encode($this->authentication);
+            $request[] = "Authorization: Basic " . Base64::encode($this->authentication);
         }
 
         if ($messageEncoder instanceof CompressedJsonEncoder) {
@@ -214,7 +216,7 @@ class HttpTransport extends AbstractTransport
         do {
             $chunk = $this->socketClient->read($chunkSize);
             $response .= $chunk;
-        } while (false === strpos($chunk, $delimiter) && strlen($chunk) > 0);
+        } while (false === strpos($chunk, $delimiter) && Binary::safeStrlen($chunk) > 0);
 
         $elements = explode($delimiter, $response, 2);
 

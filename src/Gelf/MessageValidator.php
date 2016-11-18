@@ -12,6 +12,7 @@
 namespace Gelf;
 
 use RuntimeException;
+use ParagonIE\ConstantTime\Binary;
 
 /**
  * Validates a given message according to the GELF standard
@@ -113,6 +114,6 @@ class MessageValidator implements MessageValidatorInterface
      */
     public static function isEmpty($scalar)
     {
-        return strlen($scalar) < 1;
+        return Binary::safeStrlen($scalar) < 1;
     }
 }

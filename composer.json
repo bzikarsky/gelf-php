@@ -14,6 +14,8 @@
     ],
     "require": {
         "php": ">=5.3.9",
+        "paragonie/constant_time_encoding": "^1",
+        "paragonie/random_compat": "^1|^2",
         "psr/log": "~1.0"
     },
     "autoload": {

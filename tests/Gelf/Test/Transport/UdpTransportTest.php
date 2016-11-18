@@ -12,6 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\UdpTransport;
+use ParagonIE\ConstantTime\Binary;
 use PHPUnit_Framework_TestCase as TestCase;
 
 class UdpTransportTest extends TestCase
@@ -108,7 +109,7 @@ class UdpTransportTest extends TestCase
     {
         $chunkSize = 10;
         $transport = $this->getTransport(10);
-        $expectedMessageCount =  strlen($this->testMessage) / $chunkSize;
+        $expectedMessageCount =  Binary::safeStrlen($this->testMessage) / $chunkSize;
 
         $this->socketClient
             ->expects($this->exactly($expectedMessageCount))
