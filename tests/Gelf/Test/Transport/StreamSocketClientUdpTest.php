@@ -13,6 +13,7 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
 use Gelf\TestCase;
+use ParagonIE\ConstantTime\Binary;
 
 class StreamSocketClientUdpTest extends TestCase
 {
@@ -76,7 +77,7 @@ class StreamSocketClientUdpTest extends TestCase
         $testData = "Hello World!";
         $numBytes = $this->socketClient->write($testData);
 
-        $this->assertEquals(strlen($testData), $numBytes);
+        $this->assertEquals(Binary::safeStrlen($testData), $numBytes);
 
         // check that message is sent to server
         $readData = fread($this->serverSocket, $numBytes);

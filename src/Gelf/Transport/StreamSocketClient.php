@@ -11,6 +11,7 @@
 
 namespace Gelf\Transport;
 
+use ParagonIE\ConstantTime\Binary;
 use RuntimeException;
 
 /**
@@ -201,7 +202,7 @@ class StreamSocketClient
         $buffer = (string) $buffer;
         $socket = $this->getSocket();
         $byteCount = @fwrite($socket, $buffer);
-        $bufLen = strlen($buffer);
+        $bufLen = Binary::safeStrlen($buffer);
 
         if ($byteCount === false) {
             throw new \RuntimeException("Failed to write to socket");
