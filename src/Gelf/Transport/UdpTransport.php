@@ -116,7 +116,7 @@ class UdpTransport extends AbstractTransport
         }
 
         // generate a random 8byte-message-id
-        $messageId = substr(md5(uniqid(), true), 0, 8);
+        $messageId = substr(md5(uniqid("", true), true), 0, 8);
 
         // send chunks with a correct chunk-header
         // @link http://graylog2.org/gelf#specs
