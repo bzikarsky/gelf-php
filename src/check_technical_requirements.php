@@ -10,7 +10,6 @@
  */
 if (extension_loaded('mbstring')) {
     // 2 - MB_OVERLOAD_STRING
-    var_dump(ini_get('mbstring.func_overload'));
     if (ini_get('mbstring.func_overload') & 2) {
         throw new UnexpectedValueException(
             'Overloading of string functions using mbstring.func_overload ' .
