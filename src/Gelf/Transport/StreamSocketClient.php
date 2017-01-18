@@ -199,19 +199,35 @@ class StreamSocketClient
     public function write($buffer)
     {
         $buffer = (string) $buffer;
-        $socket = $this->getSocket();
-        $byteCount = @fwrite($socket, $buffer);
         $bufLen = strlen($buffer);
 
-        if ($byteCount === false) {
-            throw new \RuntimeException("Failed to write to socket");
+        $socket = $this->getSocket();
+        $written = 0;
+
+        while ($written < $bufLen) {
+            // PHP's fwrite does not behave nice in regards to errors, so we wrap
+            // it with a temporary error handler and treat every warning/notice as
+            // a error
+            $failed = false;
+            $errorMessage = "Failed to write to socket";
+            set_error_handler(function ($errno, $errstr) use (&$failed, &$errorMessage) {
+                $failed = true;
+                $errorMessage .= ": $errstr ($errno)";
+            });
+            $byteCount = fwrite($socket, substr($buffer, $written));
+            restore_error_handler();
+
+
+            if ($failed || $byteCount === false) {
+                throw new \RuntimeException();
+            }
+
+
+            $written += $byteCount;
         }
 
-        if ($byteCount !== $bufLen) {
-            throw new \RuntimeException("Incomplete write: Only $byteCount of $bufLen written");
-        }
 
-        return $byteCount;
+        return $written;
     }
 
     /**
