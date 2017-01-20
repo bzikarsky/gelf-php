@@ -219,7 +219,7 @@ class StreamSocketClient
 
 
             if ($failed || $byteCount === false) {
-                throw new \RuntimeException();
+                throw new \RuntimeException($errorMessage);
             }
 
 
