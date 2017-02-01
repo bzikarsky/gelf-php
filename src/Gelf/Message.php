@@ -295,7 +295,11 @@ class Message implements MessageInterface
 
         // add additionals
         foreach ($this->getAllAdditionals() as $key => $value) {
-            $message["_" . $key] = $value;
+            if(array_key_exists($key,$message)) 
+                $message[$key]=$value;
+            
+            else 
+                $message["_" . $key] = $value;
         }
 
         // return after filtering empty strings and null values
