@@ -302,5 +302,13 @@ class Message implements MessageInterface
         return array_filter($message, function ($message) {
             return is_bool($message) || strlen($message);
         });
+    } 
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return json_encode($this->toArray());
     }
 }
