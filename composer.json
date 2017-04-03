@@ -19,10 +19,7 @@
     "autoload": {
         "psr-4": {
             "Gelf\\": "src/Gelf"
-        },
-        "files": [
-            "src/check_technical_requirements.php"   
-        ]
+        }
     },
     "provide": {
         "psr/log-implementation": "~1.0"
