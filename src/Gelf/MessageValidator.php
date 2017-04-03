@@ -113,6 +113,6 @@ class MessageValidator implements MessageValidatorInterface
      */
     public static function isEmpty($scalar)
     {
-        return strlen($scalar) < 1;
+        return empty($scalar);
     }
 }
