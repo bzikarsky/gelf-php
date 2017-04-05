@@ -219,7 +219,9 @@ class StreamSocketClient
 
 
             if ($failed || $byteCount === false) {
-                throw new \RuntimeException($errorMessage);
+                if ($this->scheme !== 'udp') {
+                    throw new \RuntimeException($errorMessage);
+                }
             }
 
 
