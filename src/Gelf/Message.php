@@ -300,7 +300,7 @@ class Message implements MessageInterface
 
         // return after filtering empty strings and null values
         return array_filter($message, function ($message) {
-            return is_bool($message) || strlen($message);
+            return is_array($message) || is_bool($message) || strlen($message);
         });
     }
 }
