@@ -110,9 +110,8 @@ class Message implements MessageInterface
             }
         } elseif (is_string($level)) {
             $level = strtolower($level);
-            $map = array_flip(self::$psrLevels);
-            if (isset($map[$level])) {
-                return $map[$level];
+            if (false !== $level = array_search($level, $psrLevels)) {
+                return $level;
             }
         }
 
