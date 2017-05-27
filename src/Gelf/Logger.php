@@ -112,6 +112,17 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
+     * Override this function to inject a different
+     * \Gelf\Message instance into the logger
+     *
+     * @return Message
+     */
+    protected function createMessage()
+    {
+        return new Message();
+    }
+
+    /**
      * Initializes message-object
      *
      * @param  mixed   $level
@@ -127,7 +138,7 @@ class Logger extends AbstractLogger implements LoggerInterface
         $message = self::interpolate($message, $context);
 
         // create message object
-        $messageObj = new Message();
+        $messageObj = $this->createMessage();
         $messageObj->setLevel($level);
         $messageObj->setShortMessage($message);
         $messageObj->setFacility($this->facility);
