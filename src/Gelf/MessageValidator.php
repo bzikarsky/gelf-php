@@ -66,7 +66,7 @@ class MessageValidator implements MessageValidatorInterface
         }
 
         if ($message->hasAdditional('id')) {
-            $reason = "addtional field 'id' is not allowed";
+            $reason = "additional field 'id' is not allowed";
 
             return false;
         }
