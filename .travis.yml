@@ -7,6 +7,8 @@ php:
   - 7.0
   - nightly
   - hhvm
+  
+dist: trusty
 
 # upgrade to container-based travis
 sudo: false
