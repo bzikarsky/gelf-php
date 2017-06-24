@@ -217,11 +217,13 @@ class StreamSocketClient
             $byteCount = fwrite($socket, substr($buffer, $written));
             restore_error_handler();
 
+            if ($byteCount === 0 && defined('HHVM_VERSION')) {
+                $failed = true;
+            }
 
             if ($failed || $byteCount === false) {
                 throw new \RuntimeException($errorMessage);
             }
-
 
             $written += $byteCount;
         }
