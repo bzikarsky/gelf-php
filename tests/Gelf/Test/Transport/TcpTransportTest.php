@@ -122,4 +122,30 @@ class TcpTransportTest extends TestCase
 
         $this->transport->setConnectTimeout(123);
     }
+
+    private function getScheme($transport)
+    {
+        $reflectedTransport = new \ReflectionObject($transport);
+        $reflectedClient = $reflectedTransport->getProperty('socketClient');
+        $reflectedClient->setAccessible(true);
+
+        $socketClient = $reflectedClient->getValue($transport);
+        $reflectedSocketClient = new \ReflectionObject($socketClient);
+        $reflectedScheme = $reflectedSocketClient->getProperty('scheme');
+        $reflectedScheme->setAccessible(true);
+
+        return $reflectedScheme->getValue($socketClient);
+    }
+
+    public function testCustomScheme()
+    {
+        $transport = new TcpTransport(null, null, 'custom');
+        $this->assertEquals('custom', $this->getScheme($transport));
+    }
+
+    public function testDefaultScheme()
+    {
+        $transport = new TcpTransport(null, null);
+        $this->assertEquals('tcp', $this->getScheme($transport));
+    }
 }
