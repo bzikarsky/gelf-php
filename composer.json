@@ -14,15 +14,13 @@
     ],
     "require": {
         "php": ">=5.3.9",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "paragonie/constant_time_encoding": "^1"
     },
     "autoload": {
         "psr-4": {
             "Gelf\\": "src/Gelf"
-        },
-        "files": [
-            "src/check_technical_requirements.php"   
-        ]
+        }
     },
     "provide": {
         "psr/log-implementation": "~1.0"

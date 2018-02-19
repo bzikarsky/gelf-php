@@ -12,6 +12,7 @@
 namespace Gelf\Transport;
 
 use RuntimeException;
+use ParagonIE\ConstantTime\Binary;
 
 /**
  * StreamSocketClient is a very simple OO-Wrapper around the PHP
@@ -199,7 +200,7 @@ class StreamSocketClient
     public function write($buffer)
     {
         $buffer = (string) $buffer;
-        $bufLen = strlen($buffer);
+        $bufLen = Binary::safeStrlen($buffer);
 
         $socket = $this->getSocket();
         $written = 0;
@@ -214,7 +215,7 @@ class StreamSocketClient
                 $failed = true;
                 $errorMessage .= ": $errstr ($errno)";
             });
-            $byteCount = fwrite($socket, substr($buffer, $written));
+            $byteCount = fwrite($socket, Binary::safeSubstr($buffer, $written));
             restore_error_handler();
 
             if ($byteCount === 0 && defined('HHVM_VERSION')) {
