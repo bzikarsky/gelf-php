@@ -68,7 +68,7 @@ class PublisherTest extends TestCase
     public function testMissingTransport()
     {
         $publisher = new Publisher(null, $this->messageValidator);
-        $this->assertEquals(0, count($publisher->getTransports()));
+        $this->assertCount(0, $publisher->getTransports());
 
         $publisher->publish($this->message);
     }
@@ -95,16 +95,16 @@ class PublisherTest extends TestCase
     public function testGetTransports()
     {
         $pub = new Publisher(null, $this->messageValidator);
-        $this->assertEquals(0, count($pub->getTransports()));
+        $this->assertCount(0, $pub->getTransports());
 
         $pub->addTransport($this->transportA);
-        $this->assertEquals(1, count($pub->getTransports()));
+        $this->assertCount(1, $pub->getTransports());
 
         $pub->addTransport($this->transportB);
-        $this->assertEquals(2, count($pub->getTransports()));
+        $this->assertCount(2, $pub->getTransports());
 
         $pub->addTransport($this->transportA);
-        $this->assertEquals(2, count($pub->getTransports()));
+        $this->assertCount(2, $pub->getTransports());
     }
 
     public function testInitWithDefaultValidator()

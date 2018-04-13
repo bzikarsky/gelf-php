@@ -46,7 +46,7 @@ class JsonEncoderTest extends TestCase
 
         // check that there is JSON inside
         $data = json_decode($json, $assoc = true);
-        $this->assertTrue(is_array($data));
+        $this->assertInternalType('array', $data);
 
         // check that we have our data array
         $this->assertEquals($testData, $data);
