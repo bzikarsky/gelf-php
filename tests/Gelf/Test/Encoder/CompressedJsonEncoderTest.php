@@ -12,7 +12,7 @@
 namespace Gelf\Test\Encoder;
 
 use Gelf\Encoder\CompressedJsonEncoder;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase as TestCase;
 
 class CompressedJsonEncoderTest extends TestCase
 {

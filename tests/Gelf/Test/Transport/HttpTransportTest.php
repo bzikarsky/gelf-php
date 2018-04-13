@@ -13,7 +13,7 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\SslOptions;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase as TestCase;
 
 class HttpTransportTest extends TestCase
 {
