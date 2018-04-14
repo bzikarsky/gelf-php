@@ -14,7 +14,7 @@ namespace Gelf\Test;
 use Gelf\Logger;
 use Gelf\MessageInterface;
 use Gelf\PublisherInterface;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Exception;
 use Closure;

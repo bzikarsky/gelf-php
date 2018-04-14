@@ -12,7 +12,7 @@
 namespace Gelf\Test;
 
 use Gelf\Publisher;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class PublisherTest extends TestCase
 {
