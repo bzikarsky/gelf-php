@@ -12,7 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\AmqpTransport;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class AmqpTransportTest extends TestCase
 {

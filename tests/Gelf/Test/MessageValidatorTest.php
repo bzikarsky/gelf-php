@@ -12,7 +12,7 @@
 namespace Gelf\Test;
 
 use Gelf\MessageValidator;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class MessageValidatorTest extends TestCase
 {

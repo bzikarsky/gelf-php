@@ -12,7 +12,7 @@
 namespace Gelf\Test;
 
 use Gelf\Message;
-use PHPUnit\Framework\TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
 class MessageTest extends TestCase
