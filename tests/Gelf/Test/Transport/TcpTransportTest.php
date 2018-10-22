@@ -12,6 +12,7 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\TcpTransport;
+use Gelf\Transport\SslOptions;
 use PHPUnit\Framework\TestCase;
 
 class TcpTransportTest extends TestCase
@@ -75,6 +76,50 @@ class TcpTransportTest extends TestCase
         $reflectedClient->setValue($transport, $this->socketClient);
 
         return $transport;
+    }
+
+    public function testConstructor()
+    {
+        $transport = new TcpTransport();
+        $this->validateTransport($transport, '127.0.0.1', 12201);
+
+        $transport = new TcpTransport('test.local', 2202);
+        $this->validateTransport($transport, 'test.local', 2202);
+
+        // test defaults:
+        //   port 12202 without explicit SSL options       => sslOptions: default
+        $transport = new TcpTransport('localhost', 12202);
+        $this->validateTransport($transport, 'localhost', 12202, new SslOptions());
+    }
+
+    public function validateTransport(
+        TcpTransport $transport,
+        $host,
+        $port,
+        $sslOptions = null
+    ) {
+        $r = new \ReflectionObject($transport);
+
+        foreach (array('host', 'port', 'sslOptions') as $test) {
+            $p = $r->getProperty($test);
+            $p->setAccessible(true);
+            $this->assertEquals(${$test}, $p->getValue($transport));
+        }
+    }
+
+    public function testSslOptionsAreUsed()
+    {
+        $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions->expects($this->exactly(2))->method('toStreamContext')->will($this->returnValue(array('ssl' => null)));
+
+        $transport = new TcpTransport("localhost", "12202", $sslOptions);
+
+        $reflectedTransport = new \ReflectionObject($transport);
+        $reflectedGetContext = $reflectedTransport->getMethod('getContext');
+        $reflectedGetContext->setAccessible(true);
+        $context = $reflectedGetContext->invoke($transport);
+
+        $this->assertEquals(array('ssl' => null), $context);
     }
 
     public function testSetEncoder()
