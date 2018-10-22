@@ -156,7 +156,7 @@ class SslOptions
             $sslContext[PHP_VERSION_ID < 50600 ? 'SNI_server_name' : 'peer_name'] = $serverName;
 
             if ($this->verifyPeer) {
-                $sslContext['CN_match'] = $serverName;
+                $sslContext[PHP_VERSION_ID < 50600 ? 'CN_match' : 'peer_name'] = $serverName;
             }
         }
 

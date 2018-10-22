@@ -77,7 +77,8 @@ class SslOptionsTest extends TestCase
     public function testToStreamContextWithHostname()
     {
         $options = new SslOptions();
-        $peerNameKey = PHP_VERSION_ID < 50600 ? 'SNI_server_name' : 'peer_name';
+        $peerNameKey = PHP_VERSION_ID < 50600 ? 'CN_match' : 'peer_name';
+        $sniPeerNameKey = PHP_VERSION_ID < 50600 ? 'SNI_server_name' : 'peer_name';
         $host = 'test.local';
 
         $options->setVerifyPeer(false);
@@ -86,10 +87,10 @@ class SslOptionsTest extends TestCase
         $this->assertArrayHasKey('ssl', $context);
         $this->assertArrayHasKey('SNI_enabled', $context['ssl']);
         $this->assertArrayNotHasKey('CN_match', $context['ssl']);
-        $this->assertArrayHasKey($peerNameKey, $context['ssl']);
+        $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
         $this->assertEquals(true, $context['ssl']['SNI_enabled']);
-        $this->assertEquals($host, $context['ssl'][$peerNameKey]);
+        $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
 
 
         $options->setVerifyPeer(true);
@@ -97,11 +98,11 @@ class SslOptionsTest extends TestCase
 
         $this->assertArrayHasKey('ssl', $context);
         $this->assertArrayHasKey('SNI_enabled', $context['ssl']);
-        $this->assertArrayHasKey('CN_match', $context['ssl']);
         $this->assertArrayHasKey($peerNameKey, $context['ssl']);
+        $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
         $this->assertEquals(true, $context['ssl']['SNI_enabled']);
-        $this->assertEquals($host, $context['ssl']['CN_match']);
         $this->assertEquals($host, $context['ssl'][$peerNameKey]);
+        $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
     }
 }
