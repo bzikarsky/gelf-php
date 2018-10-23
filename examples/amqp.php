@@ -11,7 +11,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-// Note, You need install "amqp" extension for PHP.
+// Note, You need to install "amqp" extension for PHP.
 // @link http://php.net/manual/pl/book.amqp.php
 
 $connection = new \AMQPConnection(array(

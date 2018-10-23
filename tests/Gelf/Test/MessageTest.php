@@ -12,7 +12,7 @@
 namespace Gelf\Test;
 
 use Gelf\Message;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 
 class MessageTest extends TestCase
@@ -30,8 +30,8 @@ class MessageTest extends TestCase
 
     public function testTimestamp()
     {
-        $this->assertTrue(microtime(true) >= $this->message->getTimestamp());
-        $this->assertTrue(0 < $this->message->getTimestamp());
+        $this->assertLessThanOrEqual(microtime(true), $this->message->getTimestamp());
+        $this->assertGreaterThan(0, $this->message->getTimestamp());
 
         $this->message->setTimestamp(123);
         $this->assertEquals(123, $this->message->getTimestamp());
@@ -134,18 +134,18 @@ class MessageTest extends TestCase
 
     public function testAdditionals()
     {
-        $this->assertTrue(is_array($this->message->getAllAdditionals()));
-        $this->assertTrue(0 == count($this->message->getAllAdditionals()));
+        $this->assertInternalType('array', $this->message->getAllAdditionals());
+        $this->assertCount(0, $this->message->getAllAdditionals());
 
         $this->assertFalse($this->message->hasAdditional("foo"));
         $this->message->setAdditional("foo", "bar");
         $this->assertEquals("bar", $this->message->getAdditional("foo"));
         $this->assertTrue($this->message->hasAdditional("foo"));
-        $this->assertTrue(1 == count($this->message->getAllAdditionals()));
+        $this->assertCount(1, $this->message->getAllAdditionals());
 
         $this->message->setAdditional("foo", "buk");
         $this->assertEquals("buk", $this->message->getAdditional("foo"));
-        $this->assertTrue(1 == count($this->message->getAllAdditionals()));
+        $this->assertCount(1, $this->message->getAllAdditionals());
 
         $this->assertEquals(
             array("foo" => "buk"),
@@ -200,7 +200,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("bool-true", true);
         $this->message->setAdditional("bool-false", false);
         $data = $this->message->toArray();
-        $this->assertTrue(is_array($data));
+        $this->assertInternalType('array', $data);
 
         // test additionals
         $this->assertArrayHasKey("_foo", $data);
@@ -265,7 +265,7 @@ class MessageTest extends TestCase
                     $method,
                     $k
                 );
-                $this->assertFalse(array_key_exists($k, $data), $error);
+                $this->assertArrayNotHasKey($k, $data, $error);
             } else {
                 $this->assertEquals($data[$k], $this->message->$method());
             }

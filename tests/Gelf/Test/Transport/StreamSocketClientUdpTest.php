@@ -68,7 +68,7 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function testGetSocket()
     {
-        $this->assertTrue(is_resource($this->socketClient->getSocket()));
+        $this->assertInternalType('resource', $this->socketClient->getSocket());
     }
 
     public function testWrite()

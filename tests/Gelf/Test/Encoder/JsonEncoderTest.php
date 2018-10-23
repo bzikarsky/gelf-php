@@ -12,7 +12,7 @@
 namespace Gelf\Test\Encoder;
 
 use Gelf\Encoder\JsonEncoder;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 
 class JsonEncoderTest extends TestCase
 {
@@ -46,7 +46,7 @@ class JsonEncoderTest extends TestCase
 
         // check that there is JSON inside
         $data = json_decode($json, $assoc = true);
-        $this->assertTrue(is_array($data));
+        $this->assertInternalType('array', $data);
 
         // check that we have our data array
         $this->assertEquals($testData, $data);
