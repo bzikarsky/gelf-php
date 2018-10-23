@@ -29,6 +29,11 @@ class Logger extends AbstractLogger implements LoggerInterface
     protected $facility;
 
     /**
+     * @var array
+     */
+    protected $defaultContext;
+
+    /**
      * @var PublisherInterface
      */
     protected $publisher;
@@ -37,17 +42,20 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Creates a PSR-3 Logger for GELF/Graylog2
      *
      * @param PublisherInterface|null $publisher
-     * @param string|null             $facility
+     * @param string|null $facility
+     * @param array $defaultContext
      */
     public function __construct(
         PublisherInterface $publisher = null,
-        $facility = null
+        $facility = null,
+        array $defaultContext = array()
     ) {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
         $this->publisher = $publisher ?: new Publisher(new UdpTransport());
 
         $this->setFacility($facility);
+        $this->setDefaultContext($defaultContext);
     }
 
     /**
@@ -112,6 +120,22 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
+     * @return array
+     */
+    public function getDefaultContext()
+    {
+        return $this->defaultContext;
+    }
+
+    /**
+     * @param array $defaultContext
+     */
+    public function setDefaultContext($defaultContext)
+    {
+        $this->defaultContext = $defaultContext;
+    }
+
+    /**
      * Initializes message-object
      *
      * @param  mixed   $level
@@ -132,6 +156,9 @@ class Logger extends AbstractLogger implements LoggerInterface
         $messageObj->setShortMessage($message);
         $messageObj->setFacility($this->facility);
 
+        foreach ($this->getDefaultContext() as $key => $value) {
+            $messageObj->setAdditional($key, $value);
+        }
         foreach ($context as $key => $value) {
             $messageObj->setAdditional($key, $value);
         }
