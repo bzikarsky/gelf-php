@@ -231,6 +231,40 @@ class MessageTest extends TestCase
                     $method,
                     $k
                 );
+                $this->assertFalse(array_key_exists($k, $data), $error);
+            } else {
+                $this->assertEquals($data[$k], $this->message->$method());
+            }
+        }
+    }
+
+    public function testToArrayWithArrayData()
+    {
+        $this->message->setAdditional("foo", array("foo" => "bar"));
+        $data = $this->message->toArray();
+        $this->assertTrue(is_array($data));
+
+        $map = array(
+            "version"       => "getVersion",
+            "host"          => "getHost",
+            "timestamp"     => "getTimestamp",
+            "full_message"  => "getFullMessage",
+            "short_message" => "getShortMessage",
+            "line"          => "getLine",
+            "file"          => "getFile",
+            "facility"      => "getFacility",
+            "level"         => "getSyslogLevel"
+        );
+
+        foreach ($map as $k => $method) {
+            $r = $this->message->$method();
+            if (empty($r)) {
+                $error = sprintf(
+                    "When method %s returns an empty value, " .
+                    "%s should not be in array",
+                    $method,
+                    $k
+                );
                 $this->assertArrayNotHasKey($k, $data, $error);
             } else {
                 $this->assertEquals($data[$k], $this->message->$method());
