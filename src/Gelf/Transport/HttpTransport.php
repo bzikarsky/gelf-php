@@ -27,20 +27,26 @@ use RuntimeException;
  */
 class HttpTransport extends AbstractTransport
 {
+    const DEFAULT_HOST = "127.0.0.1";
+    const DEFAULT_PORT = 12202;
+    const DEFAULT_PATH = "/gelf";
+    
+    const AUTO_SSL_PORT = 443;
+    
     /**
      * @var string
      */
-    protected $host = "127.0.0.1";
+    protected $host;
 
     /**
      * @var int
      */
-    protected $port = 12202;
+    protected $port;
 
     /**
      * @var string
      */
-    protected $path = "/gelf";
+    protected $path;
 
     /**
      * @var StreamSocketClient
@@ -65,13 +71,17 @@ class HttpTransport extends AbstractTransport
      * @param string|null     $path       when NULL or empty default-path is used
      * @param SslOptions|null $sslOptions when null not SSL is used
      */
-    public function __construct($host = null, $port = null, $path = null, SslOptions $sslOptions = null)
-    {
-        $this->host = $host ?: $this->host;
-        $this->port = $port ?: $this->port;
-        $this->path = ($path === null) ? $this->path : $path;
+    public function __construct(
+        $host = self::DEFAULT_HOST,
+        $port = self::DEFAULT_PORT,
+        $path = self::DEFAULT_PATH,
+        SslOptions $sslOptions = null
+    ) {
+        $this->host = $host;
+        $this->port = $port;
+        $this->path = $path;
 
-        if ($port == 443 && $sslOptions == null) {
+        if ($port == self::AUTO_SSL_PORT && $sslOptions == null) {
             $sslOptions = new SslOptions();
         }
 
