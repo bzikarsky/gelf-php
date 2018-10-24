@@ -47,11 +47,7 @@ class MessageValidator implements MessageValidatorInterface
      */
     public function validate0100(MessageInterface $message, &$reason = "")
     {
-        if (self::isEmpty($message->getHost())) {
-            $reason = "host not set";
-
-            return false;
-        }
+      
 
         if (self::isEmpty($message->getShortMessage())) {
             $reason = "short-message not set";
