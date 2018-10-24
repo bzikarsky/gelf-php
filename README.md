@@ -3,7 +3,6 @@ gelf-php [![Latest Stable Version](https://img.shields.io/packagist/v/graylog2/g
 [![Build Status](https://img.shields.io/travis/bzikarsky/gelf-php.svg?style=flat-square)](https://travis-ci.org/bzikarsky/gelf-php)
 [![Code Coverage](https://img.shields.io/scrutinizer/coverage/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
 [![Scrutinizer Quality Score](https://img.shields.io/scrutinizer/g/bzikarsky/gelf-php.svg?style=flat-square)](https://scrutinizer-ci.com/g/bzikarsky/gelf-php/)
-[![Dependency Status](https://img.shields.io/versioneye/d/php/graylog2:gelf-php.svg?style=flat-square)](https://www.versioneye.com/user/projects/52591e23632bac78d0000047)
 
 
 A php implementation to send log-files to a gelf compatible backend like [Graylog2](http://graylog2.org/).
