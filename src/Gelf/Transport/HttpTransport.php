@@ -64,6 +64,16 @@ class HttpTransport extends AbstractTransport
     protected $authentication = null;
 
     /**
+     * @var string|null
+     */
+    protected $proxyUri = null;
+
+    /**
+     * @var bool
+     */
+    protected $requestFullUri = false;
+
+    /**
      * Class constructor
      *
      * @param string|null     $host       when NULL or empty default-host is used
@@ -86,7 +96,6 @@ class HttpTransport extends AbstractTransport
         }
 
         $this->sslOptions = $sslOptions;
-
         $this->messageEncoder = new DefaultEncoder();
         $this->socketClient = new StreamSocketClient(
             $this->getScheme(),
@@ -100,7 +109,7 @@ class HttpTransport extends AbstractTransport
      * Creates a HttpTransport from a URI
      *
      * Supports http and https schemes, port-, path- and auth-definitions
-     * If the port is ommitted 80 and 443 are used respectively.
+     * If the port is omitted 80 and 443 are used respectively.
      * If a username but no password is given, and empty password is used.
      * If a https URI is given, the provided SslOptions (with a fallback to
      * the default SslOptions) are used.
@@ -155,6 +164,20 @@ class HttpTransport extends AbstractTransport
     public function setAuthentication($username, $password)
     {
         $this->authentication = $username . ":" . $password;
+    }
+
+    /**
+     * Enables HTTP proxy
+     *
+     * @param $proxyUri
+     * @param bool $requestFullUri
+     */
+    public function setProxy($proxyUri, $requestFullUri = false)
+    {
+        $this->proxyUri = $proxyUri;
+        $this->requestFullUri = $requestFullUri;
+
+        $this->socketClient->setContext($this->getContext());
     }
 
     /**
@@ -218,7 +241,7 @@ class HttpTransport extends AbstractTransport
     private function readResponseHeaders()
     {
         $chunkSize = 1024; // number of bytes to read at once
-        $delimiter = "\r\n\r\n"; // delimiter between headers and rsponse
+        $delimiter = "\r\n\r\n"; // delimiter between headers and response
         $response = "";
 
         do {
@@ -244,11 +267,20 @@ class HttpTransport extends AbstractTransport
      */
     private function getContext()
     {
-        if (null === $this->sslOptions) {
-            return array();
+        $options = array();
+
+        if (null !== $this->sslOptions) {
+            $options = array_merge($options, $this->sslOptions->toStreamContext($this->host));
         }
 
-        return $this->sslOptions->toStreamContext($this->host);
+        if (null !== $this->proxyUri) {
+            $options['http'] = array(
+                'proxy' => $this->proxyUri,
+                'request_fulluri' => $this->requestFullUri
+            );
+        }
+
+        return $options;
     }
 
     /**

@@ -11,25 +11,33 @@
 
 namespace Gelf\Test\Transport;
 
+use Gelf\Encoder\EncoderInterface;
+use Gelf\Message;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\SslOptions;
+use Gelf\Transport\StreamSocketClient;
 use PHPUnit\Framework\TestCase;
 
 class HttpTransportTest extends TestCase
 {
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|StreamSocketClient
      */
     protected $socketClient;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var StreamSocketClient
+     */
+    protected $originalSocketClient;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|Message
      */
     protected $message;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|EncoderInterface
      */
     protected $encoder;
 
@@ -73,6 +81,8 @@ class HttpTransportTest extends TestCase
         $reflectedTransport = new \ReflectionObject($transport);
         $reflectedClient = $reflectedTransport->getProperty('socketClient');
         $reflectedClient->setAccessible(true);
+
+        $this->originalSocketClient = $reflectedClient->getValue($transport);
         $reflectedClient->setValue($transport, $this->socketClient);
 
         return $transport;
@@ -98,7 +108,7 @@ class HttpTransportTest extends TestCase
      */
     public function testFromUrlConstructorInvalidUri()
     {
-        $transport = HttpTransport::fromUrl('-://:-');
+        HttpTransport::fromUrl('-://:-');
     }
 
     /**
@@ -106,7 +116,7 @@ class HttpTransportTest extends TestCase
      */
     public function testFromUrlConstructorInvalidScheme()
     {
-        $transport = HttpTransport::fromUrl('ftp://foobar');
+        HttpTransport::fromUrl('ftp://foobar');
     }
 
     public function testFromUrlConstructor()
@@ -148,17 +158,27 @@ class HttpTransportTest extends TestCase
     ) {
         $r = new \ReflectionObject($transport);
 
-        foreach (array('host', 'port', 'path', 'sslOptions', 'authentication') as $test) {
-            $p = $r->getProperty($test);
+        $testProperties = array(
+            'host' => $host,
+            'port' => $port,
+            'path' => $path,
+            'sslOptions' => $sslOptions,
+            'authentication' => $authentication
+        );
+
+        foreach ($testProperties as $property => $value) {
+            $p = $r->getProperty($property);
             $p->setAccessible(true);
-            $this->assertEquals(${$test}, $p->getValue($transport));
+            $this->assertEquals($value, $p->getValue($transport));
         }
     }
 
     public function testSslOptionsAreUsed()
     {
         $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
-        $sslOptions->expects($this->exactly(2))->method('toStreamContext')->will($this->returnValue(array('ssl' => null)));
+        $sslOptions->expects($this->exactly(2))
+            ->method('toStreamContext')
+            ->will($this->returnValue(array('ssl' => null)));
 
         $transport = new HttpTransport("localhost", "12345", "/gelf", $sslOptions);
 
@@ -188,7 +208,7 @@ class HttpTransportTest extends TestCase
     }
 
     /**
-     * @expectedException        RuntimeException
+     * @expectedException        \RuntimeException
      * @expectedExceptionMessage Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''
      */
     public function testEmptyResponseException()
@@ -237,6 +257,25 @@ class HttpTransportTest extends TestCase
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
         $this->transport->send($this->message);
+    }
+
+    public function testProxy()
+    {
+        $test = $this;
+        $this->socketClient->expects($this->once())
+            ->method("setContext")
+            ->willReturnCallback(function (array $context) use ($test) {
+                $test->assertArrayHasKey("http", $context);
+                $test->assertEquals(
+                    array(
+                        "proxy" => "tcp://proxy.example.com:5100",
+                        "request_fulluri" => true
+                    ),
+                    $context["http"]
+                );
+            });
+
+        $this->transport->setProxy("tcp://proxy.example.com:5100", true);
     }
 
     public function testSendCompressed()
