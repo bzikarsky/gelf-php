@@ -11,25 +11,47 @@
 
 namespace Gelf\Test;
 
+use Gelf\MessageInterface;
+use Gelf\MessageValidatorInterface;
 use Gelf\Publisher;
+use Gelf\Transport\TransportInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class PublisherTest extends TestCase
 {
 
+    /**
+     * @var MockObject|TransportInterface
+     */
     protected $transportA;
+
+    /**
+     * @var MockObject|TransportInterface
+     */
     protected $transportB;
+
+    /**
+     * @var MockObject|MessageValidatorInterface
+     */
     protected $messageValidator;
+
+    /**
+     * @var MockObject|MessageInterface
+     */
     protected $message;
+
+    /**
+     * @var Publisher
+     */
     protected $publisher;
 
     public function setUp()
     {
-        $this->transportA = $this->getMock('Gelf\Transport\TransportInterface');
-        $this->transportB = $this->getMock('Gelf\Transport\TransportInterface');
-        $this->messageValidator =
-            $this->getMock('Gelf\MessageValidatorInterface');
-        $this->message = $this->getMock('Gelf\MessageInterface');
+        $this->transportA = $this->getMockBuilder(TransportInterface::class)->getMock();
+        $this->transportB = $this->getMockBuilder(TransportInterface::class)->getMock();
+        $this->messageValidator = $this->getMockBuilder(MessageValidatorInterface::class)->getMock();
+        $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         $this->publisher = new Publisher(
             $this->transportA,
@@ -51,7 +73,7 @@ class PublisherTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testPublishErrorOnInvalid()
     {
@@ -63,7 +85,7 @@ class PublisherTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testMissingTransport()
     {
@@ -111,7 +133,7 @@ class PublisherTest extends TestCase
     {
         $pub = new Publisher();
         $this->assertInstanceOf(
-            'Gelf\MessageValidatorInterface',
+            MessageValidatorInterface::class,
             $pub->getMessageValidator()
         );
     }

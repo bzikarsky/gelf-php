@@ -170,12 +170,16 @@ class StreamSocketClientTcpTest extends TestCase
     public function testDestructorWithoutSocket()
     {
         unset($this->socketClient);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testDestructorWithSocket()
     {
         $this->socketClient->getSocket();
         unset($this->socketClient);
+
+        $this->addToAssertionCount(1);
     }
 
     public function testCloseWithoutConnectionWrite()

@@ -11,24 +11,28 @@
 
 namespace Gelf\Test\Transport;
 
+use Gelf\Encoder\EncoderInterface;
+use Gelf\MessageInterface;
+use Gelf\Transport\StreamSocketClient;
 use Gelf\Transport\UdpTransport;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class UdpTransportTest extends TestCase
 {
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|StreamSocketClient
      */
     protected $socketClient;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|MessageInterface
      */
     protected $message;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|EncoderInterface
      */
     protected $encoder;
 
@@ -37,23 +41,23 @@ class UdpTransportTest extends TestCase
      */
     protected $transport;
 
+    /**
+     * @var string
+     */
     protected $testMessage;
 
     public function setUp()
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMock(
-            "\\Gelf\\Transport\\StreamSocketClient",
-            $methods = array(),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->socketClient = $this->getMockBuilder(StreamSocketClient::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -79,7 +83,8 @@ class UdpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        /** @var EncoderInterface|MockObject $encoder */
+        $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -89,7 +94,7 @@ class UdpTransportTest extends TestCase
     {
         $transport = new UdpTransport();
         $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface",
+            EncoderInterface::class,
             $transport->getMessageEncoder()
         );
     }

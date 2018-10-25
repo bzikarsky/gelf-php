@@ -14,6 +14,7 @@ namespace Gelf\Test;
 use Gelf\Logger;
 use Gelf\MessageInterface;
 use Gelf\PublisherInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Exception;
@@ -21,9 +22,8 @@ use Closure;
 
 class LoggerTest extends TestCase
 {
-
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|PublisherInterface
+     * @var MockObject|PublisherInterface
      */
     protected $publisher;
 
@@ -31,11 +31,15 @@ class LoggerTest extends TestCase
      * @var Logger
      */
     protected $logger;
+
+    /**
+     * @var string
+     */
     protected $facility = "test-facility";
 
     public function setUp()
     {
-        $this->publisher = $this->getMock('\Gelf\PublisherInterface');
+        $this->publisher = $this->getMockBuilder(PublisherInterface::class)->getMock();
         $this->logger = new Logger($this->publisher, $this->facility);
     }
 
@@ -43,7 +47,8 @@ class LoggerTest extends TestCase
     {
         $this->assertEquals($this->publisher, $this->logger->getPublisher());
 
-        $newPublisher = $this->getMock('\Gelf\PublisherInterface');
+        /** @var MockObject|PublisherInterface $newPublisher */
+        $newPublisher = $this->getMockBuilder(PublisherInterface::class)->getMock();
         $this->logger->setPublisher($newPublisher);
         $this->assertEquals($newPublisher, $this->logger->getPublisher());
     }
@@ -125,9 +130,11 @@ class LoggerTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->prop1 = 'val1';
 
-        $toString = $this->getMock('dummyClass', array('__toString'));
-        $toString->method('__toString')
-            ->willReturn('toString');
+        $toString = $this->getMockBuilder(\stdClass::class)
+            ->setMethods(['__toString'])
+            ->getMock();
+
+        $toString->method('__toString')->willReturn('toString');
 
         return array(
             'array'     => array(array('bar' => 'buz'), '{"bar":"buz"}'),

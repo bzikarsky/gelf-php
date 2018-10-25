@@ -11,37 +11,41 @@
 
 namespace Gelf\Test\Transport;
 
+use Gelf\Encoder\EncoderInterface;
+use Gelf\MessageInterface;
 use Gelf\Transport\AmqpTransport;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AmqpTransportTest extends TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|MessageInterface
      */
     protected $message;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | \Gelf\Encoder\EncoderInterface
+     * @var MockObject|EncoderInterface
      */
     protected $encoder;
+
     /**
      * @var string
      */
     protected $testMessage;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | AmqpTransport
+     * @var MockObject|AmqpTransport
      */
     protected $transport;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | \AMQPExchange
+     * @var MockObject|\AMQPExchange
      */
     protected $exchange;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject | \AMQPQueue
+     * @var MockObject|\AMQPQueue
      */
     protected $queue;
 
@@ -55,31 +59,28 @@ class AmqpTransportTest extends TestCase
             define('AMQP_DURABLE', 2);
         }
 
-        $this->testMessage = str_repeat("0123456789", 30); // 300 char string
+        $this->testMessage = str_repeat('0123456789', 30); // 300 char string
 
-        $this->exchange = $this->getMock(
-            "\\AMQPExchange",
-            $methods = array('publish'),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
-        $this->queue = $this->getMock(
-            "\\AMQPQueue",
-            $methods = array('getName', 'getFlags'),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
+        $this->exchange = $this->getMockBuilder(\AMQPExchange::class)
+            ->setMethods(['publish'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->queue = $this->getMockBuilder(\AMQPQueue::class)
+            ->setMethods(['getName', 'getFlags'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+
+        $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
-        $this->transport = $this->getTransport(0);
+
+        $this->transport = $this->getTransport();
     }
 
     protected function getTransport()
@@ -102,7 +103,8 @@ class AmqpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        /** @var EncoderInterface|MockObject $encoder */
+        $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -111,21 +113,16 @@ class AmqpTransportTest extends TestCase
     public function testGetEncoder()
     {
         $transport = new AmqpTransport($this->exchange, $this->queue);
-        $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface",
-            $transport->getMessageEncoder()
-        );
+        $this->assertInstanceOf(EncoderInterface::class, $transport->getMessageEncoder());
     }
 
     public function testPublish()
     {
-        $transport = $this->getMock(
-            "\\Gelf\\Transport\\AmqpTransport",
-            $methods = array("send"),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
+        /** @var MockObject|AmqpTransport $transport */
+        $transport = $this->getMockBuilder(AmqpTransport::class)
+            ->setMethods(['send'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $transport
             ->expects($this->once())
@@ -141,6 +138,9 @@ class AmqpTransportTest extends TestCase
     public function testSend()
     {
         $transport = $this->getTransport();
+        $this->exchange->expects($this->once())
+            ->method("publish");
+
         $transport->send($this->message);
     }
 }

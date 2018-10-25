@@ -11,33 +11,30 @@
 
 namespace Gelf\Test\Transport;
 
+use Gelf\Encoder\CompressedJsonEncoder;
 use Gelf\Encoder\EncoderInterface;
-use Gelf\Message;
+use Gelf\MessageInterface;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\SslOptions;
 use Gelf\Transport\StreamSocketClient;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class HttpTransportTest extends TestCase
 {
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|StreamSocketClient
+     * @var MockObject|StreamSocketClient
      */
     protected $socketClient;
 
     /**
-     * @var StreamSocketClient
-     */
-    protected $originalSocketClient;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|Message
+     * @var MockObject|MessageInterface
      */
     protected $message;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|EncoderInterface
+     * @var MockObject|EncoderInterface
      */
     protected $encoder;
 
@@ -46,23 +43,23 @@ class HttpTransportTest extends TestCase
      */
     protected $transport;
 
+    /**
+     * @var string
+     */
     protected $testMessage;
 
     public function setUp()
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMock(
-            "\\Gelf\\Transport\\StreamSocketClient",
-            $methods = array(),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->socketClient = $this->getMockBuilder(StreamSocketClient::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -81,8 +78,6 @@ class HttpTransportTest extends TestCase
         $reflectedTransport = new \ReflectionObject($transport);
         $reflectedClient = $reflectedTransport->getProperty('socketClient');
         $reflectedClient->setAccessible(true);
-
-        $this->originalSocketClient = $reflectedClient->getValue($transport);
         $reflectedClient->setValue($transport, $this->socketClient);
 
         return $transport;
@@ -175,7 +170,7 @@ class HttpTransportTest extends TestCase
 
     public function testSslOptionsAreUsed()
     {
-        $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions = $this->getMockBuilder(SslOptions::class)->getMock();
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
             ->will($this->returnValue(array('ssl' => null)));
@@ -192,7 +187,8 @@ class HttpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        /** @var EncoderInterface|MockObject $encoder */
+        $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -202,7 +198,7 @@ class HttpTransportTest extends TestCase
     {
         $transport = new HttpTransport();
         $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface",
+            EncoderInterface::class,
             $transport->getMessageEncoder()
         );
     }
@@ -300,7 +296,8 @@ class HttpTransportTest extends TestCase
             ->method("read")
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
-        $compressedEncoder = $this->getMock("\\Gelf\\Encoder\\CompressedJsonEncoder");
+        /** @var CompressedJsonEncoder|MockObject $compressedEncoder */
+        $compressedEncoder = $this->getMockBuilder(CompressedJsonEncoder::class)->getMock();
         $compressedEncoder
             ->expects($this->any())
             ->method('encode')
@@ -314,17 +311,15 @@ class HttpTransportTest extends TestCase
 
     public function testPublish()
     {
-        $transport = $this->getMock(
-            "\\Gelf\\Transport\\HttpTransport",
-            $methods = array("send"),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
+        /** @var MockObject|HttpTransport $transport */
+        $transport = $this->getMockBuilder(HttpTransport::class)
+            ->setMethods(['send'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $transport
             ->expects($this->once())
-            ->method("send")
+            ->method('send')
             ->with($this->message)
             ->will($this->returnValue(42));
 

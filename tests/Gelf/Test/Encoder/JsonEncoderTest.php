@@ -12,13 +12,15 @@
 namespace Gelf\Test\Encoder;
 
 use Gelf\Encoder\JsonEncoder;
+use Gelf\MessageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class JsonEncoderTest extends TestCase
 {
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var MockObject|MessageInterface
      */
     protected $message;
 
@@ -29,7 +31,7 @@ class JsonEncoderTest extends TestCase
 
     public function setUp()
     {
-        $this->message = $this->getMock('\\Gelf\\Message');
+        $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
         $this->encoder = new JsonEncoder();
     }
 

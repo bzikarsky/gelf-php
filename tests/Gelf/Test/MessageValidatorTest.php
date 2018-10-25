@@ -11,6 +11,7 @@
 
 namespace Gelf\Test;
 
+use Gelf\MessageInterface;
 use Gelf\MessageValidator;
 use PHPUnit\Framework\TestCase;
 
@@ -118,7 +119,7 @@ class MessageValidatorTest extends TestCase
         $version = "1.0",
         $additionals = array()
     ) {
-        $msg = $this->getMock('Gelf\MessageInterface');
+        $msg = $this->getMockBuilder(MessageInterface::class)->getMock();
         $msg->expects($this->any())->method('getHost')
             ->will($this->returnValue($host));
         $msg->expects($this->any())->method('getVersion')
