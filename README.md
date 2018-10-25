@@ -51,6 +51,52 @@ Reinstall dependencies: `composer install`
 
 For usage examples, go to [/examples](https://github.com/bzikarsky/gelf-php/tree/master/examples).
 
+### Muting connection and transport errors
+
+Oftentimes projects run into the situation where they don't want to raise exceptions for logging-errors. Since
+the standard transports like Udp, Tcp and Http can be kind of noise for fwrite/fopen errors, gelf-php provides
+a `IgnoreErrorTransportWrapper`. This class can decorate any `AbstractTransport` and will mute all exceptions.
+
+How this applies in practice can be seen in the [advanced-example](https://github.com/bzikarsky/gelf-php/blob/master/examples/advanced.php#L18-L20).
+
+If you use gelf-php in conjunction with monolog/symfony, the following snippet should help you with properly setting up your logging backend.
+
+Assumung you have a typical monolog config:
+
+```yml
+monolog:
+  handlers:
+    graylog:
+      type: service
+      id: monolog.gelf_handler
+      level: debug
+```
+
+You only need to properly define the symfony-service `gelf-handler`:
+
+```yml
+services:
+  monolog.gelf_handler:
+    class: Monolog\Handler\GelfHandler
+    arguments: [@gelf.publisher]
+    
+  gelf.publisher:
+    class: Gelf\Publisher
+    arguments: [@gelf.ignore_error_transport]
+    
+  gelf.ignore_error_transport:
+    class: Gelf\Transport\IgnoreErrorTransportWrapper
+    arguments: [@gelf.transport]
+    
+  gelf.transport:
+    class: Gelf\Transport\UdpTransport # or Tcp, Amp, Http,...
+    arguments: [] # ... whatever is required
+```
+
+
+
+
+
 HHVM
 ----
 
