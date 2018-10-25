@@ -259,6 +259,16 @@ class StreamSocketClient
     }
 
     /**
+     * Checks if the socket is closed
+     *
+     * @return bool
+     */
+    public function isClosed()
+    {
+        return $this->socket === null;
+    }
+
+    /**
      * Returns the current connect-timeout
      *
      * @return int
@@ -275,6 +285,34 @@ class StreamSocketClient
      */
     public function setConnectTimeout($timeout)
     {
+        if (!$this->isClosed()) {
+            throw new \LogicException("Cannot change socket properties with an open connection");
+        }
+
         $this->connectTimeout = $timeout;
+    }
+
+    /**
+     * Returns the stream context
+     *
+     * @return array
+     */
+    public function getContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Sets the stream context
+     *
+     * @param array $context
+     */
+    public function setContext(array $context)
+    {
+        if (!$this->isClosed()) {
+            throw new \LogicException("Cannot change socket properties with an open connection");
+        }
+
+        $this->context = $context;
     }
 }

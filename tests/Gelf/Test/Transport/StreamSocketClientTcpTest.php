@@ -182,7 +182,10 @@ class StreamSocketClientTcpTest extends TestCase
     {
         // close unopened stream
         $this->socketClient->close();
+        $this->assertTrue($this->socketClient->isClosed());
+
         $this->socketClient->write("abcd");
+        $this->assertFalse($this->socketClient->isClosed());
         $client = stream_socket_accept($this->serverSocket);
         $this->assertEquals("abcd", fread($client, 4));
     }
@@ -190,10 +193,12 @@ class StreamSocketClientTcpTest extends TestCase
     public function testCloseWrite()
     {
         $this->socketClient->write("abcd");
+        $this->assertFalse($this->socketClient->isClosed());
         $client = stream_socket_accept($this->serverSocket);
         $this->assertEquals("abcd", fread($client, 4));
 
         $this->socketClient->close();
+        $this->assertTrue($this->socketClient->isClosed());
 
         $this->socketClient->write("efgh");
         $client2 = stream_socket_accept($this->serverSocket);
@@ -215,8 +220,56 @@ class StreamSocketClientTcpTest extends TestCase
         );
 
         $client = new StreamSocketClient("tcp", $this->host, $this->port, $context);
+        $this->assertEquals($context, $client->getContext());
+
         $this->assertEquals($testName, stream_socket_get_name($client->getSocket(), false));
         $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+    }
+
+    /**
+     * @group hhvm-failures
+     */
+    public function testUpdateStreamContext()
+    {
+        $this->failsOnHHVM();
+
+        $testName = '127.0.0.1:12345';
+        $context = array(
+            'socket' => array(
+                'bindto' => $testName
+            )
+        );
+
+        $this->assertEquals(array(), $this->socketClient->getContext());
+        $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+        $this->socketClient->close();
+
+        $this->socketClient->setContext($context);
+        $this->assertEquals($context, $this->socketClient->getContext());
+
+        $this->assertEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSetContextFailsAfterConnect()
+    {
+        // enforce connect
+        $this->socketClient->getSocket();
+
+        $this->socketClient->setContext(array("foo" => "bar"));
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSetConnectTimeoutFailsAfterConnect()
+    {
+        // enforce connect
+        $this->socketClient->getSocket();
+
+        $this->socketClient->setConnectTimeout(1);
     }
 
     public function testConnectTimeout()
