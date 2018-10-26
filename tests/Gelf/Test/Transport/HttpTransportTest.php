@@ -309,25 +309,6 @@ class HttpTransportTest extends TestCase
         $this->transport->send($this->message);
     }
 
-    public function testPublish()
-    {
-        /** @var MockObject|HttpTransport $transport */
-        $transport = $this->getMockBuilder(HttpTransport::class)
-            ->setMethods(['send'])
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $transport
-            ->expects($this->once())
-            ->method('send')
-            ->with($this->message)
-            ->will($this->returnValue(42));
-
-        $response = $transport->publish($this->message);
-
-        $this->assertSame(42, $response);
-    }
-
     public function testCloseSocketOnHttpOneZero()
     {
         $this->socketClient
