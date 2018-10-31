@@ -51,17 +51,17 @@ class AmqpTransportTest extends TestCase
      */
     protected $queue;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        if (!defined('AMQP_NOPARAM')) {
-            define('AMQP_NOPARAM', 0);
+        if (!\defined('AMQP_NOPARAM')) {
+            \define('AMQP_NOPARAM', 0);
         }
 
-        if (!defined('AMQP_DURABLE')) {
-            define('AMQP_DURABLE', 2);
+        if (!\defined('AMQP_DURABLE')) {
+            \define('AMQP_DURABLE', 2);
         }
 
-        $this->testMessage = str_repeat('0123456789', 30); // 300 char string
+        $this->testMessage = \str_repeat('0123456789', 30); // 300 char string
 
         $this->exchange = $this->getMockBuilder(\AMQPExchange::class)
             ->setMethods(['publish'])
@@ -103,7 +103,7 @@ class AmqpTransportTest extends TestCase
         return $transport;
     }
 
-    public function testSetEncoder()
+    public function testSetEncoder(): void
     {
         /** @var EncoderInterface|MockObject $encoder */
         $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
@@ -112,17 +112,17 @@ class AmqpTransportTest extends TestCase
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 
-    public function testGetEncoder()
+    public function testGetEncoder(): void
     {
         $transport = new AmqpTransport($this->exchange, $this->queue);
         $this->assertInstanceOf(EncoderInterface::class, $transport->getMessageEncoder());
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $transport = $this->getTransport();
         $this->exchange->expects($this->once())
-            ->method("publish");
+            ->method('publish');
 
         $transport->send($this->message);
     }

@@ -24,7 +24,6 @@ use PHPUnit\Framework\TestCase;
 
 class HttpTransportTest extends TestCase
 {
-
     /**
      * @var MockObject|StreamSocketClient
      */
@@ -50,9 +49,9 @@ class HttpTransportTest extends TestCase
      */
     protected $testMessage;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->testMessage = str_repeat("0123456789", 30); // 300 char string
+        $this->testMessage = \str_repeat('0123456789', 30); // 300 char string
 
         $this->socketClient = $this->getMockBuilder(StreamSocketClient::class)
             ->disableOriginalConstructor()
@@ -85,7 +84,7 @@ class HttpTransportTest extends TestCase
         return $transport;
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $transport = new HttpTransport();
         $this->validateTransport($transport, '127.0.0.1', 12202, '/gelf');
@@ -100,33 +99,31 @@ class HttpTransportTest extends TestCase
         $this->validateTransport($transport, 'localhost', 443, '/gelf', new SslOptions());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testFromUrlConstructorInvalidUri()
+    public function testFromUrlConstructorInvalidUri(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         HttpTransport::fromUrl('-://:-');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testFromUrlConstructorInvalidScheme()
+    public function testFromUrlConstructorInvalidScheme(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         HttpTransport::fromUrl('ftp://foobar');
     }
 
-    public function testFromUrlConstructor()
+    public function testFromUrlConstructor(): void
     {
         $transport = HttpTransport::fromUrl('HTTP://localhost');
         $this->validateTransport($transport, 'localhost', 80, '', null, null);
 
         $transport = HttpTransport::fromUrl('http://localhost:1234');
         $this->validateTransport($transport, 'localhost', 1234, '', null, null);
-        
+
         $transport = HttpTransport::fromUrl('http://localhost/abc');
         $this->validateTransport($transport, 'localhost', 80, '/abc', null, null);
-        
+
         $transport = HttpTransport::fromUrl('http://localhost:1234/abc');
         $this->validateTransport($transport, 'localhost', 1234, '/abc', null, null);
 
@@ -138,7 +135,7 @@ class HttpTransportTest extends TestCase
 
         $transport = HttpTransport::fromUrl('https://localhost');
         $this->validateTransport($transport, 'localhost', 443, '', new SslOptions(), null);
-        
+
         $sslOptions = new SslOptions();
         $sslOptions->setVerifyPeer(false);
         $transport = HttpTransport::fromUrl('HTTPS://localhost', $sslOptions);
@@ -152,16 +149,16 @@ class HttpTransportTest extends TestCase
         $path,
         $sslOptions = null,
         $authentication = null
-    ) {
+    ): void {
         $r = new \ReflectionObject($transport);
 
-        $testProperties = array(
+        $testProperties = [
             'host' => $host,
             'port' => $port,
             'path' => $path,
             'sslOptions' => $sslOptions,
             'authentication' => $authentication
-        );
+        ];
 
         foreach ($testProperties as $property => $value) {
             $p = $r->getProperty($property);
@@ -170,24 +167,24 @@ class HttpTransportTest extends TestCase
         }
     }
 
-    public function testSslOptionsAreUsed()
+    public function testSslOptionsAreUsed(): void
     {
         $sslOptions = $this->getMockBuilder(SslOptions::class)->getMock();
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
-            ->will($this->returnValue(array('ssl' => null)));
+            ->will($this->returnValue(['ssl' => null]));
 
-        $transport = new HttpTransport("localhost", "12345", "/gelf", $sslOptions);
+        $transport = new HttpTransport('localhost', '12345', '/gelf', $sslOptions);
 
         $reflectedTransport = new \ReflectionObject($transport);
         $reflectedGetContext = $reflectedTransport->getMethod('getContext');
         $reflectedGetContext->setAccessible(true);
         $context = $reflectedGetContext->invoke($transport);
 
-        $this->assertEquals(array('ssl' => null), $context);
+        $this->assertEquals(['ssl' => null], $context);
     }
 
-    public function testSetEncoder()
+    public function testSetEncoder(): void
     {
         /** @var EncoderInterface|MockObject $encoder */
         $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
@@ -196,7 +193,7 @@ class HttpTransportTest extends TestCase
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 
-    public function testGetEncoder()
+    public function testGetEncoder(): void
     {
         $transport = new HttpTransport();
         $this->assertInstanceOf(
@@ -205,100 +202,99 @@ class HttpTransportTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException        \RuntimeException
-     * @expectedExceptionMessage Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''
-     */
-    public function testEmptyResponseException()
+    public function testEmptyResponseException(): void
     {
-        $this->socketClient->expects($this->once())->method("read")
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage("Graylog-Server didn't answer properly");
+
+        $this->socketClient->expects($this->once())->method('read')
             ->willReturn('');
 
         $this->transport->send($this->message);
     }
 
-    public function testSendUncompressed()
+    public function testSendUncompressed(): void
     {
-        $request = "POST /gelf HTTP/1.1"."\r\n"
-                 . "Host: 127.0.0.1:12202"."\r\n"
-                 . "Content-Length: 300"."\r\n"
-                 . "Content-Type: application/json"."\r\n"
-                 . "Connection: Keep-Alive"."\r\n"
-                 . "Accept: */*"."\r\n"
-                 . ""."\r\n"
+        $request = 'POST /gelf HTTP/1.1'."\r\n"
+                 . 'Host: 127.0.0.1:12202'."\r\n"
+                 . 'Content-Length: 300'."\r\n"
+                 . 'Content-Type: application/json'."\r\n"
+                 . 'Connection: Keep-Alive'."\r\n"
+                 . 'Accept: */*'."\r\n"
+                 . ''."\r\n"
                  . $this->testMessage;
 
         $this->socketClient
             ->expects($this->once())
-            ->method("write")
+            ->method('write')
             ->with($request);
 
         $this->socketClient
             ->expects($this->once())
-            ->method("read")
+            ->method('read')
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
         $this->transport->send($this->message);
     }
 
-    public function testAuthentication()
+    public function testAuthentication(): void
     {
-        $this->transport->setAuthentication("test", "test");
+        $this->transport->setAuthentication('test', 'test');
 
         $test = $this;
         $this->socketClient->expects($this->once())
-            ->method("write")
-            ->will($this->returnCallback(function ($data) use ($test) {
-                $test->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
+            ->method('write')
+            ->will($this->returnCallback(function ($data) use ($test): void {
+                $test->assertContains('Authorization: Basic ' . \base64_encode('test:test'), $data);
             }));
-            
+
         $this->socketClient
             ->expects($this->once())
-            ->method("read")
+            ->method('read')
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
         $this->transport->send($this->message);
     }
 
-    public function testProxy()
+    public function testProxy(): void
     {
         $test = $this;
         $this->socketClient->expects($this->once())
-            ->method("setContext")
-            ->willReturnCallback(function (array $context) use ($test) {
-                $test->assertArrayHasKey("http", $context);
+            ->method('setContext')
+            ->willReturnCallback(function (array $context) use ($test): void {
+                $test->assertArrayHasKey('http', $context);
                 $test->assertEquals(
-                    array(
-                        "proxy" => "tcp://proxy.example.com:5100",
-                        "request_fulluri" => true
-                    ),
-                    $context["http"]
+                    [
+                        'proxy' => 'tcp://proxy.example.com:5100',
+                        'request_fulluri' => true
+                    ],
+                    $context['http']
                 );
             });
 
-        $this->transport->setProxy("tcp://proxy.example.com:5100", true);
+        $this->transport->setProxy('tcp://proxy.example.com:5100', true);
     }
 
-    public function testSendCompressed()
+    public function testSendCompressed(): void
     {
-        $request = "POST /gelf HTTP/1.1"."\r\n"
-                 . "Host: 127.0.0.1:12202"."\r\n"
-                 . "Content-Length: 300"."\r\n"
-                 . "Content-Type: application/json"."\r\n"
-                 . "Connection: Keep-Alive"."\r\n"
-                 . "Accept: */*"."\r\n"
-                 . "Content-Encoding: gzip"."\r\n"
-                 . ""."\r\n"
+        $request = 'POST /gelf HTTP/1.1'."\r\n"
+                 . 'Host: 127.0.0.1:12202'."\r\n"
+                 . 'Content-Length: 300'."\r\n"
+                 . 'Content-Type: application/json'."\r\n"
+                 . 'Connection: Keep-Alive'."\r\n"
+                 . 'Accept: */*'."\r\n"
+                 . 'Content-Encoding: gzip'."\r\n"
+                 . ''."\r\n"
                  . $this->testMessage;
 
         $this->socketClient
             ->expects($this->once())
-            ->method("write")
+            ->method('write')
             ->with($request);
 
         $this->socketClient
             ->expects($this->once())
-            ->method("read")
+            ->method('read')
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
         /** @var CompressedJsonEncoder|MockObject $compressedEncoder */
@@ -314,35 +310,35 @@ class HttpTransportTest extends TestCase
         $this->transport->send($this->message);
     }
 
-    public function testCloseSocketOnHttpOneZero()
+    public function testCloseSocketOnHttpOneZero(): void
     {
         $this->socketClient
             ->expects($this->once())
-            ->method("read")
+            ->method('read')
             ->will($this->returnValue("HTTP/1.0 202 Accepted\r\n\r\n"));
 
         $this->socketClient
             ->expects($this->once())
-            ->method("close");
+            ->method('close');
 
         $this->transport->send($this->message);
     }
 
-    public function testCloseSocketOnConnectionClose()
+    public function testCloseSocketOnConnectionClose(): void
     {
         $this->socketClient
             ->expects($this->once())
-            ->method("read")
+            ->method('read')
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\nConnection: Close\r\n\r\n"));
 
         $this->socketClient
             ->expects($this->once())
-            ->method("close");
+            ->method('close');
 
         $this->transport->send($this->message);
     }
 
-    public function testConnectTimeout()
+    public function testConnectTimeout(): void
     {
         $this->socketClient
             ->expects($this->once())

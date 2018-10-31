@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace Gelf\Test;
 
+use Closure;
+use Exception;
 use Gelf\Logger;
 use Gelf\MessageInterface;
 use Gelf\PublisherInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
-use Exception;
-use Closure;
 
 class LoggerTest extends TestCase
 {
@@ -37,15 +37,15 @@ class LoggerTest extends TestCase
     /**
      * @var string
      */
-    protected $facility = "test-facility";
+    protected $facility = 'test-facility';
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->publisher = $this->getMockBuilder(PublisherInterface::class)->getMock();
         $this->logger = new Logger($this->publisher, $this->facility);
     }
 
-    public function testPublisher()
+    public function testPublisher(): void
     {
         $this->assertEquals($this->publisher, $this->logger->getPublisher());
 
@@ -55,11 +55,11 @@ class LoggerTest extends TestCase
         $this->assertEquals($newPublisher, $this->logger->getPublisher());
     }
 
-    public function testFacility()
+    public function testFacility(): void
     {
         $this->assertEquals($this->facility, $this->logger->getFacility());
 
-        $newFacility = "foobar-facil";
+        $newFacility = 'foobar-facil';
         $this->logger->setFacility($newFacility);
         $this->assertEquals($newFacility, $this->logger->getFacility());
 
@@ -68,55 +68,57 @@ class LoggerTest extends TestCase
         $this->assertEquals($newFacility, $this->logger->getFacility());
     }
 
-    public function testSimpleLog()
+    public function testSimpleLog(): void
     {
         $test = $this;
         $facility = $this->facility;
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $facility) {
-                $test->assertEquals("test", $message->getShortMessage());
+            function (MessageInterface $message) use ($test, $facility): void {
+                $test->assertEquals('test', $message->getShortMessage());
                 $test->assertEquals(LogLevel::ALERT, $message->getLevel());
                 $test->assertEquals($facility, $message->getFacility());
             }
         );
 
-        $this->logger->log(LogLevel::ALERT, "test");
+        $this->logger->log(LogLevel::ALERT, 'test');
     }
 
-    public function testLogContext()
+    public function testLogContext(): void
     {
         $test = $this;
-        $additional = array('test' => 'bar', 'abc' => 'buz');
+        $additional = ['test' => 'bar', 'abc' => 'buz'];
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $additional) {
-                $test->assertEquals("foo bar", $message->getShortMessage());
+            function (MessageInterface $message) use ($test, $additional): void {
+                $test->assertEquals('foo bar', $message->getShortMessage());
                 $test->assertEquals($additional, $message->getAllAdditionals());
             }
         );
 
-        $this->logger->log(LogLevel::NOTICE, "foo {test}", $additional);
+        $this->logger->log(LogLevel::NOTICE, 'foo {test}', $additional);
     }
 
     /**
      * @see https://github.com/bzikarsky/gelf-php/issues/50
      * @dataProvider providerLogContextWithStructuralValues
+     * @param mixed $contextValue
+     * @param mixed $expected
      */
-    public function testLogContextWithStructuralValues($contextValue, $expected)
+    public function testLogContextWithStructuralValues($contextValue, $expected): void
     {
         $test = $this;
-        $additional = array('context' => $contextValue);
+        $additional = ['context' => $contextValue];
         $this->validatePublish(
-            function (MessageInterface $message) use ($test, $expected) {
+            function (MessageInterface $message) use ($test, $expected): void {
                 // Use Message::toArray() as it filters invalid values
                 $final = $message->toArray();
                 if (!isset($final['_context'])) {
-                    $test->fail("Expected context key missing");
+                    $test->fail('Expected context key missing');
                 }
                 $actual = $final['_context'];
                 // Only scalar values are allowed, with exception of boolean
                 $test->assertTrue(
-                    is_scalar($actual) && !is_bool($actual),
-                    'Unexpected context value of type: ' . gettype($actual)
+                    \is_scalar($actual) && !\is_bool($actual),
+                    'Unexpected context value of type: ' . \gettype($actual)
                 );
                 $test->assertSame($expected, $actual);
             }
@@ -138,20 +140,20 @@ class LoggerTest extends TestCase
 
         $toString->method('__toString')->willReturn('toString');
 
-        return array(
-            'array'     => array(array('bar' => 'buz'), '{"bar":"buz"}'),
-            'boolTrue'  => array(true, 'true'),
-            'boolFalse' => array(false, 'false'),
-            'integer'   => array(123, 123),
-            'float'     => array(123.456, 123.456),
-            'object'    => array($stdClass, '[object (stdClass)]'),
-            'toString'  => array($toString, 'toString'),
-            'resource'  => array(fopen('php://memory', 'r'), '[resource]'),
-            'null'      => array(null, 'NULL')
-        );
+        return [
+            'array'     => [['bar' => 'buz'], '{"bar":"buz"}'],
+            'boolTrue'  => [true, 'true'],
+            'boolFalse' => [false, 'false'],
+            'integer'   => [123, 123],
+            'float'     => [123.456, 123.456],
+            'object'    => [$stdClass, '[object (stdClass)]'],
+            'toString'  => [$toString, 'toString'],
+            'resource'  => [\fopen('php://memory', 'r'), '[resource]'],
+            'null'      => [null, 'NULL']
+        ];
     }
 
-    public function testLogException()
+    public function testLogException(): void
     {
         $test = $this;
 
@@ -159,16 +161,16 @@ class LoggerTest extends TestCase
         $line = __LINE__ + 3;
 
         try {
-            throw new Exception("test-message", 123);
+            throw new Exception('test-message', 123);
         } catch (Exception $e) {
             $this->validatePublish(
-                function (MessageInterface $message) use ($e, $line, $test) {
+                function (MessageInterface $message) use ($e, $line, $test): void {
                     $test->assertContains(
                         $e->getMessage(),
                         $message->getFullMessage()
                     );
                     $test->assertContains(
-                        get_class($e),
+                        \get_class($e),
                         $message->getFullMessage()
                     );
                     $test->assertEquals($line, $message->getLine());
@@ -179,30 +181,30 @@ class LoggerTest extends TestCase
             $this->logger->log(
                 LogLevel::ALERT,
                 $e->getMessage(),
-                array('exception' => $e)
+                ['exception' => $e]
             );
         }
     }
 
-    // @see https://github.com/bzikarsky/gelf-php/issues/9
-    public function testStringZeroMessage()
+    /** @see https://github.com/bzikarsky/gelf-php/issues/9 */
+    public function testStringZeroMessage(): void
     {
         $test = $this;
         $this->validatePublish(
-            function (MessageInterface $message) use ($test) {
-                $test->assertEquals("0", $message->getShortMessage());
+            function (MessageInterface $message) use ($test): void {
+                $test->assertEquals('0', $message->getShortMessage());
             }
         );
 
         $this->logger->info('0');
     }
 
-    // @see https://github.com/bzikarsky/gelf-php/issues/9
-    public function testNumericZeroMessage()
+    /** @see https://github.com/bzikarsky/gelf-php/issues/9 */
+    public function testNumericZeroMessage(): void
     {
         $test = $this;
         $this->validatePublish(
-            function (MessageInterface $message) use ($test) {
+            function (MessageInterface $message) use ($test): void {
                 $test->assertEquals(0, $message->getShortMessage());
             }
         );
@@ -210,7 +212,7 @@ class LoggerTest extends TestCase
         $this->logger->alert(0);
     }
 
-    private function validatePublish(Closure $validator)
+    private function validatePublish(Closure $validator): void
     {
         $this->publisher->expects($this->once())->method('publish')->will(
             $this->returnCallback($validator)

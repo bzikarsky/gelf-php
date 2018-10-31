@@ -20,7 +20,6 @@ use PHPUnit\Framework\TestCase;
 
 class CompressedJsonEncoderTest extends TestCase
 {
-
     /**
      * @var MockObject|MessageInterface
      */
@@ -31,15 +30,15 @@ class CompressedJsonEncoderTest extends TestCase
      */
     protected $encoder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
         $this->encoder = new CompressedJsonEncoder();
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
-        $testData = array('foo' => 'bar');
+        $testData = ['foo' => 'bar'];
 
         $this->message
             ->expects($this->once())
@@ -49,14 +48,14 @@ class CompressedJsonEncoderTest extends TestCase
         $bytes = $this->encoder->encode($this->message);
 
         // check for valid zlib-compressed string
-        $this->assertEquals("\x78\x9c", substr($bytes, 0, 2));
+        $this->assertEquals("\x78\x9c", \substr($bytes, 0, 2));
 
         // check that it's uncompressable
-        $json = gzuncompress($bytes);
+        $json = \gzuncompress($bytes);
         $this->assertInternalType('string', $json);
 
         // check that there is JSON inside
-        $data = json_decode($json, $assoc = true);
+        $data = \json_decode($json, $assoc = true);
         $this->assertInternalType('array', $data);
 
         // check that we have our data array

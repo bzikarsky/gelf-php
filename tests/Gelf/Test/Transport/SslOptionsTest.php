@@ -18,7 +18,7 @@ use Gelf\Transport\SslOptions;
 
 class SslOptionsTest extends TestCase
 {
-    public function testState()
+    public function testState(): void
     {
         $options = new SslOptions();
 
@@ -40,43 +40,43 @@ class SslOptionsTest extends TestCase
         $this->assertEquals('ALL:!ADH:@STRENGTH', $options->getCiphers());
     }
 
-    public function testToStreamContext()
+    public function testToStreamContext(): void
     {
         $options = new SslOptions();
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        $this->assertEquals([
+            'ssl' => [
                 'verify_peer' => true,
                 'allow_self_signed' => false,
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
 
         $options->setVerifyPeer(false);
         $options->setAllowSelfSigned(true);
         $options->setCaFile('/path/to/ca');
         $options->setCiphers('ALL:!ADH:@STRENGTH');
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        $this->assertEquals([
+            'ssl' => [
                 'verify_peer' => false,
                 'allow_self_signed' => true,
                 'cafile' => '/path/to/ca',
                 'ciphers' => 'ALL:!ADH:@STRENGTH'
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
 
         $options->setCaFile(null);
         $options->setCiphers(null);
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        $this->assertEquals([
+            'ssl' => [
                 'verify_peer' => false,
                 'allow_self_signed' => true,
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
     }
 
-    public function testToStreamContextWithHostname()
+    public function testToStreamContextWithHostname(): void
     {
         $options = new SslOptions();
         $peerNameKey = PHP_VERSION_ID < 50600 ? 'CN_match' : 'peer_name';
@@ -91,7 +91,7 @@ class SslOptionsTest extends TestCase
         $this->assertArrayNotHasKey('CN_match', $context['ssl']);
         $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        $this->assertEquals(true, $context['ssl']['SNI_enabled']);
+        $this->assertTrue($context['ssl']['SNI_enabled']);
         $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
 
 
@@ -103,7 +103,7 @@ class SslOptionsTest extends TestCase
         $this->assertArrayHasKey($peerNameKey, $context['ssl']);
         $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        $this->assertEquals(true, $context['ssl']['SNI_enabled']);
+        $this->assertTrue($context['ssl']['SNI_enabled']);
         $this->assertEquals($host, $context['ssl'][$peerNameKey]);
         $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
     }

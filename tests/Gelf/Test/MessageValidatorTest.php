@@ -19,61 +19,63 @@ use PHPUnit\Framework\TestCase;
 
 class MessageValidatorTest extends TestCase
 {
-
     /**
      * @var MessageValidator
      */
     protected $messageValidator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->messageValidator = new MessageValidator();
     }
 
     /**
      * @dataProvider versions
+     * @param mixed $version
      */
-    public function testValid($version)
+    public function testValid($version): void
     {
-        $msg = $this->getMessage("lorem", "example.local", $version);
+        $msg = $this->getMessage('lorem', 'example.local', $version);
         $this->assertTrue($this->messageValidator->validate($msg, $reason));
     }
 
     /**
      * @dataProvider versions
+     * @param mixed $version
      */
-    public function testZeroMessagesValidates($version)
+    public function testZeroMessagesValidates($version): void
     {
-        $msg = $this->getMessage(0, "example.local", $version);
+        $msg = $this->getMessage(0, 'example.local', $version);
         $this->assertTrue($this->messageValidator->validate($msg));
 
-        $msg = $this->getMessage("0", "example.local", $version);
+        $msg = $this->getMessage('0', 'example.local', $version);
         $this->assertTrue($this->messageValidator->validate($msg));
     }
 
     /**
      * @dataProvider versions
+     * @param mixed $version
      */
-    public function testInvalidAddtionalFieldID($version)
+    public function testInvalidAddtionalFieldID($version): void
     {
         $msg = $this->getMessage(
-            "lorem ipsum",
-            "example.local",
+            'lorem ipsum',
+            'example.local',
             $version,
-            array('id' => 1)
+            ['id' => 1]
         );
 
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
         $this->assertContains('id', $reason);
     }
 
-    public function testInvalidAddtionalKeyV11()
+    public function testInvalidAddtionalKeyV11(): void
     {
         $msg = $this->getMessage(
-            "lorem",
-            "example.local",
-            "1.1",
-            array('foo?' => 1)
+            'lorem',
+            'example.local',
+            '1.1',
+            ['foo?' => 1]
         );
 
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
@@ -81,10 +83,10 @@ class MessageValidatorTest extends TestCase
     }
 
     private function getMessage(
-        $shortMessage = "lorem ipsum",
-        $host = "example.local",
-        $version = "1.0",
-        $additionals = array()
+        $shortMessage = 'lorem ipsum',
+        $host = 'example.local',
+        $version = '1.0',
+        $additionals = []
     ) {
         $msg = $this->getMockBuilder(MessageInterface::class)->getMock();
         $msg->expects($this->any())->method('getHost')
@@ -109,6 +111,6 @@ class MessageValidatorTest extends TestCase
 
     public static function versions()
     {
-        return array(array('1.0'), array('1.1'));
+        return [['1.0'], ['1.1']];
     }
 }

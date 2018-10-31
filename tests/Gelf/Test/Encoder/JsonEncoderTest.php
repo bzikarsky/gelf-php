@@ -20,7 +20,6 @@ use PHPUnit\Framework\TestCase;
 
 class JsonEncoderTest extends TestCase
 {
-
     /**
      * @var MockObject|MessageInterface
      */
@@ -31,15 +30,15 @@ class JsonEncoderTest extends TestCase
      */
     protected $encoder;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->message = $this->getMockBuilder(MessageInterface::class)->getMock();
         $this->encoder = new JsonEncoder();
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
-        $testData = array('foo' => 'bar');
+        $testData = ['foo' => 'bar'];
 
         $this->message
             ->expects($this->once())
@@ -49,7 +48,7 @@ class JsonEncoderTest extends TestCase
         $json = $this->encoder->encode($this->message);
 
         // check that there is JSON inside
-        $data = json_decode($json, $assoc = true);
+        $data = \json_decode($json, $assoc = true);
         $this->assertInternalType('array', $data);
 
         // check that we have our data array

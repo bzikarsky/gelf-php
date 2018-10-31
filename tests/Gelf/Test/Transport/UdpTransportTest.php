@@ -22,7 +22,6 @@ use PHPUnit\Framework\TestCase;
 
 class UdpTransportTest extends TestCase
 {
-
     /**
      * @var MockObject|StreamSocketClient
      */
@@ -48,9 +47,9 @@ class UdpTransportTest extends TestCase
      */
     protected $testMessage;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $this->testMessage = str_repeat("0123456789", 30); // 300 char string
+        $this->testMessage = \str_repeat('0123456789', 30); // 300 char string
 
         $this->socketClient = $this->getMockBuilder(StreamSocketClient::class)
             ->disableOriginalConstructor()
@@ -83,7 +82,7 @@ class UdpTransportTest extends TestCase
         return $transport;
     }
 
-    public function testSetEncoder()
+    public function testSetEncoder(): void
     {
         /** @var EncoderInterface|MockObject $encoder */
         $encoder = $this->getMockBuilder(EncoderInterface::class)->getMock();
@@ -92,7 +91,7 @@ class UdpTransportTest extends TestCase
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 
-    public function testGetEncoder()
+    public function testGetEncoder(): void
     {
         $transport = new UdpTransport();
         $this->assertInstanceOf(
@@ -101,7 +100,7 @@ class UdpTransportTest extends TestCase
         );
     }
 
-    public function testSendUnchunked()
+    public function testSendUnchunked(): void
     {
         $this->socketClient
             ->expects($this->once())
@@ -111,11 +110,11 @@ class UdpTransportTest extends TestCase
         $this->transport->send($this->message);
     }
 
-    public function testSendChunked()
+    public function testSendChunked(): void
     {
         $chunkSize = 10;
         $transport = $this->getTransport(10);
-        $expectedMessageCount =  strlen($this->testMessage) / $chunkSize;
+        $expectedMessageCount =  \strlen($this->testMessage) / $chunkSize;
 
         $this->socketClient
             ->expects($this->exactly($expectedMessageCount))
@@ -124,11 +123,10 @@ class UdpTransportTest extends TestCase
         $transport->send($this->message);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testInvalidChunkNumber()
+    public function testInvalidChunkNumber(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $transport = $this->getTransport(1);
         $transport->send($this->message);
     }

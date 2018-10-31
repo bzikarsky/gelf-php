@@ -13,12 +13,11 @@ declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
-use Gelf\Transport\StreamSocketClient;
 use Gelf\TestCase;
+use Gelf\Transport\StreamSocketClient;
 
 class StreamSocketClientUdpTest extends TestCase
 {
-
     /**
      * @var StreamSocketClient
      */
@@ -29,10 +28,10 @@ class StreamSocketClientUdpTest extends TestCase
      */
     protected $serverSocket;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
-        $host = "127.0.0.1";
-        $this->serverSocket = stream_socket_server(
+        $host = '127.0.0.1';
+        $this->serverSocket = \stream_socket_server(
             "udp://$host:0",
             $errNo,
             $errMsg,
@@ -40,31 +39,30 @@ class StreamSocketClientUdpTest extends TestCase
         );
 
         if (!$this->serverSocket) {
-            throw new \RuntimeException("Failed to create test-server-socket");
+            throw new \RuntimeException('Failed to create test-server-socket');
         }
 
         // get random port
-        $socketName = stream_socket_get_name(
+        $socketName = \stream_socket_get_name(
             $this->serverSocket,
             $peerName = false
         );
-        list(, $port) = explode(":", $socketName);
+        [, $port] = \explode(':', $socketName);
 
         $this->socketClient = new StreamSocketClient('udp', $host, $port);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         unset($this->socketClient);
-        fclose($this->serverSocket);
+        \fclose($this->serverSocket);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidConstructorArguments(): void
     {
-        $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
+        $this->expectException(\RuntimeException::class);
+
+        $client = new StreamSocketClient('not-a-scheme', 'not-a-host', -1);
         $client->getSocket();
     }
 
@@ -75,13 +73,13 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function testWrite(): void
     {
-        $testData = "Hello World!";
+        $testData = 'Hello World!';
         $numBytes = $this->socketClient->write($testData);
 
-        $this->assertEquals(strlen($testData), $numBytes);
+        $this->assertEquals(\strlen($testData), $numBytes);
 
         // check that message is sent to server
-        $readData = fread($this->serverSocket, $numBytes);
+        $readData = \fread($this->serverSocket, $numBytes);
 
         $this->assertEquals($testData, $readData);
     }

@@ -22,7 +22,6 @@ use PHPUnit\Framework\TestCase;
 
 class PublisherTest extends TestCase
 {
-
     /**
      * @var MockObject|TransportInterface
      */
@@ -48,7 +47,7 @@ class PublisherTest extends TestCase
      */
     protected $publisher;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->transportA = $this->getMockBuilder(TransportInterface::class)->getMock();
         $this->transportB = $this->getMockBuilder(TransportInterface::class)->getMock();
@@ -61,7 +60,7 @@ class PublisherTest extends TestCase
         );
     }
 
-    public function testPublish()
+    public function testPublish(): void
     {
         $this->transportA->expects($this->once())
             ->method('send')
@@ -74,11 +73,10 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testPublishErrorOnInvalid()
+    public function testPublishErrorOnInvalid(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $this->messageValidator->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(false));
@@ -86,18 +84,17 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testMissingTransport()
+    public function testMissingTransport(): void
     {
+        $this->expectException(\RuntimeException::class);
+
         $publisher = new Publisher(null, $this->messageValidator);
         $this->assertCount(0, $publisher->getTransports());
 
         $publisher->publish($this->message);
     }
 
-    public function testMultipleTransports()
+    public function testMultipleTransports(): void
     {
         $pub = $this->publisher;
         $pub->addTransport($this->transportB);
@@ -116,7 +113,7 @@ class PublisherTest extends TestCase
         $pub->publish($this->message);
     }
 
-    public function testGetTransports()
+    public function testGetTransports(): void
     {
         $pub = new Publisher(null, $this->messageValidator);
         $this->assertCount(0, $pub->getTransports());
@@ -131,7 +128,7 @@ class PublisherTest extends TestCase
         $this->assertCount(2, $pub->getTransports());
     }
 
-    public function testInitWithDefaultValidator()
+    public function testInitWithDefaultValidator(): void
     {
         $pub = new Publisher();
         $this->assertInstanceOf(

@@ -13,13 +13,12 @@ declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
+use \PHPUnit\Framework\MockObject\MockObject as MockObject;
 use Gelf\Message;
 use Gelf\MessageInterface;
 use Gelf\TestCase;
-use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
 use Gelf\Transport\TransportInterface;
-use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 class IgnoreErrorTransportWrapperTest extends TestCase
 {
@@ -32,9 +31,9 @@ class IgnoreErrorTransportWrapperTest extends TestCase
         $wrapper   = new IgnoreErrorTransportWrapper($transport);
 
         $transport->expects($this->once())
-                  ->method('send')
-                  ->with($expectedMessage)
-                  ->willThrowException($expectedException);
+            ->method('send')
+            ->with($expectedMessage)
+            ->willThrowException($expectedException);
 
         $bytes = $wrapper->send($expectedMessage);
         $lastError = $wrapper->getLastError();
