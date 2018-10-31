@@ -18,6 +18,8 @@ before_script:
 
 script: 
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
+  - composer code-style-check
+  - composer code-style-check-additional
 
 after_script:
   - wget https://scrutinizer-ci.com/ocular.phar
