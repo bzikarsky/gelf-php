@@ -9,10 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // We need a transport - TCP via port 12201 is standard.
-$transport = new Gelf\Transport\TcpTransport("127.0.0.1", 12201);
+$transport = new Gelf\Transport\TcpTransport('127.0.0.1', 12201);
 
 // While the TCP transport is itself a publisher, we wrap it in a real Publisher for convenience
 // A publisher allows for message validation before transmission, and it also supports sending messages
@@ -21,10 +23,8 @@ $publisher = new Gelf\Publisher();
 $publisher->addTransport($transport);
 
 // Now we can create custom messages and publish them
-$message = new Gelf\Message();
-$message->setShortMessage("It works in TCP!")
-        ->setLevel(\Psr\Log\LogLevel::ALERT)
-        ->setFullMessage("There was a foo in bar")
-        ->setFacility("local8")
-;
+$message = new Gelf\Message('Foobar!', \Psr\Log\LogLevel::ALERT);
+$message->setFullMessage('There was a foo in bar')
+    ->setFacility('example-facility');
+
 $publisher->publish($message);

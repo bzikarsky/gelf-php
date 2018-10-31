@@ -48,7 +48,7 @@ class Logger extends AbstractLogger
      * @param array $defaultContext
      */
     public function __construct(
-        PublisherInterface $publisher = null,
+        ?PublisherInterface $publisher = null,
         ?string $facility = null,
         array $defaultContext = []
     ) {

@@ -9,15 +9,16 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // We need a transport - UDP via port 12201 is standard.
 $transport = new Gelf\Transport\UdpTransport(
-    "127.0.0.1",
+    '127.0.0.1',
     12201,
     Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN
 );
-
 
 // To mute all connection related exceptions, as it may be useful in logging, we can wrap the transport:
 //
@@ -30,17 +31,15 @@ $publisher = new Gelf\Publisher();
 $publisher->addTransport($transport);
 
 // Now we can create custom messages and publish them
-$message = new Gelf\Message();
-$message->setShortMessage("Foobar!")
-    ->setLevel(\Psr\Log\LogLevel::ALERT)
-    ->setFullMessage("There was a foo in bar")
-    ->setFacility("example-facility")
-;
+$message = new Gelf\Message('Foobar!', \Psr\Log\LogLevel::ALERT);
+$message->setFullMessage('There was a foo in bar')
+    ->setFacility('example-facility');
+
 $publisher->publish($message);
 
 // The implementation of PSR-3 is encapsulated in the Logger-class.
 // It provides high-level logging methods, such as alert(), info(), etc.
-$logger = new Gelf\Logger($publisher, "example-facility");
+$logger = new Gelf\Logger($publisher, 'example-facility');
 
 // Now we can log...
-$logger->alert("Foobaz!");
+$logger->alert('Foobaz!');

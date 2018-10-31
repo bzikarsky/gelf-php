@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 // When creating a logger without any options, it logs automatically to localhost:12201 via UDP
@@ -16,4 +18,4 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $logger = new Gelf\Logger();
 
 // Log!
-$logger->alert("Foobaz!");
+$logger->alert('Foobaz!');
