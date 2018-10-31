@@ -200,7 +200,7 @@ class StreamSocketClient
     public function write($buffer)
     {
         $buffer = (string) $buffer;
-        $bufLen = Binary::safeStrlen($buffer);
+        $bufLen = \strlen($buffer);
 
         $socket = $this->getSocket();
         $written = 0;
@@ -215,7 +215,7 @@ class StreamSocketClient
                 $failed = true;
                 $errorMessage .= ": $errstr ($errno)";
             });
-            $byteCount = fwrite($socket, Binary::safeSubstr($buffer, $written));
+            $byteCount = fwrite($socket, \substr($buffer, $written));
             restore_error_handler();
 
             if ($byteCount === 0 && defined('HHVM_VERSION')) {
