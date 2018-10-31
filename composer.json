@@ -14,7 +14,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Gelf\\": "src/Gelf"
+      "Gelf\\": "src"
     }
   },
   "require": {
