@@ -1,0 +1,55 @@
+<?php
+
+return PhpCsFixer\Config::create()
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@PSR2' => true,
+        '@PSR1' => true,
+        '@PHPUnit60Migration:risky' => true,
+        '@PHP71Migration:risky' => true,
+        '@PHP71Migration' => true,
+        'array_indentation' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'backtick_to_shell_exec' => true,
+        'comment_to_phpdoc' => true,
+        'compact_nullable_typehint' => true,
+        'date_time_immutable' => true,
+        'escape_implicit_backslashes' => true,
+        'explicit_indirect_variable' => true,
+        'fully_qualified_strict_types' => true,
+        'header_comment' => ['header' => "This file is part of the php-gelf package.\n\n(c) Benjamin Zikarsky <http://benjamin-zikarsky.de>\n\nFor the full copyright and license information, please view the LICENSE\nfile that was distributed with this source code.", 'location' => 'after_open'],
+        'linebreak_after_opening_tag' => true,
+        'list_syntax' => ['syntax' => 'short'],
+        'method_chaining_indentation' => true,
+        'multiline_comment_opening_closing' => true,
+        'multiline_whitespace_before_semicolons' => true,
+        'no_alternative_syntax' => true,
+        'no_binary_string' => true,
+        'no_superfluous_elseif' => true,
+        'no_unreachable_default_argument_value' => true,
+        'no_useless_else' => true,
+        'no_useless_return' => true,
+        'no_empty_phpdoc' => true,
+        'ordered_imports' => true,
+        'php_unit_method_casing' => true,
+        'php_unit_construct' => true,
+        'php_unit_no_expectation_annotation' => true,
+        'php_unit_set_up_tear_down_visibility' => true,
+        'phpdoc_add_missing_param_annotation' => true,
+        'simplified_null_return' => true,
+        'strict_comparison' => true,
+        'strict_param' => true,
+        'string_line_ending' => true,
+        'no_trailing_whitespace' => true,
+        'no_whitespace_in_blank_line' => true,
+        'class_attributes_separation' => true,
+        'no_unused_imports' => true,
+        'single_quote' => true,
+        'native_function_invocation' => true,
+        'yoda_style' => true
+    ])
+    ->setFinder(PhpCsFixer\Finder::create()
+        ->exclude('vendor')
+        ->in(__DIR__)
+    )
+;
