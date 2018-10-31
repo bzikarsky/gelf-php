@@ -29,5 +29,3 @@ if (!\file_exists($autoloadFile)) {
 }
 
 require_once $autoloadFile;
-
-require_once __DIR__ . '/Gelf/TestCase.php';

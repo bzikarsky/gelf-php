@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
-use Gelf\TestCase;
 use Gelf\Transport\StreamSocketClient;
+use LogicException;
+use PHPUnit\Framework\TestCase;
 
 class StreamSocketClientTcpTest extends TestCase
 {
@@ -210,13 +211,8 @@ class StreamSocketClientTcpTest extends TestCase
         $this->assertEquals('efgh', \fread($client2, 4));
     }
 
-    /**
-     * @group hhvm-failures
-     */
     public function testStreamContext(): void
     {
-        $this->failsOnHHVM();
-
         $testName = '127.0.0.1:12345';
         $context = [
             'socket' => [
@@ -231,13 +227,8 @@ class StreamSocketClientTcpTest extends TestCase
         $this->assertNotEquals($testName, \stream_socket_get_name($this->socketClient->getSocket(), false));
     }
 
-    /**
-     * @group hhvm-failures
-     */
     public function testUpdateStreamContext(): void
     {
-        $this->failsOnHHVM();
-
         $testName = '127.0.0.1:12345';
         $context = [
             'socket' => [
@@ -257,7 +248,7 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testSetContextFailsAfterConnect(): void
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
 
         // enforce connect
         $this->socketClient->getSocket();
