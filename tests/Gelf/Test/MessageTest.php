@@ -9,8 +9,11 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Test;
 
+use DateTime;
 use Gelf\Message;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
@@ -25,30 +28,9 @@ class MessageTest extends TestCase
 
     public function setUp()
     {
-        $this->message = new Message();
+        $this->message = new Message('test-message');
     }
 
-    public function testTimestamp()
-    {
-        $this->assertLessThanOrEqual(microtime(true), $this->message->getTimestamp());
-        $this->assertGreaterThan(0, $this->message->getTimestamp());
-
-        $this->message->setTimestamp(123);
-        $this->assertEquals(123, $this->message->getTimestamp());
-
-        $this->message->setTimestamp("abc");
-        $this->assertEquals(0, $this->message->getTimestamp());
-
-        $this->message->setTimestamp("1.23");
-        $this->assertEquals(1.23, $this->message->getTimestamp());
-    }
-
-    public function testVersion()
-    {
-        $this->assertEquals("1.0", $this->message->getVersion());
-        $this->assertEquals($this->message, $this->message->setVersion("1.1"));
-        $this->assertEquals("1.1", $this->message->getVersion());
-    }
 
     public function testHost()
     {
@@ -74,22 +56,22 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testLevelInvalidString()
+    public function testLevelInvalidString(): void
     {
-        $this->message->setLevel("invalid");
+        $this->message->setLevel('invalid');
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testLevelInvalidInteger()
+    public function testLevelInvalidInteger(): void
     {
         $this->message->setLevel(8);
     }
 
-    public function testLogLevelToPsr()
+    public function testLogLevelToPsr(): void
     {
         $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr("alert"));
         $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr("ALERT"));
@@ -97,42 +79,22 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testLogLevelToPsrInvalidString()
+    public function testLogLevelToPsrInvalidString(): void
     {
-        Message::logLevelToPsr("invalid");
+        Message::logLevelToPsr('invalid');
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testLogLevelToPsrInvalidInt()
+    public function testLogLevelToPsrInvalidInt(): void
     {
         Message::logLevelToPsr(-1);
     }
 
-    public function testOptionalMessageFields()
-    {
-        $fields = array(
-            "Line",
-            "File",
-            "Facility",
-            "FullMessage",
-            "ShortMessage"
-        );
-
-        foreach ($fields as $field) {
-            $g = "get$field";
-            $s = "set$field";
-            $this->assertEmpty($this->message->$g());
-
-            $this->message->$s("test");
-            $this->assertEquals("test", $this->message->$g());
-        }
-    }
-
-    public function testAdditionals()
+    public function testAdditionals(): void
     {
         $this->assertInternalType('array', $this->message->getAllAdditionals());
         $this->assertCount(0, $this->message->getAllAdditionals());
@@ -154,29 +116,29 @@ class MessageTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testSetAdditionalEmptyKey()
+    public function testSetAdditionalEmptyKey(): void
     {
         $this->message->setAdditional("", "test");
     }
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testGetAdditionalInvalidKey()
+    public function testGetAdditionalInvalidKey(): void
     {
         $this->message->getAdditional("invalid");
     }
 
-    public function testSetTimestamp()
+    public function testSetTimestamp(): void
     {
         $dt = new \DateTime('@1393661544.3012');
         $this->message->setTimestamp($dt);
 
-        $this->assertEquals($dt->format("U.u"), $this->message->getTimestamp());
+        $this->assertEquals($dt, $this->message->getTimestamp());
     }
 
-    public function testMethodChaining()
+    public function testMethodChaining(): void
     {
         $message = $this->message
             ->setTimestamp(new \DateTime())
@@ -194,7 +156,7 @@ class MessageTest extends TestCase
         $this->assertEquals($this->message, $message);
     }
 
-    public function testToArrayV10()
+    public function testToArrayV10(): void
     {
         $this->message->setAdditional("foo", "bar");
         $this->message->setAdditional("bool-true", true);
@@ -210,10 +172,13 @@ class MessageTest extends TestCase
         $this->assertArrayHasKey("_bool-false", $data);
         $this->assertFalse($data["_bool-false"]);
 
+        // Test timestamp
+        $this->assertArrayHasKey('timestamp', $data);
+        $this->assertEquals($this->message->getTimestamp()->format("U.u"), $data["timestamp"]);
+
         $map = array(
             "version"       => "getVersion",
             "host"          => "getHost",
-            "timestamp"     => "getTimestamp",
             "full_message"  => "getFullMessage",
             "short_message" => "getShortMessage",
             "line"          => "getLine",
@@ -238,16 +203,18 @@ class MessageTest extends TestCase
         }
     }
 
-    public function testToArrayWithArrayData()
+    public function testToArrayWithArrayData(): void
     {
         $this->message->setAdditional("foo", array("foo" => "bar"));
         $data = $this->message->toArray();
-        $this->assertTrue(is_array($data));
+
+        // Test timestamp
+        $this->assertArrayHasKey('timestamp', $data);
+        $this->assertEquals($this->message->getTimestamp()->format("U.u"), $data["timestamp"]);
 
         $map = array(
             "version"       => "getVersion",
             "host"          => "getHost",
-            "timestamp"     => "getTimestamp",
             "full_message"  => "getFullMessage",
             "short_message" => "getShortMessage",
             "line"          => "getLine",
@@ -272,7 +239,7 @@ class MessageTest extends TestCase
         }
     }
 
-    public function testToArrayV11()
+    public function testToArrayV11(): void
     {
         $this->message->setVersion("1.1");
         $this->message->setShortMessage("lorem ipsum");
@@ -305,5 +272,9 @@ class MessageTest extends TestCase
         $this->assertTrue($data["_bool-true"]);
         $this->assertArrayHasKey("_bool-false", $data);
         $this->assertFalse($data["_bool-false"]);
+
+        // Test timestamp
+        $this->assertArrayHasKey('timestamp', $data);
+        $this->assertEquals($this->message->getTimestamp()->format("U.u"), $data["timestamp"]);
     }
 }

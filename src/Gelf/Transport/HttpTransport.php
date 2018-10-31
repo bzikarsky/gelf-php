@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Transport;
 
 use Gelf\MessageInterface;
@@ -242,12 +244,12 @@ class HttpTransport extends AbstractTransport
     {
         $chunkSize = 1024; // number of bytes to read at once
         $delimiter = "\r\n\r\n"; // delimiter between headers and response
-        $response = "";
+        $response = '';
 
         do {
             $chunk = $this->socketClient->read($chunkSize);
             $response .= $chunk;
-        } while (false === strpos($chunk, $delimiter) && strlen($chunk) > 0);
+        } while (false === \strpos($chunk, $delimiter) && $chunk !== '');
 
         $elements = explode($delimiter, $response, 2);
 

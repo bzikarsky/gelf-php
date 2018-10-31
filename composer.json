@@ -1,31 +1,33 @@
 {
-    "name": "graylog2/gelf-php",
-    "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Benjamin Zikarsky",
-            "email": "benjamin@zikarsky.de"
-        },
-        {
-            "name": "gelf-php contributors",
-            "homepage": "https://github.com/bzikarsky/gelf-php/contributors"
-        }
-    ],
-    "require": {
-        "php": "^7.2",
-        "psr/log": "~1.0"
+  "name": "graylog2/gelf-php",
+  "description": "A php implementation to send log-messages to a GELF compatible backend like Graylog2.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Benjamin Zikarsky",
+      "email": "benjamin@zikarsky.de"
     },
-    "autoload": {
-        "psr-4": {
-            "Gelf\\": "src/Gelf"
-        }
-    },
-    "provide": {
-        "psr/log-implementation": "~1.0"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^7.4",
-        "squizlabs/php_codesniffer": "^3.3"
+    {
+      "name": "gelf-php contributors",
+      "homepage": "https://github.com/bzikarsky/gelf-php/contributors"
     }
+  ],
+  "require": {
+    "php": "^7.2",
+    "psr/log": "~1.0",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Gelf\\": "src/Gelf"
+    }
+  },
+  "provide": {
+    "psr/log-implementation": "~1.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.4",
+    "squizlabs/php_codesniffer": "^3.3",
+    "roave/security-advisories": "dev-master"
+  }
 }

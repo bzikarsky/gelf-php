@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Test\Transport;
 
 use Gelf\Encoder\EncoderInterface;
@@ -115,7 +117,9 @@ class TcpTransportTest extends TestCase
     {
         /** @var SslOptions|MockObject $sslOptions */
         $sslOptions = $this->getMockBuilder(SslOptions::class)->getMock();
-        $sslOptions->expects($this->exactly(2))->method('toStreamContext')->will($this->returnValue(array('ssl' => null)));
+        $sslOptions->expects($this->exactly(2))
+            ->method('toStreamContext')
+            ->will($this->returnValue(array('ssl' => null)));
 
         $transport = new TcpTransport("localhost", "12202", $sslOptions);
 

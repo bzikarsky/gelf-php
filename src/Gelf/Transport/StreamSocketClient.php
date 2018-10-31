@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Transport;
 
 use RuntimeException;
@@ -118,8 +120,8 @@ class StreamSocketClient
         }
 
         // set non-blocking for UDP
-        if (strcasecmp("udp", $scheme) == 0) {
-            stream_set_blocking($socket, 0);
+        if (\strcasecmp('udp', $scheme) === 0) {
+            \stream_set_blocking($socket, false);
         }
 
         return $socket;
@@ -165,8 +167,8 @@ class StreamSocketClient
         }
 
         // set non-blocking for UDP
-        if (strcasecmp("udp", $this->scheme) == 0) {
-            stream_set_blocking($socket, 0);
+        if (\strcasecmp('udp', $this->scheme) === 0) {
+            \stream_set_blocking($socket, false);
         }
 
         return $socket;

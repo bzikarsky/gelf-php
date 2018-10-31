@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Test\Transport;
 
 use Gelf\Encoder\CompressedJsonEncoder;
@@ -209,6 +211,9 @@ class HttpTransportTest extends TestCase
      */
     public function testEmptyResponseException()
     {
+        $this->socketClient->expects($this->once())->method("read")
+            ->willReturn('');
+
         $this->transport->send($this->message);
     }
 

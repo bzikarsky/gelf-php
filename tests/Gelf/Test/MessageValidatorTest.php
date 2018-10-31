@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Test;
 
 use Gelf\MessageInterface;
@@ -18,6 +20,9 @@ use PHPUnit\Framework\TestCase;
 class MessageValidatorTest extends TestCase
 {
 
+    /**
+     * @var MessageValidator
+     */
     protected $messageValidator;
 
     public function setUp()
@@ -44,44 +49,6 @@ class MessageValidatorTest extends TestCase
 
         $msg = $this->getMessage("0", "example.local", $version);
         $this->assertTrue($this->messageValidator->validate($msg));
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testInvalidVersion()
-    {
-        $msg = $this->getMessage("lorem ipsum", "example.local", null);
-        $this->messageValidator->validate($msg);
-    }
-
-    /**
-     * @dataProvider versions
-     */
-    public function testMissingShortMessage($version)
-    {
-        $msg = $this->getMessage(null, "example.local", $version);
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('short-message', $reason);
-    }
-
-    /**
-     * @dataProvider versions
-     */
-    public function testMissingHost($version)
-    {
-        $msg = $this->getMessage("lorem ipsum", null, $version);
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('host', $reason);
-    }
-
-    public function testMissingVersion()
-    {
-        $msg = $this->getMessage("lorem ipsum", "example.local", null);
-
-        // direct into version validate, parent would throw invalid version
-        $this->assertFalse($this->messageValidator->validate0100($msg, $r));
-        $this->assertContains('version', $r);
     }
 
     /**

@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf;
 
 use Gelf\Transport\UdpTransport;
@@ -21,7 +23,7 @@ use Exception;
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class Logger extends AbstractLogger implements LoggerInterface
+class Logger extends AbstractLogger
 {
     /**
      * @var string|null
@@ -39,7 +41,7 @@ class Logger extends AbstractLogger implements LoggerInterface
     protected $publisher;
 
     /**
-     * Creates a PSR-3 Logger for GELF/Graylog2
+     * Create a PSR-3 Logger for GELF/Graylog2
      *
      * @param PublisherInterface|null $publisher
      * @param string|null $facility
@@ -47,8 +49,8 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     public function __construct(
         PublisherInterface $publisher = null,
-        $facility = null,
-        array $defaultContext = array()
+        ?string $facility = null,
+        array $defaultContext = []
     ) {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
@@ -59,13 +61,13 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
-     * Publishes a given message and context with given level
+     * Publish a given message and context with given level
      *
      * @param mixed $level
      * @param mixed $rawMessage
      * @param array $context
      */
-    public function log($level, $rawMessage, array $context = array())
+    public function log($level, $rawMessage, array $context = array()): void
     {
         $message = $this->initMessage($level, $rawMessage, $context);
 
@@ -73,38 +75,41 @@ class Logger extends AbstractLogger implements LoggerInterface
         if (isset($context['exception'])
            && $context['exception'] instanceof Exception
         ) {
-            $this->initExceptionData($message, $context['exception']);
+            self::initExceptionData($message, $context['exception']);
         }
 
         $this->publisher->publish($message);
     }
 
     /**
-     * Returns the currently used publisher
+     * Return the currently used publisher
      *
      * @return PublisherInterface
      */
-    public function getPublisher()
+    public function getPublisher(): PublisherInterface
     {
         return $this->publisher;
     }
 
     /**
-     * Sets a new publisher
+     * Set a new publisher
      *
      * @param PublisherInterface $publisher
+     * @return self
      */
-    public function setPublisher(PublisherInterface $publisher)
+    public function setPublisher(PublisherInterface $publisher): self
     {
         $this->publisher = $publisher;
+
+        return $this;
     }
 
     /**
-     * Returns the faciilty-name used in GELF
+     * Return the facility-name used in GELF
      *
      * @return string|null
      */
-    public function getFacility()
+    public function getFacility(): ?string
     {
         return $this->facility;
     }
@@ -113,52 +118,61 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Sets the facility for GELF messages
      *
      * @param string|null $facility
+     * @return self
      */
-    public function setFacility($facility = null)
+    public function setFacility(?string $facility): self
     {
         $this->facility = $facility;
+
+        return $this;
     }
 
     /**
+     * Get the default context
+     *
      * @return array
      */
-    public function getDefaultContext()
+    public function getDefaultContext(): array
     {
         return $this->defaultContext;
     }
 
     /**
+     * Set the default context
+     *
      * @param array $defaultContext
+     * @return self
      */
-    public function setDefaultContext($defaultContext)
+    public function setDefaultContext(array $defaultContext): self
     {
         $this->defaultContext = $defaultContext;
+
+        return $this;
     }
 
     /**
-     * Initializes message-object
+     * Initialize a message-object
      *
      * @param  mixed   $level
      * @param  mixed   $message
      * @param  array   $context
      * @return Message
      */
-    protected function initMessage($level, $message, array $context)
+    protected function initMessage($level, $message, array $context): Message
     {
         // assert that message is a string, and interpolate placeholders
         $message = (string) $message;
-        $context = $this->initContext($context);
+        $context = self::initContext($context);
         $message = self::interpolate($message, $context);
 
         // create message object
-        $messageObj = new Message();
-        $messageObj->setLevel($level);
-        $messageObj->setShortMessage($message);
+        $messageObj = new Message($message, $level);
         $messageObj->setFacility($this->facility);
 
         foreach ($this->getDefaultContext() as $key => $value) {
             $messageObj->setAdditional($key, $value);
         }
+
         foreach ($context as $key => $value) {
             $messageObj->setAdditional($key, $value);
         }
@@ -167,12 +181,12 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
-     * Initializes context array, ensuring all values are string-safe
+     * Initialize context array, ensuring all values are string-safe
      *
      * @param array $context
      * @return array
      */
-    protected function initContext($context)
+    private static function initContext(array $context): array
     {
         foreach ($context as $key => &$value) {
             switch (gettype($value)) {
@@ -189,7 +203,7 @@ class Logger extends AbstractLogger implements LoggerInterface
                     if (method_exists($value, '__toString')) {
                         $value = (string)$value;
                     } else {
-                        $value = '[object (' . get_class($value) . ')]';
+                        $value = '[object (' . \get_class($value) . ')]';
                     }
                     break;
                 case 'NULL':
@@ -205,22 +219,22 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
-     * Initializes Exceptiondata with given message
+     * Initialize Exception-data with given message
      *
      * @param Message   $message
      * @param Exception $exception
      */
-    protected function initExceptionData(Message $message, Exception $exception)
+    private static function initExceptionData(Message $message, Exception $exception): void
     {
         $message->setLine($exception->getLine());
         $message->setFile($exception->getFile());
 
-        $longText = "";
+        $longText = '';
 
         do {
             $longText .= sprintf(
                 "%s: %s (%d)\n\n%s\n",
-                get_class($exception),
+                \get_class($exception),
                 $exception->getMessage(),
                 $exception->getCode(),
                 $exception->getTraceAsString()
@@ -242,7 +256,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param array $context
      * @return string
      */
-    private static function interpolate($message, array $context)
+    private static function interpolate(string $message, array $context): string
     {
         // build a replacement array with braces around the context keys
         $replace = array();

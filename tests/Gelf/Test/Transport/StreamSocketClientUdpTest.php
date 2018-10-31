@@ -9,6 +9,8 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
@@ -27,7 +29,7 @@ class StreamSocketClientUdpTest extends TestCase
      */
     protected $serverSocket;
 
-    public function setUp()
+    public function setUp(): void
     {
         $host = "127.0.0.1";
         $this->serverSocket = stream_socket_server(
@@ -51,27 +53,27 @@ class StreamSocketClientUdpTest extends TestCase
         $this->socketClient = new StreamSocketClient('udp', $host, $port);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
-    public function testInvalidConstructorArguments()
+    public function testInvalidConstructorArguments(): void
     {
         $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
         $client->getSocket();
     }
 
-    public function testGetSocket()
+    public function testGetSocket(): void
     {
         $this->assertInternalType('resource', $this->socketClient->getSocket());
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $testData = "Hello World!";
         $numBytes = $this->socketClient->write($testData);
@@ -84,14 +86,14 @@ class StreamSocketClientUdpTest extends TestCase
         $this->assertEquals($testData, $readData);
     }
 
-    public function testDestructorWithoutSocket()
+    public function testDestructorWithoutSocket(): void
     {
         unset($this->socketClient);
 
         $this->addToAssertionCount(1);
     }
 
-    public function testDestructorWithSocket()
+    public function testDestructorWithSocket(): void
     {
         $this->socketClient->getSocket();
         unset($this->socketClient);

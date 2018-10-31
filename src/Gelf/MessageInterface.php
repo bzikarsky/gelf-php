@@ -9,7 +9,12 @@
  * file that was distributed with this source code.
  */
 
+declare(strict_types=1);
+
 namespace Gelf;
+
+use DateTimeImmutable;
+use DateTimeInterface;
 
 /**
  * This interface defines the minimum amount of method any Message
@@ -24,70 +29,70 @@ interface MessageInterface
      *
      * @return string
      */
-    public function getVersion();
+    public function getVersion(): string;
 
     /**
      * Returns the host of the message
      *
      * @return string
      */
-    public function getHost();
+    public function getHost(): string;
 
     /**
      * Returns the short text of the message
      *
      * @return string
      */
-    public function getShortMessage();
+    public function getShortMessage(): string;
 
     /**
      * Returns the full text of the message
      *
-     * @return string
+     * @return null|string
      */
-    public function getFullMessage();
+    public function getFullMessage(): ?string;
 
     /**
      * Returns the timestamp of the message
      *
-     * @return float
+     * @return DateTimeImmutable
      */
-    public function getTimestamp();
+    public function getTimestamp(): DateTimeInterface;
 
     /**
      * Returns the log level of the message as a Psr\Log\Level-constant
      *
      * @return string
      */
-    public function getLevel();
+    public function getLevel(): string;
 
     /**
      * Returns the log level of the message as a numeric syslog level
      *
      * @return int
      */
-    public function getSyslogLevel();
+    public function getSyslogLevel(): int;
 
     /**
      * Returns the facility of the message
      *
-     * @return string
+     * @return null|string
      */
-    public function getFacility();
+    public function getFacility(): ?string;
 
     /**
      * Returns the file of the message
      *
-     * @return string
+     * @return null|string
      */
-    public function getFile();
+    public function getFile(): ?string;
 
     /**
      * Returns the the line of the message
      *
-     * @return string
+     * @return null|int
      */
-    public function getLine();
+    public function getLine(): ?int;
 
     /**
      * Returns the value of the additional field of the message
@@ -95,7 +100,7 @@ interface MessageInterface
      * @param  string $key
      * @return mixed
      */
-    public function getAdditional($key);
+    public function getAdditional(string $key);
 
     /**
      * Checks if a additional fields is set
@@ -103,19 +108,19 @@ interface MessageInterface
      * @param  string $key
      * @return bool
      */
-    public function hasAdditional($key);
+    public function hasAdditional(string $key): bool;
 
     /**
      * Returns all additional fields as an array
      *
      * @return array
      */
-    public function getAllAdditionals();
+    public function getAllAdditionals(): array;
 
     /**
      * Converts the message to an array
      *
      * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 }

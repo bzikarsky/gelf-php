@@ -1,8 +1,21 @@
 <?php
 
+/*
+ * This file is part of the php-gelf package.
+ *
+ * (c) Benjamin Zikarsky <http://benjamin-zikarsky.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types=1);
+
 namespace Gelf\Transport;
 
+use Exception;
 use Gelf\MessageInterface as Message;
+use Throwable;
 
 /**
  * A wrapper for any AbstractTransport to ignore any kind of errors
@@ -12,7 +25,7 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
 {
 
     /**
-     * @var AbstractTransport
+     * @var TransportInterface
      */
     private $transport;
 
@@ -24,9 +37,9 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
     /**
      * IgnoreErrorTransportWrapper constructor.
      *
-     * @param AbstractTransport $transport
+     * @param TransportInterface $transport
      */
-    public function __construct(AbstractTransport $transport)
+    public function __construct(TransportInterface $transport)
     {
         $this->transport = $transport;
     }
@@ -38,11 +51,11 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
      *
      * @return int the number of bytes sent
      */
-    public function send(Message $message)
+    public function send(Message $message): int
     {
         try {
             return $this->transport->send($message);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $this->lastError = $e;
             return 0;
         }
@@ -50,9 +63,9 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
 
     /**
      * Returns the last error
-     * @return \Exception|null
+     * @return \Throwable|null
      */
-    public function getLastError()
+    public function getLastError(): Throwable
     {
         return $this->lastError;
     }

@@ -1,7 +1,5 @@
 <?php
 
-namespace Gelf;
-
 /*
  * This file is part of the php-gelf package.
  *
@@ -10,6 +8,10 @@ namespace Gelf;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
+declare(strict_types=1);
+
+namespace Gelf;
 
 /**
  * A publisher is responsible for publishing a given GELF-message
