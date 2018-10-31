@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Exception;
 use Gelf\MessageInterface as Message;
 use Throwable;
 
@@ -23,7 +22,6 @@ use Throwable;
  */
 class IgnoreErrorTransportWrapper extends AbstractTransport
 {
-
     /**
      * @var TransportInterface
      */

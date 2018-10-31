@@ -24,7 +24,6 @@ use Gelf\MessageInterface;
  */
 interface EncoderInterface
 {
-
     /**
      * Encodes a given message
      *

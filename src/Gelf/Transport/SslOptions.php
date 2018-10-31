@@ -65,7 +65,7 @@ class SslOptions
      *
      * @param boolean $allowSelfSigned
      */
-    public function setAllowSelfSigned($allowSelfSigned)
+    public function setAllowSelfSigned($allowSelfSigned): void
     {
         $this->allowSelfSigned = $allowSelfSigned;
     }
@@ -85,7 +85,7 @@ class SslOptions
      *
      * @param string|null $caFile
      */
-    public function setCaFile($caFile)
+    public function setCaFile($caFile): void
     {
         $this->caFile = $caFile;
     }
@@ -107,7 +107,7 @@ class SslOptions
      *
      * @param string|null $ciphers
      */
-    public function setCiphers($ciphers)
+    public function setCiphers($ciphers): void
     {
         $this->ciphers = $ciphers;
     }
@@ -127,7 +127,7 @@ class SslOptions
      *
      * @param boolean $verifyPeer
      */
-    public function setVerifyPeer($verifyPeer)
+    public function setVerifyPeer($verifyPeer): void
     {
         $this->verifyPeer = $verifyPeer;
     }
@@ -140,10 +140,10 @@ class SslOptions
      */
     public function toStreamContext($serverName = null)
     {
-        $sslContext = array(
+        $sslContext = [
             'verify_peer'       => (bool) $this->verifyPeer,
             'allow_self_signed' => (bool) $this->allowSelfSigned
-        );
+        ];
 
         if (null !== $this->caFile) {
             $sslContext['cafile'] = $this->caFile;
@@ -162,6 +162,6 @@ class SslOptions
             }
         }
 
-        return array('ssl' => $sslContext);
+        return ['ssl' => $sslContext];
     }
 }

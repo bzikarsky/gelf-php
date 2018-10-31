@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace Gelf\Transport;
 
 use RuntimeException;
-use ParagonIE\ConstantTime\Binary;
 
 /**
  * StreamSocketClient is a very simple OO-Wrapper around the PHP
@@ -28,7 +27,7 @@ class StreamSocketClient
     /**
      * @deprecated deprecated since v1.4.0
      */
-    const SOCKET_TIMEOUT = 30;
+    public const SOCKET_TIMEOUT = 30;
 
     /**
      * @var string
@@ -66,7 +65,7 @@ class StreamSocketClient
      * @param integer $port
      * @param array   $context
      */
-    public function __construct($scheme, $host, $port, array $context = array())
+    public function __construct($scheme, $host, $port, array $context = [])
     {
         $this->scheme = $scheme;
         $this->host = $host;
@@ -98,20 +97,20 @@ class StreamSocketClient
      */
     protected static function initSocket($scheme, $host, $port, array $context)
     {
-        $socketDescriptor = sprintf("%s://%s:%d", $scheme, $host, $port);
-        $socket = @stream_socket_client(
+        $socketDescriptor = \sprintf('%s://%s:%d', $scheme, $host, $port);
+        $socket = @\stream_socket_client(
             $socketDescriptor,
             $errNo,
             $errStr,
             static::SOCKET_TIMEOUT,
             \STREAM_CLIENT_CONNECT,
-            stream_context_create($context)
+            \stream_context_create($context)
         );
 
-        if ($socket === false) {
+        if (false === $socket) {
             throw new RuntimeException(
-                sprintf(
-                    "Failed to create socket-client for %s: %s (%s)",
+                \sprintf(
+                    'Failed to create socket-client for %s: %s (%s)',
                     $socketDescriptor,
                     $errStr,
                     $errNo
@@ -120,13 +119,12 @@ class StreamSocketClient
         }
 
         // set non-blocking for UDP
-        if (\strcasecmp('udp', $scheme) === 0) {
+        if (0 === \strcasecmp('udp', $scheme)) {
             \stream_set_blocking($socket, false);
         }
 
         return $socket;
     }
-
 
     /**
      * Internal function mimicking the behaviour of static::initSocket
@@ -139,26 +137,26 @@ class StreamSocketClient
      */
     private function buildSocket()
     {
-        $socketDescriptor = sprintf(
-            "%s://%s:%d",
+        $socketDescriptor = \sprintf(
+            '%s://%s:%d',
             $this->scheme,
             $this->host,
             $this->port
         );
 
-        $socket = @stream_socket_client(
+        $socket = @\stream_socket_client(
             $socketDescriptor,
             $errNo,
             $errStr,
             $this->connectTimeout,
             \STREAM_CLIENT_CONNECT,
-            stream_context_create($this->context)
+            \stream_context_create($this->context)
         );
 
-        if ($socket === false) {
+        if (false === $socket) {
             throw new RuntimeException(
-                sprintf(
-                    "Failed to create socket-client for %s: %s (%s)",
+                \sprintf(
+                    'Failed to create socket-client for %s: %s (%s)',
                     $socketDescriptor,
                     $errStr,
                     $errNo
@@ -167,7 +165,7 @@ class StreamSocketClient
         }
 
         // set non-blocking for UDP
-        if (\strcasecmp('udp', $this->scheme) === 0) {
+        if (0 === \strcasecmp('udp', $this->scheme)) {
             \stream_set_blocking($socket, false);
         }
 
@@ -212,19 +210,19 @@ class StreamSocketClient
             // it with a temporary error handler and treat every warning/notice as
             // a error
             $failed = false;
-            $errorMessage = "Failed to write to socket";
-            set_error_handler(function ($errno, $errstr) use (&$failed, &$errorMessage) {
+            $errorMessage = 'Failed to write to socket';
+            \set_error_handler(function ($errno, $errstr) use (&$failed, &$errorMessage): void {
                 $failed = true;
                 $errorMessage .= ": $errstr ($errno)";
             });
-            $byteCount = fwrite($socket, \substr($buffer, $written));
-            restore_error_handler();
+            $byteCount = \fwrite($socket, \substr($buffer, $written));
+            \restore_error_handler();
 
-            if ($byteCount === 0 && defined('HHVM_VERSION')) {
+            if (0 === $byteCount && \defined('HHVM_VERSION')) {
                 $failed = true;
             }
 
-            if ($failed || $byteCount === false) {
+            if ($failed || false === $byteCount) {
                 throw new \RuntimeException($errorMessage);
             }
 
@@ -244,19 +242,19 @@ class StreamSocketClient
      */
     public function read($byteCount)
     {
-        return fread($this->getSocket(), $byteCount);
+        return \fread($this->getSocket(), $byteCount);
     }
 
     /**
      * Closes underlying socket explicitly
      */
-    public function close()
+    public function close(): void
     {
-        if (!is_resource($this->socket)) {
+        if (!\is_resource($this->socket)) {
             return;
         }
 
-        fclose($this->socket);
+        \fclose($this->socket);
         $this->socket = null;
     }
 
@@ -267,7 +265,7 @@ class StreamSocketClient
      */
     public function isClosed()
     {
-        return $this->socket === null;
+        return null === $this->socket;
     }
 
     /**
@@ -285,10 +283,10 @@ class StreamSocketClient
      *
      * @param int $timeout
      */
-    public function setConnectTimeout($timeout)
+    public function setConnectTimeout($timeout): void
     {
         if (!$this->isClosed()) {
-            throw new \LogicException("Cannot change socket properties with an open connection");
+            throw new \LogicException('Cannot change socket properties with an open connection');
         }
 
         $this->connectTimeout = $timeout;
@@ -309,10 +307,10 @@ class StreamSocketClient
      *
      * @param array $context
      */
-    public function setContext(array $context)
+    public function setContext(array $context): void
     {
         if (!$this->isClosed()) {
-            throw new \LogicException("Cannot change socket properties with an open connection");
+            throw new \LogicException('Cannot change socket properties with an open connection');
         }
 
         $this->context = $context;

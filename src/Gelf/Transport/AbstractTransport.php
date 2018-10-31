@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Gelf\Transport;
 
 use Gelf\Encoder\EncoderInterface;
-use Gelf\MessageInterface;
-use Gelf\PublisherInterface;
 
 /**
  * The CompressedJsonEncoder allows the encoding of GELF messages as described
@@ -25,7 +23,6 @@ use Gelf\PublisherInterface;
  */
 abstract class AbstractTransport implements TransportInterface
 {
-
     /**
      * @var EncoderInterface
      */

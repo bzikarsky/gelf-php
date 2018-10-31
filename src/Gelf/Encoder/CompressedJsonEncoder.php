@@ -23,7 +23,7 @@ use Gelf\MessageInterface;
  */
 class CompressedJsonEncoder extends JsonEncoder
 {
-    const DEFAULT_COMPRESSION_LEVEL = -1;
+    public const DEFAULT_COMPRESSION_LEVEL = -1;
 
     /**
      * @var int
@@ -53,6 +53,6 @@ class CompressedJsonEncoder extends JsonEncoder
     {
         $json = parent::encode($message);
 
-        return gzcompress($json, $this->compressionLevel);
+        return \gzcompress($json, $this->compressionLevel);
     }
 }

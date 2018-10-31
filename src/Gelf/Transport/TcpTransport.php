@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\MessageInterface as Message;
 use Gelf\Encoder\JsonEncoder as DefaultEncoder;
+use Gelf\MessageInterface as Message;
 
 /**
  * TcpTransport allows the transfer of GELF-messages (with SSL/TLS support)
@@ -28,10 +28,11 @@ use Gelf\Encoder\JsonEncoder as DefaultEncoder;
  */
 class TcpTransport extends AbstractTransport
 {
-    const DEFAULT_HOST = "127.0.0.1";
-    const DEFAULT_PORT = 12201;
+    public const DEFAULT_HOST = '127.0.0.1';
 
-    const AUTO_SSL_PORT = 12202;
+    public const DEFAULT_PORT = 12201;
+
+    public const AUTO_SSL_PORT = 12202;
 
     /**
      * @var string
@@ -68,7 +69,7 @@ class TcpTransport extends AbstractTransport
         $this->host = $host;
         $this->port = $port;
 
-        if ($port == self::AUTO_SSL_PORT && $sslOptions == null) {
+        if (self::AUTO_SSL_PORT === $port && null === $sslOptions) {
             $sslOptions = new SslOptions();
         }
 
@@ -114,7 +115,7 @@ class TcpTransport extends AbstractTransport
     private function getContext()
     {
         if (null === $this->sslOptions) {
-            return array();
+            return [];
         }
 
         return $this->sslOptions->toStreamContext($this->host);
@@ -125,7 +126,7 @@ class TcpTransport extends AbstractTransport
      *
      * @param int $timeout
      */
-    public function setConnectTimeout($timeout)
+    public function setConnectTimeout($timeout): void
     {
         $this->socketClient->setConnectTimeout($timeout);
     }

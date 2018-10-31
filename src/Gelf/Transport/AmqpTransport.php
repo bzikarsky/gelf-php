@@ -54,9 +54,9 @@ class AmqpTransport extends AbstractTransport
     {
         $rawMessage = $this->getMessageEncoder()->encode($message);
 
-        $attributes = array(
+        $attributes = [
             'Content-type' => 'application/json'
-        );
+        ];
 
         // if queue is durable then mark message as 'persistent'
         if (($this->queue->getFlags() & AMQP_DURABLE) > 0) {

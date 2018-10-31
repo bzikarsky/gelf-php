@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace Gelf;
 
-use DateTime;
-use DateTimeImmutable;
 use DateTimeInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
@@ -145,6 +143,7 @@ class Message implements MessageInterface
      * the syslog representation
      *
      * @param int|string
+     * @param mixed $level
      * @return integer
      */
     final public static function logLevelToSyslog($level): int
@@ -222,9 +221,7 @@ class Message implements MessageInterface
 
     public function setTimestamp(DateTimeInterface $timestamp): self
     {
-        $this->timestamp = $timestamp instanceof DateTime
-            ? DateTimeImmutable::createFromMutable($timestamp)
-            : $timestamp;
+        $this->timestamp = $timestamp;
 
         return $this;
     }
@@ -286,7 +283,7 @@ class Message implements MessageInterface
     {
         if (!isset($this->additionals[$key])) {
             throw new RuntimeException(
-                sprintf("Additional key '%s' is not defined", $key)
+                \sprintf("Additional key '%s' is not defined", $key)
             );
         }
 
@@ -330,7 +327,7 @@ class Message implements MessageInterface
 
         // Transform 1.1 deprecated fields to additionals
         // Will be refactored for 2.0, see #23
-        if ($this->getVersion() === '1.1') {
+        if ('1.1' === $this->getVersion()) {
             foreach (['line', 'facility', 'file'] as $idx) {
                 $message['_' . $idx] = $message[$idx];
                 unset($message[$idx]);
@@ -343,9 +340,9 @@ class Message implements MessageInterface
         }
 
         // return after filtering empty strings and null values
-        return array_filter($message, function ($message) {
+        return \array_filter($message, function ($message) {
             return \is_bool($message)
-                || $message !== null
+                || null !== $message
                 || !empty($message);
         });
     }

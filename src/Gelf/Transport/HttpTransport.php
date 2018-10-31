@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\MessageInterface;
 use Gelf\Encoder\CompressedJsonEncoder;
 use Gelf\Encoder\JsonEncoder as DefaultEncoder;
+use Gelf\MessageInterface;
 use RuntimeException;
 
 /**
@@ -29,12 +29,14 @@ use RuntimeException;
  */
 class HttpTransport extends AbstractTransport
 {
-    const DEFAULT_HOST = "127.0.0.1";
-    const DEFAULT_PORT = 12202;
-    const DEFAULT_PATH = "/gelf";
-    
-    const AUTO_SSL_PORT = 443;
-    
+    public const DEFAULT_HOST = '127.0.0.1';
+
+    public const DEFAULT_PORT = 12202;
+
+    public const DEFAULT_PATH = '/gelf';
+
+    public const AUTO_SSL_PORT = 443;
+
     /**
      * @var string
      */
@@ -93,7 +95,7 @@ class HttpTransport extends AbstractTransport
         $this->port = $port;
         $this->path = $path;
 
-        if ($port == self::AUTO_SSL_PORT && $sslOptions == null) {
+        if (self::AUTO_SSL_PORT === $port && null === $sslOptions) {
             $sslOptions = new SslOptions();
         }
 
@@ -123,30 +125,30 @@ class HttpTransport extends AbstractTransport
      */
     public static function fromUrl($url, SslOptions $sslOptions = null)
     {
-        $parsed = parse_url($url);
-        
+        $parsed = \parse_url($url);
+
         // check it's a valid URL
         if (false === $parsed || !isset($parsed['host']) || !isset($parsed['scheme'])) {
             throw new \InvalidArgumentException("$url is not a valid URL");
         }
-        
+
         // check it's http or https
-        $scheme = strtolower($parsed['scheme']);
-        if (!in_array($scheme, array('http', 'https'))) {
+        $scheme = \strtolower($parsed['scheme']);
+        if (!\in_array($scheme, ['http', 'https'], true)) {
             throw new \InvalidArgumentException("$url is not a valid http/https URL");
         }
 
         // setup defaults
-        $defaults = array('port' => 80, 'path' => '', 'user' => null, 'pass' => '');
+        $defaults = ['port' => 80, 'path' => '', 'user' => null, 'pass' => ''];
 
         // change some defaults for https
-        if ($scheme == 'https') {
+        if ('https' === $scheme) {
             $sslOptions = $sslOptions ?: new SslOptions();
             $defaults['port'] = 443;
         }
-         
+
         // merge defaults and real data and build transport
-        $parsed = array_merge($defaults, $parsed);
+        $parsed = \array_merge($defaults, $parsed);
         $transport = new static($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
 
         // add optional authentication
@@ -163,9 +165,9 @@ class HttpTransport extends AbstractTransport
      * @param string $username
      * @param string $password
      */
-    public function setAuthentication($username, $password)
+    public function setAuthentication($username, $password): void
     {
-        $this->authentication = $username . ":" . $password;
+        $this->authentication = $username . ':' . $password;
     }
 
     /**
@@ -174,7 +176,7 @@ class HttpTransport extends AbstractTransport
      * @param $proxyUri
      * @param bool $requestFullUri
      */
-    public function setProxy($proxyUri, $requestFullUri = false)
+    public function setProxy($proxyUri, $requestFullUri = false): void
     {
         $this->proxyUri = $proxyUri;
         $this->requestFullUri = $requestFullUri;
@@ -194,42 +196,42 @@ class HttpTransport extends AbstractTransport
         $messageEncoder = $this->getMessageEncoder();
         $rawMessage = $messageEncoder->encode($message);
 
-        $request = array(
-            sprintf("POST %s HTTP/1.1", $this->path),
-            sprintf("Host: %s:%d", $this->host, $this->port),
-            sprintf("Content-Length: %d", strlen($rawMessage)),
-            "Content-Type: application/json",
-            "Connection: Keep-Alive",
-            "Accept: */*"
-        );
+        $request = [
+            \sprintf('POST %s HTTP/1.1', $this->path),
+            \sprintf('Host: %s:%d', $this->host, $this->port),
+            \sprintf('Content-Length: %d', \strlen($rawMessage)),
+            'Content-Type: application/json',
+            'Connection: Keep-Alive',
+            'Accept: */*'
+        ];
 
         if (null !== $this->authentication) {
-            $request[] = "Authorization: Basic " . base64_encode($this->authentication);
+            $request[] = 'Authorization: Basic ' . \base64_encode($this->authentication);
         }
 
         if ($messageEncoder instanceof CompressedJsonEncoder) {
-            $request[] = "Content-Encoding: gzip";
+            $request[] = 'Content-Encoding: gzip';
         }
 
-        $request[] = ""; // blank line to separate headers from body
+        $request[] = ''; // blank line to separate headers from body
         $request[] = $rawMessage;
 
-        $request = implode($request, "\r\n");
+        $request = \implode($request, "\r\n");
 
         $byteCount = $this->socketClient->write($request);
         $headers = $this->readResponseHeaders();
 
         // if we don't have a HTTP/1.1 connection, or the server decided to close the connection
         // we should do so as well. next read/write-attempt will open a new socket in this case.
-        if (strpos($headers, "HTTP/1.1") !== 0 || preg_match("!Connection:\s*Close!i", $headers)) {
+        if (0 !== \strpos($headers, 'HTTP/1.1') || \preg_match('!Connection:\\s*Close!i', $headers)) {
             $this->socketClient->close();
         }
 
-        if (!preg_match("!^HTTP/1.\d 202 Accepted!i", $headers)) {
+        if (!\preg_match('!^HTTP/1.\\d 202 Accepted!i', $headers)) {
             throw new RuntimeException(
-                sprintf(
+                \sprintf(
                     "Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is '%s'",
-                    trim($headers)
+                    \trim($headers)
                 )
             );
         }
@@ -249,9 +251,9 @@ class HttpTransport extends AbstractTransport
         do {
             $chunk = $this->socketClient->read($chunkSize);
             $response .= $chunk;
-        } while (false === \strpos($chunk, $delimiter) && $chunk !== '');
+        } while (false === \strpos($chunk, $delimiter) && '' !== $chunk);
 
-        $elements = explode($delimiter, $response, 2);
+        $elements = \explode($delimiter, $response, 2);
 
         return $elements[0];
     }
@@ -269,17 +271,17 @@ class HttpTransport extends AbstractTransport
      */
     private function getContext()
     {
-        $options = array();
+        $options = [];
 
         if (null !== $this->sslOptions) {
-            $options = array_merge($options, $this->sslOptions->toStreamContext($this->host));
+            $options = \array_merge($options, $this->sslOptions->toStreamContext($this->host));
         }
 
         if (null !== $this->proxyUri) {
-            $options['http'] = array(
+            $options['http'] = [
                 'proxy' => $this->proxyUri,
                 'request_fulluri' => $this->requestFullUri
-            );
+            ];
         }
 
         return $options;
@@ -290,7 +292,7 @@ class HttpTransport extends AbstractTransport
      *
      * @param int $timeout
      */
-    public function setConnectTimeout($timeout)
+    public function setConnectTimeout($timeout): void
     {
         $this->socketClient->setConnectTimeout($timeout);
     }

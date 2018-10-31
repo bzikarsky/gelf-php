@@ -23,17 +23,17 @@ use RuntimeException;
  */
 class MessageValidator implements MessageValidatorInterface
 {
-    public function validate(MessageInterface $message, &$reason = "")
+    public function validate(MessageInterface $message, &$reason = '')
     {
         switch ($message->getVersion()) {
-            case "1.0":
+            case '1.0':
                 return $this->validate0100($message, $reason);
-            case "1.1":
+            case '1.1':
                 return $this->validate0101($message, $reason);
         }
 
         throw new RuntimeException(
-            sprintf(
+            \sprintf(
                 "No validator for message version '%s'",
                 $message->getVersion()
             )
@@ -47,22 +47,22 @@ class MessageValidator implements MessageValidatorInterface
      * @param  string           &$reason reason for the validation fail
      * @return bool
      */
-    public function validate0100(MessageInterface $message, &$reason = "")
+    public function validate0100(MessageInterface $message, &$reason = '')
     {
         if (self::isEmpty($message->getHost())) {
-            $reason = "host not set";
+            $reason = 'host not set';
 
             return false;
         }
 
         if (self::isEmpty($message->getShortMessage())) {
-            $reason = "short-message not set";
+            $reason = 'short-message not set';
 
             return false;
         }
 
         if (self::isEmpty($message->getVersion())) {
-            $reason = "version not set";
+            $reason = 'version not set';
 
             return false;
         }
@@ -83,7 +83,7 @@ class MessageValidator implements MessageValidatorInterface
      * @param  string           &$reason
      * @return bool
      */
-    public function validate0101(MessageInterface $message, &$reason = "")
+    public function validate0101(MessageInterface $message, &$reason = '')
     {
         // 1.1 incorporates 1.0 validation standar
         if (!$this->validate0100($message, $reason)) {
@@ -91,8 +91,8 @@ class MessageValidator implements MessageValidatorInterface
         }
 
         foreach ($message->getAllAdditionals() as $key => $value) {
-            if (!preg_match('#^[\w\.\-]*$#', $key)) {
-                $reason = sprintf(
+            if (!\preg_match('#^[\w\.\-]*$#', $key)) {
+                $reason = \sprintf(
                     "additional key '%s' contains invalid characters",
                     $key
                 );
@@ -115,6 +115,6 @@ class MessageValidator implements MessageValidatorInterface
      */
     public static function isEmpty($scalar)
     {
-        return strlen($scalar) < 1;
+        return \strlen($scalar) < 1;
     }
 }

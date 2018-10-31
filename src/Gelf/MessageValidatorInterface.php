@@ -27,5 +27,5 @@ interface MessageValidatorInterface
      * @param  string           &$reason
      * @return bool
      */
-    public function validate(MessageInterface $message, &$reason = "");
+    public function validate(MessageInterface $message, &$reason = '');
 }

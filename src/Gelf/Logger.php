@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace Gelf;
 
-use Gelf\Transport\UdpTransport;
-use Psr\Log\LoggerInterface;
-use Psr\Log\AbstractLogger;
 use Exception;
+use Gelf\Transport\UdpTransport;
+use Psr\Log\AbstractLogger;
 
 /**
  * A basic PSR-3 compliant logger
@@ -67,7 +66,7 @@ class Logger extends AbstractLogger
      * @param mixed $rawMessage
      * @param array $context
      */
-    public function log($level, $rawMessage, array $context = array()): void
+    public function log($level, $rawMessage, array $context = []): void
     {
         $message = $this->initMessage($level, $rawMessage, $context);
 
@@ -189,7 +188,7 @@ class Logger extends AbstractLogger
     private static function initContext(array $context): array
     {
         foreach ($context as $key => &$value) {
-            switch (gettype($value)) {
+            switch (\gettype($value)) {
                 case 'string':
                 case 'integer':
                 case 'double':
@@ -197,10 +196,10 @@ class Logger extends AbstractLogger
                     break;
                 case 'array':
                 case 'boolean':
-                    $value = json_encode($value);
+                    $value = \json_encode($value);
                     break;
                 case 'object':
-                    if (method_exists($value, '__toString')) {
+                    if (\method_exists($value, '__toString')) {
                         $value = (string)$value;
                     } else {
                         $value = '[object (' . \get_class($value) . ')]';
@@ -210,7 +209,7 @@ class Logger extends AbstractLogger
                     $value = 'NULL';
                     break;
                 default:
-                    $value = '[' . gettype($value) . ']';
+                    $value = '[' . \gettype($value) . ']';
                     break;
             }
         }
@@ -232,7 +231,7 @@ class Logger extends AbstractLogger
         $longText = '';
 
         do {
-            $longText .= sprintf(
+            $longText .= \sprintf(
                 "%s: %s (%d)\n\n%s\n",
                 \get_class($exception),
                 $exception->getMessage(),
@@ -259,12 +258,12 @@ class Logger extends AbstractLogger
     private static function interpolate(string $message, array $context): string
     {
         // build a replacement array with braces around the context keys
-        $replace = array();
+        $replace = [];
         foreach ($context as $key => $val) {
             $replace['{' . $key . '}'] = $val;
         }
 
         // interpolate replacement values into the message and return
-        return strtr($message, $replace);
+        return \strtr($message, $replace);
     }
 }

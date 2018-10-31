@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Gelf;
 
-use Gelf\Transport\TransportInterface;
 use Gelf\MessageValidator as DefaultMessageValidator;
-use SplObjectStorage as Set;
+use Gelf\Transport\TransportInterface;
 use RuntimeException;
+use SplObjectStorage as Set;
 
 /**
  * A GELF publisher functions as a hub for pushing out a GELF message
@@ -60,11 +60,11 @@ class Publisher implements PublisherInterface
      *
      * @param MessageInterface $message
      */
-    public function publish(MessageInterface $message)
+    public function publish(MessageInterface $message): void
     {
-        if (count($this->transports) == 0) {
+        if (0 === \count($this->transports)) {
             throw new RuntimeException(
-                "Publisher requires at least one transport"
+                'Publisher requires at least one transport'
             );
         }
 
@@ -84,7 +84,7 @@ class Publisher implements PublisherInterface
      *
      * @param TransportInterface $transport
      */
-    public function addTransport(TransportInterface $transport)
+    public function addTransport(TransportInterface $transport): void
     {
         $this->transports->attach($transport);
     }
@@ -96,7 +96,7 @@ class Publisher implements PublisherInterface
      */
     public function getTransports()
     {
-        return iterator_to_array($this->transports);
+        return \iterator_to_array($this->transports);
     }
 
     /**
