@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.3.9",
         "psr/log": "~1.0",
-        "paragonie/constant_time_encoding": "^1"
+        "paragonie/constant_time_encoding": "^1|^2"
     },
     "autoload": {
         "psr-4": {
