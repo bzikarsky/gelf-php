@@ -199,6 +199,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("foo", "bar");
         $this->message->setAdditional("bool-true", true);
         $this->message->setAdditional("bool-false", false);
+        $this->message->setAdditional("int-zero", 0);
         $data = $this->message->toArray();
         $this->assertInternalType('array', $data);
 
@@ -209,6 +210,8 @@ class MessageTest extends TestCase
         $this->assertTrue($data["_bool-true"]);
         $this->assertArrayHasKey("_bool-false", $data);
         $this->assertFalse($data["_bool-false"]);
+        $this->assertArrayHasKey("_int-zero", $data);
+        $this->assertEquals(0, $data["_int-zero"]);
 
         $map = array(
             "version"       => "getVersion",
@@ -279,6 +282,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("foo", "bar");
         $this->message->setAdditional("bool-true", true);
         $this->message->setAdditional("bool-false", false);
+        $this->message->setAdditional("int-zero", 0);
 
         // check that deperacted behaviour is overridden in 1.1
         $this->message->setLine(50);
@@ -305,5 +309,7 @@ class MessageTest extends TestCase
         $this->assertTrue($data["_bool-true"]);
         $this->assertArrayHasKey("_bool-false", $data);
         $this->assertFalse($data["_bool-false"]);
+        $this->assertArrayHasKey("_int-zero", $data);
+        $this->assertEquals(0, $data["_int-zero"]);
     }
 }
