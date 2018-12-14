@@ -302,6 +302,7 @@ class Message implements MessageInterface
         return array_filter($message, function ($message) {
             return is_bool($message)
                 || (is_string($message) && strlen($message))
+                || is_int($message)
                 || !empty($message);
         });
     }
