@@ -103,7 +103,7 @@ class UdpTransport extends AbstractTransport
     protected function sendMessageInChunks($rawMessage)
     {
         // split to chunks
-        $chunks = str_split($rawMessage, $this->chunkSize);
+        $chunks = str_split($rawMessage, $this->chunkSize-15);
         $numChunks = count($chunks);
 
         if ($numChunks > self::CHUNK_MAX_COUNT) {
