@@ -13,6 +13,7 @@ namespace Gelf\Transport;
 
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
+use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -30,6 +31,7 @@ class UdpTransport extends AbstractTransport
     const CHUNK_MAX_COUNT = 128; // as per GELF spec
     const CHUNK_SIZE_LAN = 8154;
     const CHUNK_SIZE_WAN = 1420;
+    const CHUNK_HEADER_LENGTH = 12; // GELF ID (2b), id (8b) , sequence (2b)
 
     const DEFAULT_HOST = "127.0.0.1";
     const DEFAULT_PORT = 12201;
@@ -47,9 +49,9 @@ class UdpTransport extends AbstractTransport
     /**
      * Class constructor
      *
-     * @param string $host      when NULL or empty DEFAULT_HOST is used
-     * @param int    $port      when NULL or empty DEFAULT_PORT is used
-     * @param int    $chunkSize defaults to CHUNK_SIZE_WAN,
+     * @param string $host when NULL or empty DEFAULT_HOST is used
+     * @param int $port when NULL or empty DEFAULT_PORT is used
+     * @param int $chunkSize defaults to CHUNK_SIZE_WAN,
      *                          0 disables chunks completely
      */
     public function __construct(
@@ -65,6 +67,11 @@ class UdpTransport extends AbstractTransport
         $this->chunkSize = $chunkSize;
 
         $this->messageEncoder = new DefaultEncoder();
+
+        if ($chunkSize > 0 && $chunkSize <= self::CHUNK_HEADER_LENGTH) {
+            throw new InvalidArgumentException('Chunk-size has to exceed ' . self::CHUNK_HEADER_LENGTH
+                . ' which is the number of bytes reserved for the chunk-header');
+        }
     }
 
     /**
@@ -94,16 +101,16 @@ class UdpTransport extends AbstractTransport
     /**
      * Sends given string in multiple chunks
      *
-     * @param  string $rawMessage
+     * @param string $rawMessage
      * @return int
      *
      * @throws RuntimeException on too large messages which would exceed the
-                                maximum number of possible chunks
+     * maximum number of possible chunks
      */
     protected function sendMessageInChunks($rawMessage)
     {
         // split to chunks
-        $chunks = str_split($rawMessage, $this->chunkSize);
+        $chunks = str_split($rawMessage, $this->chunkSize - self::CHUNK_HEADER_LENGTH);
         $numChunks = count($chunks);
 
         if ($numChunks > self::CHUNK_MAX_COUNT) {

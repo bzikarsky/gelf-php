@@ -106,13 +106,17 @@ class UdpTransportTest extends TestCase
 
     public function testSendChunked()
     {
-        $chunkSize = 10;
-        $transport = $this->getTransport(10);
-        $expectedMessageCount =  strlen($this->testMessage) / $chunkSize;
+        $chunkSize = 20 + UdpTransport::CHUNK_HEADER_LENGTH;
+        $transport = $this->getTransport($chunkSize);
+        $expectedMessageCount =  strlen($this->testMessage) / ($chunkSize - UdpTransport::CHUNK_HEADER_LENGTH);
 
+        $test = $this;
         $this->socketClient
             ->expects($this->exactly($expectedMessageCount))
-            ->method('write');
+            ->method('write')
+            ->willReturnCallback(function ($data) use ($chunkSize, $test) {
+                $test->assertLessThanOrEqual($chunkSize, strlen($data));
+            });
 
         $transport->send($this->message);
     }
@@ -122,7 +126,7 @@ class UdpTransportTest extends TestCase
      */
     public function testInvalidChunkNumber()
     {
-        $transport = $this->getTransport(1);
+        $transport = $this->getTransport(UdpTransport::CHUNK_HEADER_LENGTH + 1);
         $transport->send($this->message);
     }
 }
