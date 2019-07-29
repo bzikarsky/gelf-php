@@ -19,7 +19,7 @@ use Gelf\MessageInterface;
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class JsonEncoder implements EncoderInterface
+class JsonEncoder implements NoNullByteEncoderInterface
 {
     /**
      * Encodes a given message

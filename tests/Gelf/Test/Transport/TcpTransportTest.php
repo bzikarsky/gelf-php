@@ -11,6 +11,8 @@
 
 namespace Gelf\Test\Transport;
 
+use Gelf\Encoder\CompressedJsonEncoder;
+use Gelf\Encoder\JsonEncoder;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\SslOptions;
 use PHPUnit\Framework\TestCase;
@@ -54,7 +56,7 @@ class TcpTransportTest extends TestCase
         $this->message = $this->getMock("\\Gelf\\Message");
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->getMock("\\Gelf\\Encoder\\NoNullByteEncoderInterface");
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -126,7 +128,7 @@ class TcpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        $encoder = $this->getMock('\\Gelf\\Encoder\\NoNullByteEncoderInterface');
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -168,5 +170,28 @@ class TcpTransportTest extends TestCase
             ->with(123);
 
         $this->transport->setConnectTimeout(123);
+    }
+
+    public function testNonNullSafeEncoderFails()
+    {
+        $this->setExpectedException('InvalidArgumentException');
+        $this->transport->setMessageEncoder(new CompressedJsonEncoder());
+    }
+
+    public function testSafeEncoderSucceeds()
+    {
+        $this->assertInstanceOf(
+            "Gelf\Encoder\NoNullByteEncoderInterface",
+            $this->transport->getMessageEncoder()
+        );
+
+        $encoder = new JsonEncoder();
+        $this->assertInstanceOf(
+            "Gelf\Encoder\NoNullByteEncoderInterface",
+            $encoder
+        );
+
+        $this->transport->setMessageEncoder($encoder);
+        $this->assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 }
