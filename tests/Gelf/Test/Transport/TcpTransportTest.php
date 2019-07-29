@@ -110,7 +110,9 @@ class TcpTransportTest extends TestCase
     public function testSslOptionsAreUsed()
     {
         $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
-        $sslOptions->expects($this->exactly(2))->method('toStreamContext')->will($this->returnValue(array('ssl' => null)));
+        $sslOptions->expects($this->exactly(2))
+            ->method('toStreamContext')
+            ->will($this->returnValue(array('ssl' => null)));
 
         $transport = new TcpTransport("localhost", "12202", $sslOptions);
 
