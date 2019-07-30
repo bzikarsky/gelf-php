@@ -78,7 +78,9 @@ You only need to properly define the symfony-service `gelf-handler`:
 services:
   monolog.gelf_handler:
     class: Monolog\Handler\GelfHandler
-    arguments: [@gelf.publisher]
+    arguments:
+        - @gelf.publisher
+        - 'warning' #monolog config is ignored with custom service level has to be redefined here (default : debug), you should probably use parameters eg: '%gelf_level%'
     
   gelf.publisher:
     class: Gelf\Publisher
