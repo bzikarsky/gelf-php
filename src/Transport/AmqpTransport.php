@@ -15,26 +15,30 @@ namespace Gelf\Transport;
 
 use AMQPExchange;
 use AMQPQueue;
-use Gelf\Encoder\JsonEncoder as DefaultEncoder;
-use Gelf\MessageInterface as Message;
+use Gelf\Transport\Encoder\EncoderInterface;
+use Gelf\Transport\Encoder\JsonEncoder;
 
 /**
  * Class AmqpTransport
  *
  * @package Gelf\Transport
- * @see http://php.net/manual/pl/book.amqp.php
  */
-class AmqpTransport extends AbstractTransport
+class AmqpTransport implements TransportInterface
 {
     /**
      * @var AMQPExchange $exchange
      */
-    protected $exchange;
+    private $exchange;
 
     /**
      * @var AMQPQueue $exchange
      */
-    protected $queue;
+    private $queue;
+
+    /**
+     * @var EncoderInterface
+     */
+    private $encoder;
 
     /**
      * @param AMQPExchange $exchange
@@ -44,19 +48,14 @@ class AmqpTransport extends AbstractTransport
     {
         $this->queue = $queue;
         $this->exchange = $exchange;
-        $this->messageEncoder = new DefaultEncoder();
+        $this->encoder = new JsonEncoder();
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function send(Message $message)
+    /** @inheritdoc */
+    public function send(array $data): void
     {
-        $rawMessage = $this->getMessageEncoder()->encode($message);
-
-        $attributes = [
-            'Content-type' => 'application/json'
-        ];
+        $rawMessage = $this->encoder->encode($data);
+        $attributes = ['Content-type' => 'application/json'];
 
         // if queue is durable then mark message as 'persistent'
         if (($this->queue->getFlags() & AMQP_DURABLE) > 0) {
@@ -69,6 +68,5 @@ class AmqpTransport extends AbstractTransport
             AMQP_NOPARAM,
             $attributes
         );
-        return 1;
     }
 }

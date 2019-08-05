@@ -40,15 +40,15 @@ class MessageTest extends TestCase
 
     public function testLevel(): void
     {
-        $this->assertEquals(1, $this->message->getSyslogLevel());
+        $this->assertEquals(1, $this->message->getLevel());
         $this->assertEquals(LogLevel::ALERT, $this->message->getLevel());
 
         $this->message->setLevel(0);
-        $this->assertEquals(0, $this->message->getSyslogLevel());
+        $this->assertEquals(0, $this->message->getLevel());
         $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
 
         $this->message->setLevel(LogLevel::EMERGENCY);
-        $this->assertEquals(0, $this->message->getSyslogLevel());
+        $this->assertEquals(0, $this->message->getLevel());
         $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
     }
 
@@ -89,22 +89,22 @@ class MessageTest extends TestCase
 
     public function testAdditionals(): void
     {
-        $this->assertInternalType('array', $this->message->getAllAdditionals());
-        $this->assertCount(0, $this->message->getAllAdditionals());
+        $this->assertInternalType('array', $this->message->getFullContext());
+        $this->assertCount(0, $this->message->getFullContext());
 
-        $this->assertFalse($this->message->hasAdditional('foo'));
+        $this->assertFalse($this->message->hasContext('foo'));
         $this->message->setAdditional('foo', 'bar');
-        $this->assertEquals('bar', $this->message->getAdditional('foo'));
-        $this->assertTrue($this->message->hasAdditional('foo'));
-        $this->assertCount(1, $this->message->getAllAdditionals());
+        $this->assertEquals('bar', $this->message->getContext('foo'));
+        $this->assertTrue($this->message->hasContext('foo'));
+        $this->assertCount(1, $this->message->getFullContext());
 
         $this->message->setAdditional('foo', 'buk');
-        $this->assertEquals('buk', $this->message->getAdditional('foo'));
-        $this->assertCount(1, $this->message->getAllAdditionals());
+        $this->assertEquals('buk', $this->message->getContext('foo'));
+        $this->assertCount(1, $this->message->getFullContext());
 
         $this->assertEquals(
             ['foo' => 'buk'],
-            $this->message->getAllAdditionals()
+            $this->message->getFullContext()
         );
     }
 
@@ -119,7 +119,7 @@ class MessageTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        $this->message->getAdditional('invalid');
+        $this->message->getContext('invalid');
     }
 
     public function testSetTimestamp(): void

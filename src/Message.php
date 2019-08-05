@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace Gelf;
 
 use DateTimeInterface;
-use Psr\Log\LogLevel;
-use RuntimeException;
 
 /**
  * A message complying to the GELF standard
@@ -48,51 +46,14 @@ class Message implements MessageInterface
     private $level;
 
     /**
-     * @var string
-     */
-    private $version;
-
-    /**
      * @var null|string
      */
     private $fullMessage = null;
 
     /**
-     * @var null|string
-     */
-    private $facility = null;
-
-    /**
-     * @var null|string
-     */
-    private $file = null;
-
-    /**
-     * @var null|string
-     */
-    private $line = null;
-
-    /**
      * @var array
      */
-    private $additionals = [];
-
-    /**
-     * A list of the PSR LogLevel constants which is also a mapping of
-     * syslog code to psr-value
-     *
-     * @var array
-     */
-    private static $psrLevels = [
-        LogLevel::EMERGENCY,    // 0
-        LogLevel::ALERT,        // 1
-        LogLevel::CRITICAL,     // 2
-        LogLevel::ERROR,        // 3
-        LogLevel::WARNING,      // 4
-        LogLevel::NOTICE,       // 5
-        LogLevel::INFO,         // 6
-        LogLevel::DEBUG         // 7
-    ];
+    private $context = [];
 
     /**
      * Create a new message
@@ -100,82 +61,46 @@ class Message implements MessageInterface
      * Populate timestamp and host with sane default values
      *
      * @param string $shortMessage
-     * @param string|int $level
+     * @param int $level
      */
-    public function __construct(string $shortMessage, $level = self::DEFAULT_LEVEL)
+    public function __construct(string $shortMessage, int $level = self::DEFAULT_LEVEL)
     {
         $this->timestamp = \date_create_immutable();
         $this->host = \gethostname();
-        $this->version = '1.0';
 
         $this->shortMessage = $shortMessage;
-        $this->setLevel($level);
+        $this->level = $level;
     }
 
     /**
-     * Try to convert a given log-level (psr or syslog) to
-     * the psr representation
+     * Create a message with all the default context and the given message's data
      *
-     * @param  string|int $level
-     * @return string
+     * @param MessageInterface $message
+     * @param array $defaultContext
+     * @return self
      */
-    final public static function logLevelToPsr($level): string
+    public static function buildWithDefaultContext(MessageInterface $message, array $defaultContext): MessageInterface
     {
-        $origLevel = $level;
+        $message = new self($message->getShortMessage(), $message->getLevel());
 
-        if (\is_numeric($level)) {
-            $level = (int) $level;
-            if (isset(self::$psrLevels[$level])) {
-                return self::$psrLevels[$level];
-            }
-        } elseif (\is_string($level)) {
-            $level = \strtolower($level);
-            if (\in_array($level, self::$psrLevels, true)) {
-                return $level;
-            }
+        // Copy properties
+        $message->timestamp = $message->getTimestamp();
+        $message->host = $message->getHost();
+        $message->fullMessage = $message->getFullMessage();
+        $message->context = $message->getFullContext();
+
+        // Find missing context
+        $missingContext = \array_diff(
+            \array_keys($defaultContext),
+            \array_keys($message->getFullContext())
+        );
+
+        // Add missing context from default-context
+        foreach ($missingContext as $key) {
+            $message->context[$key] = $defaultContext[$key];
         }
 
-        throw new RuntimeException(\sprintf("Cannot convert log-level '%s' to psr-style", $origLevel));
-    }
-
-    /**
-     * Try to convert a given log-level (psr or syslog) to
-     * the syslog representation
-     *
-     * @param int|string
-     * @param mixed $level
-     * @return integer
-     */
-    final public static function logLevelToSyslog($level): int
-    {
-        $origLevel = $level;
-
-        if (\is_numeric($level)) {
-            $level = (int) $level;
-            if (isset(self::$psrLevels[$level])) {
-                return $level;
-            }
-        } elseif (\is_string($level)) {
-            $level = \strtolower($level);
-            $syslogLevel = \array_search($level, self::$psrLevels, true);
-            if (false !== $syslogLevel) {
-                return $syslogLevel;
-            }
-        }
-
-        throw new RuntimeException(\sprintf("Cannot convert log-level '%s' to syslog-style", $origLevel));
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
-    }
-
-    public function setVersion(string $version): self
-    {
-        $this->version = $version;
-
-        return $this;
+        return $message;
     }
 
     public function getHost(): string
@@ -183,11 +108,12 @@ class Message implements MessageInterface
         return $this->host;
     }
 
-    public function setHost(string $host): self
+    public function withHost(string $host): self
     {
-        $this->host = $host;
+        $newInstance = clone $this;
+        $newInstance->host = $host;
 
-        return $this;
+        return $newInstance;
     }
 
     public function getShortMessage(): string
@@ -195,11 +121,12 @@ class Message implements MessageInterface
         return $this->shortMessage;
     }
 
-    public function setShortMessage(string $shortMessage): self
+    public function withShortMessage(string $shortMessage): self
     {
-        $this->shortMessage = $shortMessage;
+        $newInstance = clone $this;
+        $newInstance->shortMessage = $shortMessage;
 
-        return $this;
+        return $newInstance;
     }
 
     public function getFullMessage(): ?string
@@ -207,11 +134,12 @@ class Message implements MessageInterface
         return $this->fullMessage;
     }
 
-    public function setFullMessage(?string $fullMessage): self
+    public function withFullMessage(?string $fullMessage): self
     {
-        $this->fullMessage = $fullMessage;
+        $newInstance = clone $this;
+        $newInstance->fullMessage = $fullMessage;
 
-        return $this;
+        return $newInstance;
     }
 
     public function getTimestamp(): DateTimeInterface
@@ -219,131 +147,61 @@ class Message implements MessageInterface
         return $this->timestamp;
     }
 
-    public function setTimestamp(DateTimeInterface $timestamp): self
+    public function withTimestamp(DateTimeInterface $timestamp): self
     {
-        $this->timestamp = $timestamp;
+        $newInstance = clone $this;
+        $newInstance->timestamp = $timestamp;
 
-        return $this;
+        return $newInstance;
     }
 
-    public function getLevel(): string
+    public function getLevel(): int
     {
-        return self::logLevelToPsr($this->level);
+        return $this->level;
     }
 
-    public function getSyslogLevel(): int
+    public function withLevel(int $level): self
     {
-        return self::logLevelToSyslog($this->level);
+        $newInstance = clone $this;
+        $newInstance->level = $level;
+
+        return $newInstance;
     }
 
-    public function setLevel($level): self
+    public function getContext(string $key)
     {
-        $this->level = self::logLevelToSyslog($level);
-
-        return $this;
-    }
-
-    public function getFacility(): ?string
-    {
-        return $this->facility;
-    }
-
-    public function setFacility(?string $facility): self
-    {
-        $this->facility = $facility;
-
-        return $this;
-    }
-
-    public function getFile(): ?string
-    {
-        return $this->file;
-    }
-
-    public function setFile(?string $file): self
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    public function getLine(): ?int
-    {
-        return $this->line;
-    }
-
-    public function setLine(?int $line): self
-    {
-        $this->line = $line;
-
-        return $this;
-    }
-
-    public function getAdditional(string $key)
-    {
-        if (!isset($this->additionals[$key])) {
-            throw new RuntimeException(
-                \sprintf("Additional key '%s' is not defined", $key)
-            );
+        if (!isset($this->context[$key])) {
+            return null;
         }
 
-        return $this->additionals[$key];
+        return $this->context[$key];
     }
 
-    public function hasAdditional(string $key): bool
+    public function hasContext(string $key): bool
     {
-        return isset($this->additionals[$key]);
+        return isset($this->context[$key]);
     }
 
-    public function setAdditional(string $key, $value): self
+    public function withContext(string $key, $value): self
     {
-        if (!$key) {
-            throw new RuntimeException('Additional field key cannot be empty');
+        $newInstance = clone $this;
+        $newInstance->context[$key] = $value;
+
+        return $newInstance;
+    }
+
+    public function withFullContext(array $context): self
+    {
+        $newInstance = clone $this;
+        foreach ($context as $key => $value) {
+            $newInstance->context[$key] = $value;
         }
 
-        $this->additionals[$key] = $value;
-
-        return $this;
+        return $newInstance;
     }
 
-    public function getAllAdditionals(): array
+    public function getFullContext(): array
     {
-        return $this->additionals;
-    }
-
-    public function toArray(): array
-    {
-        $message = [
-            'version'       => $this->getVersion(),
-            'host'          => $this->getHost(),
-            'short_message' => $this->getShortMessage(),
-            'full_message'  => $this->getFullMessage(),
-            'level'         => $this->getSyslogLevel(),
-            'timestamp'     => $this->getTimestamp()->format('U.u'),
-            'facility'      => $this->getFacility(),
-            'file'          => $this->getFile(),
-            'line'          => $this->getLine()
-        ];
-
-        // Transform 1.1 deprecated fields to additionals
-        // Will be refactored for 2.0, see #23
-        if ('1.1' === $this->getVersion()) {
-            foreach (['line', 'facility', 'file'] as $idx) {
-                $message['_' . $idx] = $message[$idx];
-                unset($message[$idx]);
-            }
-        }
-
-        // add additionals
-        foreach ($this->getAllAdditionals() as $key => $value) {
-            $message['_' . $key] = $value;
-        }
-
-        // return after filtering empty strings and null values
-        return \array_filter($message, function ($message) {
-            return \is_bool($message)
-                || null !== $message
-                || !empty($message);
-        });
+        return $this->context;
     }
 }

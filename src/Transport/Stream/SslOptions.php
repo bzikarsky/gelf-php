@@ -11,12 +11,13 @@
 
 declare(strict_types=1);
 
-namespace Gelf\Transport;
+namespace Gelf\Transport\Stream;
 
 /**
- * Abstraction of supported SSL configuration paramaters
+ * Abstraction of supported SSL configuration parameters
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @internal
  */
 class SslOptions
 {
@@ -25,21 +26,21 @@ class SslOptions
      *
      * @param boolean
      */
-    protected $verifyPeer = true;
+    private $verifyPeer = true;
 
     /**
      * Allow self-signed certificates
      *
      * @param boolean
      */
-    protected $allowSelfSigned = false;
+    private $allowSelfSigned = false;
 
     /**
      * Path to custom CA
      *
      * @param string|null
      */
-    protected $caFile = null;
+    private $caFile = null;
 
     /**
      * List of ciphers the SSL layer may use
@@ -48,54 +49,60 @@ class SslOptions
      *
      * @param string|null
      */
-    protected $ciphers = null;
+    private $ciphers = null;
 
     /**
-     * Whether self-signed certificates are allowed
+     * Return whether self-signed certificates are allowed
      *
-     * @return boolean
+     * @return bool
      */
-    public function getAllowSelfSigned()
+    public function getAllowSelfSigned(): bool
     {
         return $this->allowSelfSigned;
     }
 
     /**
-     * Enables or disables the error on self-signed certificates
+     * Enable or disable the error on self-signed certificates
      *
      * @param boolean $allowSelfSigned
+     * @return self
      */
-    public function setAllowSelfSigned($allowSelfSigned): void
+    public function setAllowSelfSigned(bool $allowSelfSigned): self
     {
         $this->allowSelfSigned = $allowSelfSigned;
+
+        return $this;
     }
 
     /**
-     * Returns the path to a custom CA
+     * Return the (optional) path to a custom CA
      *
      * @return string|null
      */
-    public function getCaFile()
+    public function getCaFile(): ?string
     {
         return $this->caFile;
     }
 
     /**
-     * Sets the path toa custom CA
+     * Set the path toa custom CA
      *
      * @param string|null $caFile
+     * @return self
      */
-    public function setCaFile($caFile): void
+    public function setCaFile(?string  $caFile): self
     {
         $this->caFile = $caFile;
+
+        return $this;
     }
 
     /**
-     * Returns des description of allowed ciphers
+     * Return des description of allowed ciphers
      *
      * @return string|null
      */
-    public function getCiphers()
+    public function getCiphers(): ?string
     {
         return $this->ciphers;
     }
@@ -106,18 +113,21 @@ class SslOptions
      * Format must follow `ciphers(1)`
      *
      * @param string|null $ciphers
+     * @return self
      */
-    public function setCiphers($ciphers): void
+    public function setCiphers($ciphers): self
     {
         $this->ciphers = $ciphers;
+
+        return $this;
     }
 
     /**
-     * Whether to check the peer certificate
+     * Return whether to check the peer certificate
      *
-     * @return boolean
+     * @return bool
      */
-    public function getVerifyPeer()
+    public function getVerifyPeer(): bool
     {
         return $this->verifyPeer;
     }
@@ -126,23 +136,26 @@ class SslOptions
      * Enable or disable the peer certificate check
      *
      * @param boolean $verifyPeer
+     * @return self
      */
-    public function setVerifyPeer($verifyPeer): void
+    public function setVerifyPeer(bool $verifyPeer): self
     {
         $this->verifyPeer = $verifyPeer;
+
+        return $this;
     }
 
     /**
      * Returns a stream-context representation of this config
      *
      * @param string|null $serverName
-     * @return array<string,mixed>
+     * @return array
      */
-    public function toStreamContext($serverName = null)
+    public function toStreamContext(?string $serverName = null): array
     {
         $sslContext = [
-            'verify_peer'       => (bool) $this->verifyPeer,
-            'allow_self_signed' => (bool) $this->allowSelfSigned
+            'verify_peer'       => $this->verifyPeer,
+            'allow_self_signed' => $this->allowSelfSigned
         ];
 
         if (null !== $this->caFile) {
@@ -155,10 +168,10 @@ class SslOptions
 
         if (null !== $serverName) {
             $sslContext['SNI_enabled'] = true;
-            $sslContext[PHP_VERSION_ID < 50600 ? 'SNI_server_name' : 'peer_name'] = $serverName;
+            $sslContext['peer_name'] = $serverName;
 
             if ($this->verifyPeer) {
-                $sslContext[PHP_VERSION_ID < 50600 ? 'CN_match' : 'peer_name'] = $serverName;
+                $sslContext['peer_name'] = $serverName;
             }
         }
 

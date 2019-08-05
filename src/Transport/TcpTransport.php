@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\Encoder\JsonEncoder as DefaultEncoder;
-use Gelf\MessageInterface as Message;
+use Gelf\Transport\Encoder\EncoderInterface;
+use Gelf\Transport\Encoder\JsonEncoder;
+use Gelf\Transport\Stream\SslOptions;
+use Gelf\Transport\Stream\StreamSocketClient;
 
 /**
  * TcpTransport allows the transfer of GELF-messages (with SSL/TLS support)
@@ -26,7 +28,7 @@ use Gelf\MessageInterface as Message;
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  * @author Ahmed Trabelsi <ahmed.trabelsi@proximedia.fr>
  */
-class TcpTransport extends AbstractTransport
+class TcpTransport implements TransportInterface
 {
     public const DEFAULT_HOST = '127.0.0.1';
 
@@ -37,33 +39,38 @@ class TcpTransport extends AbstractTransport
     /**
      * @var string
      */
-    protected $host;
+    private $host;
 
     /**
      * @var int
      */
-    protected $port;
+    private $port;
 
     /**
      * @var StreamSocketClient
      */
-    protected $socketClient;
+    private $socketClient;
 
     /**
      * @var SslOptions|null
      */
-    protected $sslOptions = null;
+    private $sslOptions = null;
+
+    /**
+     * @var EncoderInterface
+     */
+    private $encoder;
 
     /**
      * Class constructor
      *
-     * @param string|null     $host       when NULL or empty default-host is used
-     * @param int|null        $port       when NULL or empty default-port is used
-     * @param SslOptions|null $sslOptions when null not SSL is used
+     * @param string     $host
+     * @param int        $port
+     * @param SslOptions $sslOptions
      */
     public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
+        string $host = self::DEFAULT_HOST,
+        int $port = self::DEFAULT_PORT,
         SslOptions $sslOptions = null
     ) {
         $this->host = $host;
@@ -75,7 +82,7 @@ class TcpTransport extends AbstractTransport
 
         $this->sslOptions = $sslOptions;
 
-        $this->messageEncoder = new DefaultEncoder();
+        $this->encoder = new JsonEncoder();
         $this->socketClient = new StreamSocketClient(
             $this->getScheme(),
             $this->host,
@@ -84,35 +91,21 @@ class TcpTransport extends AbstractTransport
         );
     }
 
-    /**
-     * Sends a Message over this transport
-     *
-     * @param Message $message
-     *
-     * @return int the number of TCP packets sent
-     */
-    public function send(Message $message)
+    /** @inheritdoc */
+    public function send(array $data): void
     {
-        $rawMessage = $this->getMessageEncoder()->encode($message) . "\0";
+        $rawMessage = $this->encoder->encode($data) . "\0";
 
         // send message in one packet
         $this->socketClient->write($rawMessage);
-
-        return 1;
     }
 
-    /**
-     * @return string
-     */
-    private function getScheme()
+    private function getScheme(): string
     {
         return null === $this->sslOptions ? 'tcp' : 'ssl';
     }
 
-    /**
-     * @return array
-     */
-    private function getContext()
+    private function getContext(): array
     {
         if (null === $this->sslOptions) {
             return [];
@@ -122,21 +115,24 @@ class TcpTransport extends AbstractTransport
     }
 
     /**
-     * Sets the connect-timeout
+     * Set the connect-timeout (seconds)
      *
      * @param int $timeout
+     * @return self
      */
-    public function setConnectTimeout($timeout): void
+    public function setConnectTimeout(int $timeout): self
     {
         $this->socketClient->setConnectTimeout($timeout);
+
+        return $this;
     }
 
     /**
-     * Returns the connect-timeout
+     * Return the connect-timeout (seconds)
      *
      * @return int
      */
-    public function getConnectTimeout()
+    public function getConnectTimeout(): int
     {
         return $this->socketClient->getConnectTimeout();
     }

@@ -11,15 +11,13 @@
 
 declare(strict_types=1);
 
-namespace Gelf\Encoder;
-
-use Gelf\MessageInterface;
+namespace Gelf\Transport\Encoder;
 
 /**
- * The CompressedJsonEncoder allows the encoding of GELF messages as described
- * in http://www.graylog2.org/resources/documentation/sending/gelfhttp
+ * CompressedJsonEncoder first serializes the data to json and then applies gz-compression
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @internal
  */
 class CompressedJsonEncoder extends JsonEncoder
 {
@@ -28,7 +26,7 @@ class CompressedJsonEncoder extends JsonEncoder
     /**
      * @var int
      */
-    protected $compressionLevel;
+    private $compressionLevel;
 
     /**
      * Class constructor
@@ -37,21 +35,20 @@ class CompressedJsonEncoder extends JsonEncoder
      *
      * @param int $compressionLevel
      */
-    public function __construct(
-        $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL
-    ) {
+    public function __construct(int $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL)
+    {
         $this->compressionLevel = $compressionLevel;
     }
 
     /**
      * Encodes a given message
      *
-     * @param  MessageInterface $message
+     * @param  array $data
      * @return string
      */
-    public function encode(MessageInterface $message)
+    public function encode(array $data): string
     {
-        $json = parent::encode($message);
+        $json = parent::encode($data);
 
         return \gzcompress($json, $this->compressionLevel);
     }

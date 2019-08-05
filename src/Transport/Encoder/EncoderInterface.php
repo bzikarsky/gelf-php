@@ -11,21 +11,21 @@
 
 declare(strict_types=1);
 
-namespace Gelf;
+namespace Gelf\Transport\Encoder;
 
 /**
- * A message validator validates a message for validity
+ * An Encoder's responsibility is the transformation of gelf-data (array) to a byte-stream
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @internal
  */
-interface MessageValidatorInterface
+interface EncoderInterface
 {
     /**
-     * Validate a the given message for validity.
+     * Encodes a given message
      *
-     * @param  MessageInterface $message
-     * @param  string           &$reason
-     * @return bool
+     * @param array $data
+     * @return string
      */
-    public function validate(MessageInterface $message, &$reason = '');
+    public function encode(array $data): string;
 }

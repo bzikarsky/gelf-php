@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
-use Gelf\Transport\SslOptions;
+use Gelf\Transport\Stream\SslOptions;
 use PHPUnit\Framework\TestCase;
 
 class SslOptionsTest extends TestCase

@@ -16,7 +16,7 @@ namespace Gelf\Test\Transport;
 use \PHPUnit\Framework\MockObject\MockObject;
 use Gelf\Message;
 use Gelf\MessageInterface;
-use Gelf\Transport\IgnoreErrorTransportWrapper;
+use Gelf\Transport\ErrorIgnoringTransport;
 use Gelf\Transport\TransportInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -28,7 +28,7 @@ class IgnoreErrorTransportWrapperTest extends TestCase
         $expectedException = new \RuntimeException();
 
         $transport = $this->buildTransport();
-        $wrapper   = new IgnoreErrorTransportWrapper($transport);
+        $wrapper   = new ErrorIgnoringTransport($transport);
 
         $transport->expects($this->once())
             ->method('send')
@@ -36,7 +36,7 @@ class IgnoreErrorTransportWrapperTest extends TestCase
             ->willThrowException($expectedException);
 
         $bytes = $wrapper->send($expectedMessage);
-        $lastError = $wrapper->getLastError();
+        $lastError = $wrapper->getLastException();
 
         $this->assertEquals(0, $bytes);
         $this->assertSame($expectedException, $lastError);

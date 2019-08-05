@@ -14,8 +14,7 @@ declare(strict_types=1);
 namespace Gelf;
 
 /**
- * A publisher is responsible for publishing a given GELF-message
- * to one or multiple backends
+ * A publisher is responsible for publishing a given GELF-message to one or multiple backend
  */
 interface PublisherInterface
 {
@@ -23,7 +22,26 @@ interface PublisherInterface
      * Publish a message
      *
      * @param MessageInterface $message
+     * @throws Exception
      * @return void
      */
     public function publish(MessageInterface $message): void;
+
+    /**
+     * Return the default context options
+     *
+     * @return array
+     */
+    public function getDefaultContext(): array;
+
+    /**
+     * Set an array with context options
+     *
+     * The context options get added to every message if they don't contain
+     * the field yet
+     *
+     * @param array $context
+     * @return PublisherInterface
+     */
+    public function setDefaultContext(array $context): self;
 }

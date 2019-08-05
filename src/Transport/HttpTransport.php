@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\Encoder\CompressedJsonEncoder;
-use Gelf\Encoder\JsonEncoder as DefaultEncoder;
-use Gelf\MessageInterface;
+use Gelf\Transport\Encoder\CompressedJsonEncoder;
+use Gelf\Transport\Encoder\EncoderInterface;
+use Gelf\Transport\Encoder\JsonEncoder;
+use Gelf\Transport\Stream\SslOptions;
+use Gelf\Transport\Stream\StreamSocketClient;
 use RuntimeException;
 
 /**
@@ -27,7 +29,7 @@ use RuntimeException;
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class HttpTransport extends AbstractTransport
+class HttpTransport implements TransportInterface
 {
     public const DEFAULT_HOST = '127.0.0.1';
 
@@ -40,56 +42,61 @@ class HttpTransport extends AbstractTransport
     /**
      * @var string
      */
-    protected $host;
+    private $host;
 
     /**
      * @var int
      */
-    protected $port;
+    private $port;
 
     /**
      * @var string
      */
-    protected $path;
+    private $path;
 
     /**
      * @var StreamSocketClient
      */
-    protected $socketClient;
+    private $socketClient;
 
     /**
      * @var SslOptions|null
      */
-    protected $sslOptions = null;
+    private $sslOptions = null;
 
     /**
      * @var string|null
      */
-    protected $authentication = null;
+    private $authentication = null;
 
     /**
      * @var string|null
      */
-    protected $proxyUri = null;
+    private $proxyUri = null;
 
     /**
      * @var bool
      */
-    protected $requestFullUri = false;
+    private $requestFullUri = false;
+
+    /**
+     * @var EncoderInterface
+     */
+    private $encoder;
 
     /**
      * Class constructor
      *
-     * @param string|null     $host       when NULL or empty default-host is used
-     * @param int|null        $port       when NULL or empty default-port is used
-     * @param string|null     $path       when NULL or empty default-path is used
-     * @param SslOptions|null $sslOptions when null not SSL is used
+     * @param string     $host
+     * @param int        $port
+     * @param string     $path
+     * @param SslOptions|null
      */
     public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
-        $path = self::DEFAULT_PATH,
-        SslOptions $sslOptions = null
+        string $host = self::DEFAULT_HOST,
+        int $port = self::DEFAULT_PORT,
+        string $path = self::DEFAULT_PATH,
+        ?SslOptions $sslOptions = null
     ) {
         $this->host = $host;
         $this->port = $port;
@@ -100,17 +107,18 @@ class HttpTransport extends AbstractTransport
         }
 
         $this->sslOptions = $sslOptions;
-        $this->messageEncoder = new DefaultEncoder();
         $this->socketClient = new StreamSocketClient(
             $this->getScheme(),
             $this->host,
             $this->port,
             $this->getContext()
         );
+
+        $this->encoder = new CompressedJsonEncoder();
     }
 
     /**
-     * Creates a HttpTransport from a URI
+     * Create a HttpTransport from a URI
      *
      * Supports http and https schemes, port-, path- and auth-definitions
      * If the port is omitted 80 and 443 are used respectively.
@@ -123,7 +131,7 @@ class HttpTransport extends AbstractTransport
      *
      * @return HttpTransport
      */
-    public static function fromUrl($url, SslOptions $sslOptions = null)
+    public static function fromUrl(string $url, SslOptions $sslOptions = null): self
     {
         $parsed = \parse_url($url);
 
@@ -160,41 +168,40 @@ class HttpTransport extends AbstractTransport
     }
 
     /**
-     * Sets HTTP basic authentication
+     * Set HTTP basic authentication
      *
      * @param string $username
      * @param string $password
+     * @return self
      */
-    public function setAuthentication($username, $password): void
+    public function setAuthentication(string $username, string $password): self
     {
         $this->authentication = $username . ':' . $password;
+
+        return $this;
     }
 
     /**
-     * Enables HTTP proxy
+     * Enable HTTP proxy
      *
-     * @param $proxyUri
+     * @param string $proxyUri
      * @param bool $requestFullUri
+     * @return self
      */
-    public function setProxy($proxyUri, $requestFullUri = false): void
+    public function setProxy(string $proxyUri, bool $requestFullUri = false): self
     {
         $this->proxyUri = $proxyUri;
         $this->requestFullUri = $requestFullUri;
 
         $this->socketClient->setContext($this->getContext());
+
+        return $this;
     }
 
-    /**
-     * Sends a Message over this transport
-     *
-     * @param MessageInterface $message
-     *
-     * @return int the number of bytes sent
-     */
-    public function send(MessageInterface $message)
+    /** @inheritdoc */
+    public function send(array $data): void
     {
-        $messageEncoder = $this->getMessageEncoder();
-        $rawMessage = $messageEncoder->encode($message);
+        $rawMessage = $this->encoder->encode($data);
 
         $request = [
             \sprintf('POST %s HTTP/1.1', $this->path),
@@ -209,7 +216,7 @@ class HttpTransport extends AbstractTransport
             $request[] = 'Authorization: Basic ' . \base64_encode($this->authentication);
         }
 
-        if ($messageEncoder instanceof CompressedJsonEncoder) {
+        if ($this->encoder instanceof CompressedJsonEncoder) {
             $request[] = 'Content-Encoding: gzip';
         }
 
@@ -218,7 +225,7 @@ class HttpTransport extends AbstractTransport
 
         $request = \implode($request, "\r\n");
 
-        $byteCount = $this->socketClient->write($request);
+        $this->socketClient->write($request);
         $headers = $this->readResponseHeaders();
 
         // if we don't have a HTTP/1.1 connection, or the server decided to close the connection
@@ -235,14 +242,9 @@ class HttpTransport extends AbstractTransport
                 )
             );
         }
-
-        return $byteCount;
     }
 
-    /**
-     * @return string
-     */
-    private function readResponseHeaders()
+    private function readResponseHeaders(): string
     {
         $chunkSize = 1024; // number of bytes to read at once
         $delimiter = "\r\n\r\n"; // delimiter between headers and response
@@ -258,18 +260,12 @@ class HttpTransport extends AbstractTransport
         return $elements[0];
     }
 
-    /**
-     * @return string
-     */
-    private function getScheme()
+    private function getScheme(): string
     {
         return null === $this->sslOptions ? 'tcp' : 'ssl';
     }
 
-    /**
-     * @return array
-     */
-    private function getContext()
+    private function getContext(): array
     {
         $options = [];
 
@@ -288,22 +284,37 @@ class HttpTransport extends AbstractTransport
     }
 
     /**
-     * Sets the connect-timeout
+     * Sets the connect-timeout (seconds)
      *
      * @param int $timeout
+     * @return self
      */
-    public function setConnectTimeout($timeout): void
+    public function setConnectTimeout(int $timeout): self
     {
         $this->socketClient->setConnectTimeout($timeout);
+
+        return $this;
     }
 
     /**
-     * Returns the connect-timeout
+     * Returns the connect-timeout (seconds)
      *
      * @return int
      */
-    public function getConnectTimeout()
+    public function getConnectTimeout(): int
     {
         return $this->socketClient->getConnectTimeout();
+    }
+
+    /**
+     * En- or disable the use of a compressing GELF encoder
+     *
+     * @param bool $enable
+     * @return HttpTransport
+     */
+    public function useCompression(bool $enable = true): self
+    {
+        $this->encoder = $enable ? new CompressedJsonEncoder() : new JsonEncoder();
+        return $this;
     }
 }

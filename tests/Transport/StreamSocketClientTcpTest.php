@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
-use Gelf\Transport\StreamSocketClient;
+use Gelf\Transport\Stream\StreamSocketClient;
 use LogicException;
 use PHPUnit\Framework\TestCase;
 

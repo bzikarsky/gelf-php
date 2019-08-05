@@ -15,7 +15,7 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Encoder\EncoderInterface;
 use Gelf\MessageInterface;
-use Gelf\Transport\StreamSocketClient;
+use Gelf\Transport\Stream\StreamSocketClient;
 use Gelf\Transport\UdpTransport;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;

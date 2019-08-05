@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Gelf;
 
-use Gelf\MessageValidator as DefaultMessageValidator;
+use Gelf\Standard\StandardInterface;
+use Gelf\Standard\V0101Standard;
 use Gelf\Transport\TransportInterface;
-use RuntimeException;
-use SplObjectStorage as Set;
+use Gelf\Transport\UdpTransport;
 
 /**
  * A GELF publisher functions as a hub for pushing out a GELF message
@@ -27,85 +27,77 @@ use SplObjectStorage as Set;
 class Publisher implements PublisherInterface
 {
     /**
-     * @var Set
+     * @var TransportInterface
      */
-    protected $transports;
+    private $transport;
 
     /**
-     * @var MessageValidatorInterface
+     * @var StandardInterface
      */
-    protected $messageValidator;
+    private $standard;
 
     /**
-     * Creates a Publisher for GELF-messages.
+     * @var array
+     */
+    private $defaultContext = [];
+
+    /**
+     * Create a Publisher for GELF-messages.
      *
-     * @param TransportInterface|null         $transport
-     * @param MessageValidatorInterface|null  $messageValidator
+     * @param TransportInterface|null  $transport
+     * @param StandardInterface|null   $standard
      */
     public function __construct(
-        TransportInterface $transport = null,
-        MessageValidatorInterface $messageValidator = null
+        ?TransportInterface $transport = null,
+        ?StandardInterface $standard = null
     ) {
-        $this->transports = new Set();
-        $this->messageValidator = $messageValidator
-            ?: new DefaultMessageValidator();
-
-        if (null !== $transport) {
-            $this->addTransport($transport);
-        }
+        $this->transport = $transport ?? new UdpTransport();
+        $this->standard = $standard ?? new V0101Standard();
     }
 
-    /**
-     * Publish a message over all defined transports
-     *
-     * @param MessageInterface $message
-     */
+    /** @inheritdoc */
     public function publish(MessageInterface $message): void
     {
-        if (0 === \count($this->transports)) {
-            throw new RuntimeException(
-                'Publisher requires at least one transport'
-            );
+        // Apply default-context if set
+        if (\count($this->defaultContext)) {
+            $message = Message::buildWithDefaultContext($message, $this->defaultContext);
         }
 
-        $reason = '';
-        if (!$this->messageValidator->validate($message, $reason)) {
-            throw new RuntimeException("Message is invalid: $reason");
-        }
+        $data = $this->standard->serialize($message);
+        $this->transport->send($data);
+    }
 
-        foreach ($this->transports as $transport) {
-            /* @var $transport TransportInterface */
-            $transport->send($message);
-        }
+    /** @inheritdoc */
+    public function getDefaultContext(): array
+    {
+        return $this->defaultContext;
+    }
+
+    /** @inheritdoc */
+    public function setDefaultContext(array $defaultContext): self
+    {
+        $this->defaultContext = $defaultContext;
+
+        return $this;
     }
 
     /**
-     * Adds a transport to the publisher.
+     * Return the transport
      *
-     * @param TransportInterface $transport
+     * @return TransportInterface
      */
-    public function addTransport(TransportInterface $transport): void
+    public function getTransport(): TransportInterface
     {
-        $this->transports->attach($transport);
+        return $this->transport;
     }
 
     /**
-     * Returns all defined transports.
+     * Return the message standard
      *
-     * @return TransportInterface[]
+     * @return StandardInterface
      */
-    public function getTransports()
+    public function getStandard(): StandardInterface
     {
-        return \iterator_to_array($this->transports);
-    }
-
-    /**
-     * Returns the current message validator.
-     *
-     * @return MessageValidatorInterface
-     */
-    public function getMessageValidator()
-    {
-        return $this->messageValidator;
+        return $this->standard;
     }
 }

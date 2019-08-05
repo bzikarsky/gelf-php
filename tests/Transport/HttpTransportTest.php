@@ -17,8 +17,8 @@ use Gelf\Encoder\CompressedJsonEncoder;
 use Gelf\Encoder\EncoderInterface;
 use Gelf\MessageInterface;
 use Gelf\Transport\HttpTransport;
-use Gelf\Transport\SslOptions;
-use Gelf\Transport\StreamSocketClient;
+use Gelf\Transport\Stream\SslOptions;
+use Gelf\Transport\Stream\StreamSocketClient;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 

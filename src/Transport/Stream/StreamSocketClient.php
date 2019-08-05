@@ -11,9 +11,9 @@
 
 declare(strict_types=1);
 
-namespace Gelf\Transport;
+namespace Gelf\Transport\Stream;
 
-use RuntimeException;
+use Gelf\Transport\TransportException;
 
 /**
  * StreamSocketClient is a very simple OO-Wrapper around the PHP
@@ -21,6 +21,7 @@ use RuntimeException;
  * fwrite, etc.
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @internal
  */
 class StreamSocketClient
 {
@@ -32,40 +33,42 @@ class StreamSocketClient
     /**
      * @var string
      */
-    protected $host;
+    private $host;
 
     /**
      * @var integer
      */
-    protected $port;
+    private $port;
 
     /**
      * @var string
      */
-    protected $scheme;
+    private $scheme;
 
     /**
      * @var array
      */
-    protected $context;
+    private $context;
 
     /**
      * @var resource
      */
-    protected $socket;
+    private $socket;
 
     /**
      * @var int
      */
-    protected $connectTimeout = self::SOCKET_TIMEOUT;
+    private $connectTimeout = self::SOCKET_TIMEOUT;
 
     /**
+     * Create a StreamSocketClient
+     *
      * @param string  $scheme
      * @param string  $host
-     * @param integer $port
+     * @param int     $port
      * @param array   $context
      */
-    public function __construct($scheme, $host, $port, array $context = [])
+    public function __construct(string $scheme, string $host, int $port, array $context = [])
     {
         $this->scheme = $scheme;
         $this->host = $host;
@@ -82,67 +85,15 @@ class StreamSocketClient
     }
 
     /**
-     * Initializes socket-client
-     *
-     * @deprecated deprecated since v1.4.0
-     *
-     * @param string  $scheme  like "udp" or "tcp"
-     * @param string  $host
-     * @param integer $port
-     * @param array   $context
+     * Initialize a stream-socket according to the current configuration
      *
      * @return resource
      *
-     * @throws RuntimeException on connection-failure
-     */
-    protected static function initSocket($scheme, $host, $port, array $context)
-    {
-        $socketDescriptor = \sprintf('%s://%s:%d', $scheme, $host, $port);
-        $socket = @\stream_socket_client(
-            $socketDescriptor,
-            $errNo,
-            $errStr,
-            static::SOCKET_TIMEOUT,
-            \STREAM_CLIENT_CONNECT,
-            \stream_context_create($context)
-        );
-
-        if (false === $socket) {
-            throw new RuntimeException(
-                \sprintf(
-                    'Failed to create socket-client for %s: %s (%s)',
-                    $socketDescriptor,
-                    $errStr,
-                    $errNo
-                )
-            );
-        }
-
-        // set non-blocking for UDP
-        if (0 === \strcasecmp('udp', $scheme)) {
-            \stream_set_blocking($socket, false);
-        }
-
-        return $socket;
-    }
-
-    /**
-     * Internal function mimicking the behaviour of static::initSocket
-     * which will get new functionality instead of the deprecated
-     * "factory"
-     *
-     * @return resource
-     *
-     * @throws RuntimeException on connection-failure
+     * @throws TransportException on connection-failure
      */
     private function buildSocket()
     {
-        $socketDescriptor = \sprintf(
-            '%s://%s:%d',
-            $this->scheme,
-            $this->host,
-            $this->port
-        );
+        $socketDescriptor = \sprintf('%s://%s:%d', $this->scheme, $this->host, $this->port);
 
         $socket = @\stream_socket_client(
             $socketDescriptor,
@@ -154,7 +105,7 @@ class StreamSocketClient
         );
 
         if (false === $socket) {
-            throw new RuntimeException(
+            throw new TransportException(
                 \sprintf(
                     'Failed to create socket-client for %s: %s (%s)',
                     $socketDescriptor,
@@ -173,7 +124,7 @@ class StreamSocketClient
     }
 
     /**
-     * Returns raw-socket-resource
+     * Return raw-socket-resource
      *
      * @return resource
      */
@@ -188,16 +139,16 @@ class StreamSocketClient
     }
 
     /**
-     * Writes a given string to the socket and returns the
+     * Write a given string to the socket and returns the
      * number of written bytes
      *
      * @param string $buffer
      *
      * @return int
      *
-     * @throws RuntimeException on write-failure
+     * @throws TransportException on write-failure
      */
-    public function write($buffer)
+    public function write($buffer): int
     {
         $buffer = (string) $buffer;
         $bufLen = \strlen($buffer);
@@ -223,7 +174,7 @@ class StreamSocketClient
             }
 
             if ($failed || false === $byteCount) {
-                throw new \RuntimeException($errorMessage);
+                throw new TransportException($errorMessage);
             }
 
             $written += $byteCount;
@@ -234,13 +185,13 @@ class StreamSocketClient
     }
 
     /**
-     * Reads a given number of bytes from the socket
+     * Read a given number of bytes from the socket
      *
-     * @param integer $byteCount
+     * @param int $byteCount
      *
      * @return string
      */
-    public function read($byteCount)
+    public function read(int $byteCount): string
     {
         return \fread($this->getSocket(), $byteCount);
     }
@@ -259,60 +210,66 @@ class StreamSocketClient
     }
 
     /**
-     * Checks if the socket is closed
+     * Check if the socket is closed
      *
      * @return bool
      */
-    public function isClosed()
+    public function isClosed(): bool
     {
         return null === $this->socket;
     }
 
     /**
-     * Returns the current connect-timeout
+     * Return the current connect-timeout (seconds)
      *
      * @return int
      */
-    public function getConnectTimeout()
+    public function getConnectTimeout(): int
     {
         return $this->connectTimeout;
     }
 
     /**
-     * Sets the connect-timeout
+     * Set the connect-timeout (seconds)
      *
      * @param int $timeout
+     * @return self
      */
-    public function setConnectTimeout($timeout): void
+    public function setConnectTimeout(int $timeout): self
     {
         if (!$this->isClosed()) {
-            throw new \LogicException('Cannot change socket properties with an open connection');
+            throw new TransportException('Cannot change socket properties with an open connection');
         }
 
         $this->connectTimeout = $timeout;
+
+        return $this;
     }
 
     /**
-     * Returns the stream context
+     * Return the stream context
      *
      * @return array
      */
-    public function getContext()
+    public function getContext(): array
     {
         return $this->context;
     }
 
     /**
-     * Sets the stream context
+     * Set the stream context
      *
      * @param array $context
+     * @return self
      */
-    public function setContext(array $context): void
+    public function setContext(array $context): self
     {
         if (!$this->isClosed()) {
             throw new \LogicException('Cannot change socket properties with an open connection');
         }
 
         $this->context = $context;
+
+        return $this;
     }
 }

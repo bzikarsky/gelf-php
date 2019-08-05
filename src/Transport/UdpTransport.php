@@ -13,20 +13,19 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
 use Gelf\MessageInterface as Message;
+use Gelf\Transport\Encoder\CompressedJsonEncoder;
+use Gelf\Transport\Encoder\EncoderInterface;
+use Gelf\Transport\Encoder\JsonEncoder;
+use Gelf\Transport\Stream\StreamSocketClient;
 use RuntimeException;
 
 /**
- * UdpTransport allows the transfer of GELF-messages to an compatible
- * GELF-UDP-backend as described in
- * https://github.com/Graylog2/graylog2-docs/wiki/GELF
- *
- * It can also act as a direct publisher
+ * UdpTransport allows the transfer of GELF-messages to an compatible GELF-UDP-backend
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
  */
-class UdpTransport extends AbstractTransport
+class UdpTransport implements TransportInterface
 {
     public const CHUNK_GELF_ID = "\x1e\x0f";
 
@@ -43,25 +42,30 @@ class UdpTransport extends AbstractTransport
     /**
      * @var int
      */
-    protected $chunkSize;
+    private $chunkSize;
 
     /**
      * @var StreamSocketClient
      */
-    protected $socketClient;
+    private $socketClient;
+
+    /**
+     * @var EncoderInterface
+     */
+    private $encoder;
 
     /**
      * Class constructor
      *
-     * @param string $host      when NULL or empty DEFAULT_HOST is used
-     * @param int    $port      when NULL or empty DEFAULT_PORT is used
+     * @param string $host
+     * @param int    $port
      * @param int    $chunkSize defaults to CHUNK_SIZE_WAN,
      *                          0 disables chunks completely
      */
     public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
-        $chunkSize = self::CHUNK_SIZE_WAN
+        string $host = self::DEFAULT_HOST,
+        int $port = self::DEFAULT_PORT,
+        int $chunkSize = self::CHUNK_SIZE_WAN
     ) {
         // allow NULL-like values for fallback on default
         $host = $host ?: self::DEFAULT_HOST;
@@ -70,43 +74,34 @@ class UdpTransport extends AbstractTransport
         $this->socketClient = new StreamSocketClient('udp', $host, $port);
         $this->chunkSize = $chunkSize;
 
-        $this->messageEncoder = new DefaultEncoder();
+        $this->encoder = new CompressedJsonEncoder();
     }
 
-    /**
-     * Sends a Message over this transport
-     *
-     * @param Message $message
-     *
-     * @return int the number of UDP packets sent
-     */
-    public function send(Message $message)
+    /** @inheritdoc */
+    public function send(array $data): void
     {
-        $rawMessage = $this->getMessageEncoder()->encode($message);
+        $rawMessage = $this->encoder->encode($data);
 
         // test if we need to split the message to multiple chunks
         // chunkSize == 0 allows for an unlimited packet-size, and therefore
         // disables chunking
         if ($this->chunkSize && \strlen($rawMessage) > $this->chunkSize) {
-            return $this->sendMessageInChunks($rawMessage);
+            $this->sendMessageInChunks($rawMessage);
         }
 
         // send message in one packet
         $this->socketClient->write($rawMessage);
-
-        return 1;
     }
 
     /**
      * Sends given string in multiple chunks
      *
      * @param  string $rawMessage
-     * @return int
      *
-     * @throws RuntimeException on too large messages which would exceed the
-                                maximum number of possible chunks
+     * @throws TransportException on too large messages which would exceed the
+                                  maximum number of possible chunks
      */
-    protected function sendMessageInChunks($rawMessage)
+    private function sendMessageInChunks(string $rawMessage): void
     {
         // split to chunks
         $chunks = \str_split($rawMessage, $this->chunkSize);
@@ -134,7 +129,17 @@ class UdpTransport extends AbstractTransport
 
             $this->socketClient->write($data);
         }
+    }
 
-        return $numChunks;
+    /**
+     * En- or disable the use of a compressing GELF encoder
+     *
+     * @param bool $enable
+     * @return self
+     */
+    public function useCompression(bool $enable = true): self
+    {
+        $this->encoder = $enable ? new CompressedJsonEncoder() : new JsonEncoder();
+        return $this;
     }
 }

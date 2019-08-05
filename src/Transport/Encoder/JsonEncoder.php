@@ -11,19 +11,19 @@
 
 declare(strict_types=1);
 
-namespace Gelf\Transport;
+namespace Gelf\Transport\Encoder;
 
 /**
- * A transport is responsible for transporting the gelf message data to a GELF endpoint
+ * JsonEncoder encodes the data as a simple JSON structure
  *
  * @author Benjamin Zikarsky <benjamin@zikarsky.de>
+ * @internal
  */
-interface TransportInterface
+class JsonEncoder implements EncoderInterface
 {
-    /**
-     * Send gelf-data via the transport
-     *
-     * @param array $data
-     */
-    public function send(array $data): void;
+    /** @inheritdoc */
+    public function encode(array $data): string
+    {
+        return \json_encode($data);
+    }
 }

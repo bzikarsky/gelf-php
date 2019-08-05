@@ -13,14 +13,10 @@ declare(strict_types=1);
 
 namespace Gelf\Transport;
 
-use Gelf\MessageInterface as Message;
-use Throwable;
-
 /**
- * A wrapper for any AbstractTransport to ignore any kind of errors
- * @package Gelf\Transport
+ * A wrapper for any TransportInterface to ignore all transport-related exceptions
  */
-class IgnoreErrorTransportWrapper extends AbstractTransport
+class ErrorIgnoringTransport implements TransportInterface
 {
     /**
      * @var TransportInterface
@@ -28,9 +24,9 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
     private $transport;
 
     /**
-     * @var \Exception|null
+     * @var TransportException|null
      */
-    private $lastError = null;
+    private $lastException = null;
 
     /**
      * IgnoreErrorTransportWrapper constructor.
@@ -42,29 +38,23 @@ class IgnoreErrorTransportWrapper extends AbstractTransport
         $this->transport = $transport;
     }
 
-    /**
-     * Sends a Message over this transport.
-     *
-     * @param Message $message
-     *
-     * @return int the number of bytes sent
-     */
-    public function send(Message $message): int
+    /** @inheritdoc */
+    public function send(array $data): void
     {
         try {
-            return $this->transport->send($message);
-        } catch (\Throwable $e) {
-            $this->lastError = $e;
-            return 0;
+            $this->transport->send($data);
+        } catch (TransportException $e) {
+            $this->lastException = $e;
         }
     }
 
     /**
      * Returns the last error
-     * @return \Throwable|null
+     *
+     * @return TransportException|null
      */
-    public function getLastError(): Throwable
+    public function getLastException(): ?TransportException
     {
-        return $this->lastError;
+        return $this->lastException;
     }
 }
