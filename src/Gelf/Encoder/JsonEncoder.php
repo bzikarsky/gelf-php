@@ -29,6 +29,10 @@ class JsonEncoder implements NoNullByteEncoderInterface
      */
     public function encode(MessageInterface $message)
     {
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            return json_encode($message->toArray(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        }
+
         return json_encode($message->toArray());
     }
 }

@@ -51,4 +51,23 @@ class JsonEncoderTest extends TestCase
         // check that we have our data array
         $this->assertEquals($testData, $data);
     }
+
+    public function testUnicodeEncode()
+    {
+        $testData = array('foo' => 'бар');
+
+        $this->message
+            ->expects($this->once())
+            ->method('toArray')
+            ->will($this->returnValue($testData));
+
+        $json = $this->encoder->encode($this->message);
+
+        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
+            $this->assertEquals('{"foo":"бар"}', $json);
+        } else {
+            $this->assertEquals('{"foo":"\u0431\u0430\u0440"}', $json);
+        }
+
+    }
 }
