@@ -14,7 +14,11 @@
   ],
   "autoload": {
     "psr-4": {
-      "Gelf\\": "src",
+      "Gelf\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
       "Gelf\\Test\\": "tests"
     }
   },
