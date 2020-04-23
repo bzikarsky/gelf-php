@@ -160,6 +160,13 @@ class MessageTest extends TestCase
     {
         $this->message->setAdditional("", "test");
     }
+    public function testSetZeroKey()
+    {
+        $key = 0;
+        $value = 'zero';
+        $this->message->setAdditional($key, $value);
+        $this->assertEquals($value, $this->message->getAdditional($key));
+    }
     /**
      * @expectedException RuntimeException
      */
