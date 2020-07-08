@@ -256,7 +256,8 @@ class Message implements MessageInterface
 
     public function setAdditional($key, $value)
     {
-        if (!$key) {
+        $key = (string)$key;
+        if ($key === '') {
             throw new RuntimeException("Additional field key cannot be empty");
         }
 
