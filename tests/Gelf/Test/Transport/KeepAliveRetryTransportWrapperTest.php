@@ -10,7 +10,7 @@ use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 use RuntimeException;
 
 /**
- * @covers KeepAliveRetryTransportWrapper
+ * @covers \Gelf\Transport\KeepAliveRetryTransportWrapper
  */
 class KeepAliveRetryTransportWrapperTest extends TestCase
 {
