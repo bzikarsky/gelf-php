@@ -4,7 +4,7 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Message;
 use Gelf\TestCase;
-use Gelf\Transport\AbstractTransport;
+use Gelf\Transport\HttpTransport;
 use Gelf\Transport\KeepAliveRetryTransportWrapper;
 use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 use RuntimeException;
@@ -25,7 +25,7 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
     private $message;
 
     /**
-     * @var AbstractTransport|MockObject
+     * @var HttpTransport|MockObject
      */
     private $transport;
 
@@ -107,10 +107,10 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
     }
 
     /**
-     * @return MockObject|AbstractTransport
+     * @return MockObject|HttpTransport
      */
     private function buildTransport()
     {
-        return $this->getMockForAbstractClass("\\Gelf\\Transport\\AbstractTransport");
+        return $this->getMock("\\Gelf\\Transport\\HttpTransport");
     }
 }
