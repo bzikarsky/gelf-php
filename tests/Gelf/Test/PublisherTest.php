@@ -25,11 +25,11 @@ class PublisherTest extends TestCase
 
     public function setUp()
     {
-        $this->transportA = $this->getMock('Gelf\Transport\TransportInterface');
-        $this->transportB = $this->getMock('Gelf\Transport\TransportInterface');
+        $this->transportA = $this->createMock('Gelf\Transport\TransportInterface');
+        $this->transportB = $this->createMock('Gelf\Transport\TransportInterface');
         $this->messageValidator =
-            $this->getMock('Gelf\MessageValidatorInterface');
-        $this->message = $this->getMock('Gelf\MessageInterface');
+            $this->createMock('Gelf\MessageValidatorInterface');
+        $this->message = $this->createMock('Gelf\MessageInterface');
 
         $this->publisher = new Publisher(
             $this->transportA,

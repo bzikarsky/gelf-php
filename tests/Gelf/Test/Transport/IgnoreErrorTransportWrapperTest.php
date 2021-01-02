@@ -35,7 +35,7 @@ class IgnoreErrorTransportWrapperTest extends TestCase
      */
     private function buildTransport()
     {
-        return $this->getMockForAbstractClass("\\Gelf\\Transport\\AbstractTransport");
+        return $this->createMock("\\Gelf\\Transport\\AbstractTransport");
     }
 
     /**
@@ -43,6 +43,6 @@ class IgnoreErrorTransportWrapperTest extends TestCase
      */
     private function buildMessage()
     {
-        return $this->getMockForAbstractClass("\\Gelf\\Message");
+        return $this->createMock("\\Gelf\\Message");
     }
 }
