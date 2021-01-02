@@ -43,17 +43,17 @@ class UdpTransportTest extends TestCase
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMock(
+        $this->socketClient = $this->createMock(
             "\\Gelf\\Transport\\StreamSocketClient",
             $methods = array(),
             $args = array(),
             $mockClassName = '',
             $callConstructor = false
         );
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->message = $this->createMock("\\Gelf\\Message");
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->createMock("\\Gelf\\Encoder\\EncoderInterface");
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -79,7 +79,7 @@ class UdpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        $encoder = $this->createMock('\\Gelf\\Encoder\\EncoderInterface');
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());

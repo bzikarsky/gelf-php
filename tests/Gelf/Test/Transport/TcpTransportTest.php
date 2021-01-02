@@ -46,17 +46,13 @@ class TcpTransportTest extends TestCase
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMock(
-            "\\Gelf\\Transport\\StreamSocketClient",
-            $methods = array(),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->socketClient = $this->getMockBuilder("\\Gelf\\Transport\\StreamSocketClient")
+                ->disableOriginalConstructor()
+                ->getMock();
+        $this->message = $this->createMock("\\Gelf\\Message");
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\NoNullByteEncoderInterface");
+        $this->encoder = $this->createMock("\\Gelf\\Encoder\\NoNullByteEncoderInterface");
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -111,7 +107,7 @@ class TcpTransportTest extends TestCase
 
     public function testSslOptionsAreUsed()
     {
-        $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions = $this->createMock('\\Gelf\\Transport\\SslOptions');
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
             ->will($this->returnValue(array('ssl' => null)));
@@ -128,7 +124,7 @@ class TcpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\NoNullByteEncoderInterface');
+        $encoder = $this->createMock('\\Gelf\\Encoder\\NoNullByteEncoderInterface');
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -174,7 +170,7 @@ class TcpTransportTest extends TestCase
 
     public function testNonNullSafeEncoderFails()
     {
-        $this->setExpectedException('InvalidArgumentException');
+        $this->expectException('InvalidArgumentException');
         $this->transport->setMessageEncoder(new CompressedJsonEncoder());
     }
 

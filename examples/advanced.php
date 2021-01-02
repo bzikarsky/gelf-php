@@ -20,7 +20,7 @@ $transport = new Gelf\Transport\UdpTransport("127.0.0.1", 12201, Gelf\Transport\
 // $transport = new Gelf\Transport\IgnoreErrorTransportWrapper($transport);
 
 // While the UDP transport is itself a publisher, we wrap it in a real Publisher for convenience.
-// A publisher allows for message validation before transmission, and also supports sending 
+// A publisher allows for message validation before transmission, and also supports sending
 // messages to multiple backends at once.
 $publisher = new Gelf\Publisher();
 $publisher->addTransport($transport);

@@ -47,6 +47,11 @@ class AmqpTransportTest extends TestCase
 
     public function setUp()
     {
+        if (!extension_loaded('amqp')) {
+            $this->markTestSkipped('Requires ext-amqp');
+            return;
+        }
+
         if (!defined('AMQP_NOPARAM')) {
             define('AMQP_NOPARAM', 0);
         }
@@ -57,14 +62,14 @@ class AmqpTransportTest extends TestCase
 
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->exchange = $this->getMock(
+        $this->exchange = $this->createMock(
             "\\AMQPExchange",
             $methods = array('publish'),
             $args = array(),
             $mockClassName = '',
             $callConstructor = false
         );
-        $this->queue = $this->getMock(
+        $this->queue = $this->createMock(
             "\\AMQPQueue",
             $methods = array('getName', 'getFlags'),
             $args = array(),
@@ -72,10 +77,10 @@ class AmqpTransportTest extends TestCase
             $callConstructor = false
         );
 
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->message = $this->createMock("\\Gelf\\Message");
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->createMock("\\Gelf\\Encoder\\EncoderInterface");
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -102,7 +107,7 @@ class AmqpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        $encoder = $this->createMock('\\Gelf\\Encoder\\EncoderInterface');
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -119,19 +124,16 @@ class AmqpTransportTest extends TestCase
 
     public function testPublish()
     {
-        $transport = $this->getMock(
-            "\\Gelf\\Transport\\AmqpTransport",
-            $methods = array("send"),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
+        $transport = $this->getMockBuilder("\\Gelf\\Transport\\HttpTransport")
+            ->setMethods(array("send"))
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $transport
             ->expects($this->once())
             ->method("send")
             ->with($this->message)
-            ->will($this->returnValue(42));
+            ->willReturn(42);
 
         $response = $transport->publish($this->message);
 
@@ -140,6 +142,8 @@ class AmqpTransportTest extends TestCase
 
     public function testSend()
     {
+        $this->exchange->expects($this->once())->method('publish');
+
         $transport = $this->getTransport();
         $transport->send($this->message);
     }

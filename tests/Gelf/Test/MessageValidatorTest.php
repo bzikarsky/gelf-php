@@ -118,7 +118,7 @@ class MessageValidatorTest extends TestCase
         $version = "1.0",
         $additionals = array()
     ) {
-        $msg = $this->getMock('Gelf\MessageInterface');
+        $msg = $this->createMock('Gelf\MessageInterface');
         $msg->expects($this->any())->method('getHost')
             ->will($this->returnValue($host));
         $msg->expects($this->any())->method('getVersion')

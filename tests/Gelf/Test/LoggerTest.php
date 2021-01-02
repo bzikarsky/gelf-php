@@ -35,7 +35,7 @@ class LoggerTest extends TestCase
 
     public function setUp()
     {
-        $this->publisher = $this->getMock('\Gelf\PublisherInterface');
+        $this->publisher = $this->createMock('\Gelf\PublisherInterface');
         $this->logger = new Logger($this->publisher, $this->facility);
     }
 
@@ -43,7 +43,7 @@ class LoggerTest extends TestCase
     {
         $this->assertEquals($this->publisher, $this->logger->getPublisher());
 
-        $newPublisher = $this->getMock('\Gelf\PublisherInterface');
+        $newPublisher = $this->createMock('\Gelf\PublisherInterface');
         $this->logger->setPublisher($newPublisher);
         $this->assertEquals($newPublisher, $this->logger->getPublisher());
     }
@@ -125,7 +125,7 @@ class LoggerTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->prop1 = 'val1';
 
-        $toString = $this->getMock('dummyClass', array('__toString'));
+        $toString = $this->getMockBuilder('\stdClass')->setMethods(array('__toString'))->getMock();
         $toString->method('__toString')
             ->willReturn('toString');
 

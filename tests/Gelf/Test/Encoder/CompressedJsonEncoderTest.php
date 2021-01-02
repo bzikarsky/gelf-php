@@ -29,7 +29,7 @@ class CompressedJsonEncoderTest extends TestCase
 
     public function setUp()
     {
-        $this->message = $this->getMock('\\Gelf\\Message');
+        $this->message = $this->createMock('\\Gelf\\Message');
         $this->encoder = new CompressedJsonEncoder();
     }
 

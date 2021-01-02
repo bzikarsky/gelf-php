@@ -52,17 +52,17 @@ class HttpTransportTest extends TestCase
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMock(
+        $this->socketClient = $this->createMock(
             "\\Gelf\\Transport\\StreamSocketClient",
             $methods = array(),
             $args = array(),
             $mockClassName = '',
             $callConstructor = false
         );
-        $this->message = $this->getMock("\\Gelf\\Message");
+        $this->message = $this->createMock("\\Gelf\\Message");
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->getMock("\\Gelf\\Encoder\\EncoderInterface");
+        $this->encoder = $this->createMock("\\Gelf\\Encoder\\EncoderInterface");
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -175,7 +175,7 @@ class HttpTransportTest extends TestCase
 
     public function testSslOptionsAreUsed()
     {
-        $sslOptions = $this->getMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions = $this->createMock('\\Gelf\\Transport\\SslOptions');
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
             ->will($this->returnValue(array('ssl' => null)));
@@ -192,7 +192,7 @@ class HttpTransportTest extends TestCase
 
     public function testSetEncoder()
     {
-        $encoder = $this->getMock('\\Gelf\\Encoder\\EncoderInterface');
+        $encoder = $this->createMock('\\Gelf\\Encoder\\EncoderInterface');
         $this->transport->setMessageEncoder($encoder);
 
         $this->assertEquals($encoder, $this->transport->getMessageEncoder());
@@ -300,7 +300,7 @@ class HttpTransportTest extends TestCase
             ->method("read")
             ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
 
-        $compressedEncoder = $this->getMock("\\Gelf\\Encoder\\CompressedJsonEncoder");
+        $compressedEncoder = $this->createMock("\\Gelf\\Encoder\\CompressedJsonEncoder");
         $compressedEncoder
             ->expects($this->any())
             ->method('encode')
@@ -314,19 +314,16 @@ class HttpTransportTest extends TestCase
 
     public function testPublish()
     {
-        $transport = $this->getMock(
-            "\\Gelf\\Transport\\HttpTransport",
-            $methods = array("send"),
-            $args = array(),
-            $mockClassName = '',
-            $callConstructor = false
-        );
+        $transport = $this->getMockBuilder("\\Gelf\\Transport\\HttpTransport")
+            ->setMethods(array("send"))
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $transport
             ->expects($this->once())
             ->method("send")
             ->with($this->message)
-            ->will($this->returnValue(42));
+            ->willReturn(42);
 
         $response = $transport->publish($this->message);
 

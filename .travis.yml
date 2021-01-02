@@ -1,23 +1,23 @@
 language: php
 php:
-  - 5.4
-  - 5.5
   - 5.6
   - 7.0
   - 7.1
   - 7.2
   - 7.3
+  - 7.4
   
 dist: trusty
 
 # upgrade to container-based travis
 sudo: false
 
+env:
+  global:
+    - XDEBUG_MODE=coverage
+
 matrix:
   fast_finish: true
-  include:
-    - php: 5.3
-      dist: precise
   
 before_script:
   - composer self-update
