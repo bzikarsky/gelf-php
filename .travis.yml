@@ -13,6 +13,10 @@ dist: trusty
 # upgrade to container-based travis
 sudo: false
 
+env:
+  global:
+    - XDEBUG_MODE=coverage
+
 matrix:
   fast_finish: true
   
