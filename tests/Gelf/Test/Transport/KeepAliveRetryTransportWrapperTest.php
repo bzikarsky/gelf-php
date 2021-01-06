@@ -34,11 +34,18 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
      */
     private $wrapper;
 
+    /**
+     * @var KeepAliveRetryTransportWrapper
+     */
+    private $wrapperRetries;
+
     public function setUp()
     {
         $this->message = new Message();
         $this->transport = $this->buildTransport();
-        $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport);
+        $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport, 1);
+        $this->wrapperRetries   = new KeepAliveRetryTransportWrapper($this->transport, 3);
+
     }
 
     public function testSendSuccess()
@@ -88,6 +95,30 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
             ));
 
         $this->wrapper->send($this->message);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     * @expectedExceptionMessage response is ''
+     */
+    public function testSendWithThreeRetries()
+    {
+        $expectedException1 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+        $expectedException2 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+        $expectedException3 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+        $expectedException4 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+
+        $this->transport->expects($this->exactly(4))
+            ->method('send')
+            ->with($this->message)
+            ->will($this->onConsecutiveCalls(
+                $this->throwException($expectedException1),
+                $this->throwException($expectedException2),
+                $this->throwException($expectedException3),
+                $this->throwException($expectedException4)
+            ));
+
+        $this->wrapperRetries->send($this->message);
     }
 
     /**
