@@ -17,13 +17,25 @@ class KeepAliveRetryTransportWrapper extends AbstractTransport
     protected $transport;
 
     /**
+     * @var int
+     */
+    protected $maxRetries;
+
+    /**
+     * @var int
+     */
+    protected $incrementedRetries = 0;
+
+    /**
      * KeepAliveRetryTransportWrapper constructor.
      *
      * @param TransportInterface $transport
      */
-    public function __construct(TransportInterface $transport)
+    public function __construct(TransportInterface $transport, int $maxRetries)
     {
         $this->transport = $transport;
+        $this->maxRetries = $maxRetries;
+
     }
 
     /**
@@ -43,13 +55,17 @@ class KeepAliveRetryTransportWrapper extends AbstractTransport
      */
     public function send(Message $message)
     {
+        $this->incrementedRetries++;
         try {
             return $this->transport->send($message);
         } catch (\RuntimeException $e) {
             if ($e->getMessage() !== self::NO_RESPONSE) {
                 throw $e;
             }
-            return $this->transport->send($message);
+            if($this->incrementedRetries === $this->maxRetries){
+                return $this->transport->send($message);
+            }
+            return $this->send($message);
         }
     }
 }
