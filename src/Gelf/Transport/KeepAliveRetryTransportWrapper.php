@@ -19,15 +19,15 @@ class KeepAliveRetryTransportWrapper extends AbstractTransport
     /**
      * KeepAliveRetryTransportWrapper constructor.
      *
-     * @param HttpTransport $transport
+     * @param TransportInterface $transport
      */
-    public function __construct(HttpTransport $transport)
+    public function __construct(TransportInterface $transport)
     {
         $this->transport = $transport;
     }
 
     /**
-     * @return HttpTransport
+     * @return TransportInterface
      */
     public function getTransport()
     {
