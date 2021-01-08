@@ -4,7 +4,9 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Message;
 use Gelf\TestCase;
+use Gelf\Transport\HttpTransport;
 use Gelf\Transport\KeepAliveRetryTransportWrapper;
+use Gelf\Transport\RetryTransportWrapper;
 use Gelf\Transport\TransportInterface;
 use \PHPUnit_Framework_MockObject_MockObject as MockObject;
 use RuntimeException;
@@ -25,7 +27,7 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
     private $message;
 
     /**
-     * @var TransportInterface|MockObject
+     * @var HttpTransport|MockObject
      */
     private $transport;
 
@@ -43,9 +45,8 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
     {
         $this->message = new Message();
         $this->transport = $this->buildTransport();
-        $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport, 1);
-        $this->wrapperRetries   = new KeepAliveRetryTransportWrapper($this->transport, 3);
-
+        $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport);
+//        $this->wrapperRetries   = new RetryTransportWrapper($this->transport, 3);
     }
 
     public function testSendSuccess()
@@ -99,30 +100,6 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
-     */
-    public function testSendWithThreeRetries()
-    {
-        $expectedException1 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
-        $expectedException2 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
-        $expectedException3 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
-        $expectedException4 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
-
-        $this->transport->expects($this->exactly(4))
-            ->method('send')
-            ->with($this->message)
-            ->will($this->onConsecutiveCalls(
-                $this->throwException($expectedException1),
-                $this->throwException($expectedException2),
-                $this->throwException($expectedException3),
-                $this->throwException($expectedException4)
-            ));
-
-        $this->wrapperRetries->send($this->message);
-    }
-
-    /**
-     * @expectedException RuntimeException
      * @expectedExceptionMessage foo
      */
     public function testSendFailWithUnmanagedException()
@@ -138,10 +115,10 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
     }
 
     /**
-     * @return MockObject|TransportInterface
+     * @return MockObject|HttpTransport
      */
     private function buildTransport()
     {
-        return $this->getMock("\\Gelf\\Transport\\HttpTransport");
+        return $this->createMock("\\Gelf\\Transport\\HttpTransport");
     }
 }
