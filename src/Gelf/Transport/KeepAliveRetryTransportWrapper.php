@@ -11,6 +11,9 @@ class KeepAliveRetryTransportWrapper extends RetryTransportWrapper
      */
     const NO_RESPONSE = "Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''";
 
+    /**
+     * @param HttpTransport $transport
+     */
     public function __construct(HttpTransport $transport)
     {
         parent::__construct($transport, 1, function (RuntimeException $e) {
