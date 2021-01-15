@@ -29,7 +29,7 @@ class RetryTransportWrapperTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
+     * @expectedExceptionMessage bar
      */
     public function testWithoutMatcher()
     {
@@ -53,7 +53,7 @@ class RetryTransportWrapperTest extends TestCase
 
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
+     * @expectedExceptionMessage bar
      */
     public function testWithMatcher()
     {
@@ -79,7 +79,7 @@ class RetryTransportWrapperTest extends TestCase
     
     /**
      * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
+     * @expectedExceptionMessage foo
      */
     public function testWithFalseMatcher()
     {
