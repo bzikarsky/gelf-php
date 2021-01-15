@@ -27,6 +27,12 @@ class RetryTransportWrapperTest extends TestCase
         $this->transport = $this->buildTransport();
     }
 
+    public function testGetTransport()
+    {
+        $wrapper = new RetryTransportWrapper($this->transport, 1, null);
+        $this->assertEquals($this->transport, $wrapper->getTransport());
+    }
+
     /**
      * @expectedException RuntimeException
      * @expectedExceptionMessage bar
