@@ -13,7 +13,7 @@ class RetryTransportWrapper extends AbstractTransport
     const NO_RESPONSE = "Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''";
 
     /**
-     * @var HttpTransport
+     * @var TransportInterface
      */
     protected $transport;
 
