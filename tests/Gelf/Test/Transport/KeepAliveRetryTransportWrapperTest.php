@@ -6,9 +6,7 @@ use Gelf\Message;
 use Gelf\TestCase;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\KeepAliveRetryTransportWrapper;
-use Gelf\Transport\RetryTransportWrapper;
-use Gelf\Transport\TransportInterface;
-use \PHPUnit_Framework_MockObject_MockObject as MockObject;
+use PHPUnit_Framework_MockObject_MockObject as MockObject;
 use RuntimeException;
 
 /**
@@ -36,17 +34,11 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
      */
     private $wrapper;
 
-    /**
-     * @var KeepAliveRetryTransportWrapper
-     */
-    private $wrapperRetries;
-
     public function setUp()
     {
         $this->message = new Message();
         $this->transport = $this->buildTransport();
         $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport);
-//        $this->wrapperRetries   = new RetryTransportWrapper($this->transport, 3);
     }
 
     public function testSendSuccess()
