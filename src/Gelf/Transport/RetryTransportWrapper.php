@@ -32,7 +32,7 @@ class RetryTransportWrapper extends AbstractTransport
      *
      * @param TransportInterface $transport
      * @param int $maxRetries
-     * @param callable|null $exceptionMatcher
+     * @param callable(\Throwable):bool $exceptionMatcher
      */
     public function __construct(TransportInterface $transport, $maxRetries, $exceptionMatcher = null)
     {
@@ -64,7 +64,7 @@ class RetryTransportWrapper extends AbstractTransport
             try {
                 $tries++;
                 return $this->transport->send($message);
-            } catch (RuntimeException $e) {
+            } catch (\Throwable $e) {
                 if ($this->maxRetries !== 0 && $tries > $this->maxRetries) {
                     throw $e;
                 }
