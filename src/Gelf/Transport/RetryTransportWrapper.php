@@ -64,7 +64,7 @@ class RetryTransportWrapper extends AbstractTransport
             try {
                 $tries++;
                 return $this->transport->send($message);
-            } catch (\Throwable $e) {
+            } catch (\Exception $e) {
                 if ($this->maxRetries !== 0 && $tries > $this->maxRetries) {
                     throw $e;
                 }
