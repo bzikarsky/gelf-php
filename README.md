@@ -71,7 +71,7 @@ How this applies in practice can be seen in the [advanced-example](https://githu
 
 If you use gelf-php in conjunction with monolog/symfony, the following snippet should help you with properly setting up your logging backend.
 
-Assumung you have a typical monolog config:
+Assuming you have a typical monolog config:
 
 ```yml
 monolog:
