@@ -27,7 +27,7 @@ class JsonEncoderTest extends TestCase
      */
     protected $encoder;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = $this->createMock('\\Gelf\\Message');
         $this->encoder = new JsonEncoder();
@@ -46,7 +46,7 @@ class JsonEncoderTest extends TestCase
 
         // check that there is JSON inside
         $data = json_decode($json, $assoc = true);
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
 
         // check that we have our data array
         $this->assertEquals($testData, $data);

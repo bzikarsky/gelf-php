@@ -13,6 +13,7 @@ namespace Gelf\Test;
 
 use Gelf\Publisher;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PublisherTest extends TestCase
 {
@@ -23,7 +24,7 @@ class PublisherTest extends TestCase
     protected $message;
     protected $publisher;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->transportA = $this->createMock('Gelf\Transport\TransportInterface');
         $this->transportB = $this->createMock('Gelf\Transport\TransportInterface');
@@ -50,11 +51,9 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testPublishErrorOnInvalid()
     {
+        $this->expectException(RuntimeException::class);
         $this->messageValidator->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(false));
@@ -62,11 +61,9 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testMissingTransport()
     {
+        $this->expectException(RuntimeException::class);
         $publisher = new Publisher(null, $this->messageValidator);
         $this->assertCount(0, $publisher->getTransports());
 

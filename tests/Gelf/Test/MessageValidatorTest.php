@@ -13,13 +13,14 @@ namespace Gelf\Test;
 
 use Gelf\MessageValidator;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class MessageValidatorTest extends TestCase
 {
 
     protected $messageValidator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->messageValidator = new MessageValidator();
     }
@@ -45,11 +46,9 @@ class MessageValidatorTest extends TestCase
         $this->assertTrue($this->messageValidator->validate($msg));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testInvalidVersion()
     {
+        $this->expectException(RuntimeException::class);
         $msg = $this->getMessage("lorem ipsum", "example.local", null);
         $this->messageValidator->validate($msg);
     }
@@ -61,7 +60,7 @@ class MessageValidatorTest extends TestCase
     {
         $msg = $this->getMessage(null, "example.local", $version);
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('short-message', $reason);
+        $this->assertStringContainsString('short-message', $reason);
     }
 
     /**
@@ -71,7 +70,7 @@ class MessageValidatorTest extends TestCase
     {
         $msg = $this->getMessage("lorem ipsum", null, $version);
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('host', $reason);
+        $this->assertStringContainsString('host', $reason);
     }
 
     public function testMissingVersion()
@@ -80,7 +79,7 @@ class MessageValidatorTest extends TestCase
 
         // direct into version validate, parent would throw invalid version
         $this->assertFalse($this->messageValidator->validate0100($msg, $r));
-        $this->assertContains('version', $r);
+        $this->assertStringContainsString('version', $r);
     }
 
     /**
@@ -96,7 +95,7 @@ class MessageValidatorTest extends TestCase
         );
 
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('id', $reason);
+        $this->assertStringContainsString('id', $reason);
     }
 
     public function testInvalidAddtionalKeyV11()
@@ -109,7 +108,7 @@ class MessageValidatorTest extends TestCase
         );
 
         $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('additional', $reason);
+        $this->assertStringContainsString('additional', $reason);
     }
 
     private function getMessage(

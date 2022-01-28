@@ -13,6 +13,7 @@ namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
 use Gelf\TestCase;
+use RuntimeException;
 
 class StreamSocketClientUdpTest extends TestCase
 {
@@ -27,7 +28,7 @@ class StreamSocketClientUdpTest extends TestCase
      */
     protected $serverSocket;
 
-    public function setUp()
+    public function setUp(): void
     {
         $host = "127.0.0.1";
         $this->serverSocket = stream_socket_server(
@@ -51,24 +52,22 @@ class StreamSocketClientUdpTest extends TestCase
         $this->socketClient = new StreamSocketClient('udp', $host, $port);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testInvalidConstructorArguments()
     {
+        $this->expectException(RuntimeException::class);
         $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
         $client->getSocket();
     }
 
     public function testGetSocket()
     {
-        $this->assertInternalType('resource', $this->socketClient->getSocket());
+        $this->assertIsResource($this->socketClient->getSocket());
     }
 
     public function testWrite()

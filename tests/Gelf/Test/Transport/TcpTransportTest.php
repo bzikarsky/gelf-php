@@ -42,7 +42,7 @@ class TcpTransportTest extends TestCase
 
     protected $testMessage;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 

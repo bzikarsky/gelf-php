@@ -30,7 +30,7 @@ class StreamSocketClientTcpTest extends TestCase
     protected $host = "127.0.0.1";
     protected $port;
 
-    public function setUp()
+    public function setUp(): void
     {
         $host = $this->host;
         $this->serverSocket = stream_socket_server(
@@ -54,7 +54,7 @@ class StreamSocketClientTcpTest extends TestCase
         $this->port = $port;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->socketClient);
         if ($this->serverSocket !== null) {
@@ -65,7 +65,7 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testGetSocket()
     {
-        $this->assertInternalType('resource', $this->socketClient->getSocket());
+        $this->assertIsResource($this->socketClient->getSocket());
     }
 
     public function testWrite()
@@ -82,11 +82,9 @@ class StreamSocketClientTcpTest extends TestCase
         $this->assertEquals($testData, $readData);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testBadWrite()
     {
+        $this->expectException(\RuntimeException::class);
         $this->socketClient->write("Hello ");
         fclose($this->serverSocket);
         $this->serverSocket = null;
@@ -239,22 +237,18 @@ class StreamSocketClientTcpTest extends TestCase
         $this->assertEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetContextFailsAfterConnect()
     {
+        $this->expectException(\LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 
         $this->socketClient->setContext(array("foo" => "bar"));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetConnectTimeoutFailsAfterConnect()
     {
+        $this->expectException(\LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 

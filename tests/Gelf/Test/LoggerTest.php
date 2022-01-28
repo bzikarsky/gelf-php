@@ -33,7 +33,7 @@ class LoggerTest extends TestCase
     protected $logger;
     protected $facility = "test-facility";
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->publisher = $this->createMock('\Gelf\PublisherInterface');
         $this->logger = new Logger($this->publisher, $this->facility);
@@ -154,11 +154,11 @@ class LoggerTest extends TestCase
         } catch (Exception $e) {
             $this->validatePublish(
                 function (MessageInterface $message) use ($e, $line, $test) {
-                    $test->assertContains(
+                    $test->assertStringContainsString(
                         $e->getMessage(),
                         $message->getFullMessage()
                     );
-                    $test->assertContains(
+                    $test->assertStringContainsString(
                         get_class($e),
                         $message->getFullMessage()
                     );

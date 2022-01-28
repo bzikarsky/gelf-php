@@ -21,7 +21,7 @@ class RetryTransportWrapperTest extends TestCase
      */
     private $transport;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
         $this->transport = $this->buildTransport();
@@ -33,12 +33,10 @@ class RetryTransportWrapperTest extends TestCase
         $this->assertEquals($this->transport, $wrapper->getTransport());
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage bar
-     */
     public function testWithoutMatcher()
     {
+        $this->expectExceptionMessage("bar");
+        $this->expectException(RuntimeException::class);
         $wrapper = new RetryTransportWrapper($this->transport, 1, null);
 
         $expectedException1 = new RuntimeException('foo');
@@ -57,12 +55,10 @@ class RetryTransportWrapperTest extends TestCase
         $this->assertEquals('', $bytes);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage bar
-     */
     public function testWithMatcher()
     {
+        $this->expectExceptionMessage("bar");
+        $this->expectException(RuntimeException::class);
         $wrapper = new RetryTransportWrapper($this->transport, 1, function (RuntimeException $e) {
             return true;
         });
@@ -82,13 +78,11 @@ class RetryTransportWrapperTest extends TestCase
 
         $this->assertEquals('', $bytes);
     }
-    
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage foo
-     */
+
     public function testWithFalseMatcher()
     {
+        $this->expectExceptionMessage("foo");
+        $this->expectException(RuntimeException::class);
         $wrapper = new RetryTransportWrapper($this->transport, 1, function (RuntimeException $e) {
             return false;
         });

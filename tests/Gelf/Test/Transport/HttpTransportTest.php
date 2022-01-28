@@ -48,7 +48,7 @@ class HttpTransportTest extends TestCase
 
     protected $testMessage;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
@@ -103,19 +103,15 @@ class HttpTransportTest extends TestCase
         $this->validateTransport($transport, 'localhost', 443, '/gelf', new SslOptions());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFromUrlConstructorInvalidUri()
     {
+        $this->expectException(\InvalidArgumentException::class);
         HttpTransport::fromUrl('-://:-');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFromUrlConstructorInvalidScheme()
     {
+        $this->expectException(\InvalidArgumentException::class);
         HttpTransport::fromUrl('ftp://foobar');
     }
 
@@ -207,12 +203,10 @@ class HttpTransportTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException        \RuntimeException
-     * @expectedExceptionMessage Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''
-     */
     public function testEmptyResponseException()
     {
+        $this->expectExceptionMessage("Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''");
+        $this->expectException(\RuntimeException::class);
         $this->transport->send($this->message);
     }
 
@@ -248,7 +242,7 @@ class HttpTransportTest extends TestCase
         $this->socketClient->expects($this->once())
             ->method("write")
             ->will($this->returnCallback(function ($data) use ($test) {
-                $test->assertContains("Authorization: Basic " . base64_encode("test:test"), $data);
+                $test->assertStringContainsString("Authorization: Basic " . base64_encode("test:test"), $data);
             }));
             
         $this->socketClient

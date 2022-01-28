@@ -65,7 +65,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * @param mixed $rawMessage
      * @param array $context
      */
-    public function log($level, $rawMessage, array $context = array())
+    public function log($level, $rawMessage, array $context = array()): void
     {
         $message = $this->initMessage($level, $rawMessage, $context);
 

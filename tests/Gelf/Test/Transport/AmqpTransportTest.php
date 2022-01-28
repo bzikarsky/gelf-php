@@ -45,7 +45,7 @@ class AmqpTransportTest extends TestCase
      */
     protected $queue;
 
-    public function setUp()
+    public function setUp(): void
     {
         if (!extension_loaded('amqp')) {
             $this->markTestSkipped('Requires ext-amqp');

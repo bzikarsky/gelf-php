@@ -39,7 +39,7 @@ class UdpTransportTest extends TestCase
 
     protected $testMessage;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
@@ -121,11 +121,9 @@ class UdpTransportTest extends TestCase
         $transport->send($this->message);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testInvalidChunkNumber()
     {
+        $this->expectException(\RuntimeException::class);
         $transport = $this->getTransport(UdpTransport::CHUNK_HEADER_LENGTH + 1);
         $transport->send($this->message);
     }

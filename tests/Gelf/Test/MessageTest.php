@@ -14,6 +14,7 @@ namespace Gelf\Test;
 use Gelf\Message;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use RuntimeException;
 
 class MessageTest extends TestCase
 {
@@ -23,7 +24,7 @@ class MessageTest extends TestCase
      */
     private $message;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
     }
@@ -73,19 +74,15 @@ class MessageTest extends TestCase
         $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testLevelInvalidString()
     {
+        $this->expectException(RuntimeException::class);
         $this->message->setLevel("invalid");
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testLevelInvalidInteger()
     {
+        $this->expectException(RuntimeException::class);
         $this->message->setLevel(8);
     }
 
@@ -96,19 +93,15 @@ class MessageTest extends TestCase
         $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr(1));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testLogLevelToPsrInvalidString()
     {
+        $this->expectException(RuntimeException::class);
         Message::logLevelToPsr("invalid");
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testLogLevelToPsrInvalidInt()
     {
+        $this->expectException(RuntimeException::class);
         Message::logLevelToPsr(-1);
     }
 
@@ -134,7 +127,7 @@ class MessageTest extends TestCase
 
     public function testAdditionals()
     {
-        $this->assertInternalType('array', $this->message->getAllAdditionals());
+        $this->assertIsArray($this->message->getAllAdditionals());
         $this->assertCount(0, $this->message->getAllAdditionals());
 
         $this->assertFalse($this->message->hasAdditional("foo"));
@@ -153,11 +146,9 @@ class MessageTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testSetAdditionalEmptyKey()
     {
+        $this->expectException(RuntimeException::class);
         $this->message->setAdditional("", "test");
     }
     public function testSetZeroKey()
@@ -167,11 +158,10 @@ class MessageTest extends TestCase
         $this->message->setAdditional($key, $value);
         $this->assertEquals($value, $this->message->getAdditional($key));
     }
-    /**
-     * @expectedException RuntimeException
-     */
+
     public function testGetAdditionalInvalidKey()
     {
+        $this->expectException(RuntimeException::class);
         $this->message->getAdditional("invalid");
     }
 
@@ -208,7 +198,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("bool-false", false);
         $this->message->setAdditional("int-zero", 0);
         $data = $this->message->toArray();
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
 
         // test additionals
         $this->assertArrayHasKey("_foo", $data);

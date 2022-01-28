@@ -34,7 +34,7 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
      */
     private $wrapper;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
         $this->transport = $this->buildTransport();
@@ -70,12 +70,10 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
         $this->assertEquals(self::SUCCESS_VALUE, $bytes);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
-     */
     public function testSendFailTwiceWithoutResponse()
     {
+        $this->expectExceptionMessage("response is ''");
+        $this->expectException(RuntimeException::class);
         $expectedException1 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
         $expectedException2 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
 
@@ -90,12 +88,10 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
         $this->wrapper->send($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage foo
-     */
     public function testSendFailWithUnmanagedException()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("foo");
         $expectedException = new RuntimeException('foo');
 
         $this->transport->expects($this->once())
