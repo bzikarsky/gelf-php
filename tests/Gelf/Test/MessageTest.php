@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -11,182 +12,155 @@
 
 namespace Gelf\Test;
 
+use DateTime;
 use Gelf\Message;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
+use RuntimeException;
 
 class MessageTest extends TestCase
 {
+    private Message $message;
 
-    /**
-     * @var Message
-     */
-    private $message;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
     }
 
-    public function testTimestamp()
+    public function testTimestamp(): void
     {
-        $this->assertLessThanOrEqual(microtime(true), $this->message->getTimestamp());
-        $this->assertGreaterThan(0, $this->message->getTimestamp());
+        self::assertLessThanOrEqual(microtime(true), $this->message->getTimestamp());
+        self::assertGreaterThan(0, $this->message->getTimestamp());
 
         $this->message->setTimestamp(123);
-        $this->assertEquals(123, $this->message->getTimestamp());
-
-        $this->message->setTimestamp("abc");
-        $this->assertEquals(0, $this->message->getTimestamp());
-
-        $this->message->setTimestamp("1.23");
-        $this->assertEquals(1.23, $this->message->getTimestamp());
+        self::assertEquals(123, $this->message->getTimestamp());
     }
 
-    public function testVersion()
+    public function testVersion(): void
     {
-        $this->assertEquals("1.0", $this->message->getVersion());
-        $this->assertEquals($this->message, $this->message->setVersion("1.1"));
-        $this->assertEquals("1.1", $this->message->getVersion());
+        self::assertEquals("1.0", $this->message->getVersion());
+        self::assertEquals($this->message, $this->message->setVersion("1.1"));
+        self::assertEquals("1.1", $this->message->getVersion());
     }
 
-    public function testHost()
+    public function testHost(): void
     {
         // default is current hostname
-        $this->assertEquals(gethostname(), $this->message->getHost());
+        self::assertEquals(gethostname(), $this->message->getHost());
 
         $this->message->setHost("example.local");
-        $this->assertEquals("example.local", $this->message->getHost());
+        self::assertEquals("example.local", $this->message->getHost());
     }
 
-    public function testLevel()
+    public function testLevel(): void
     {
-        $this->assertEquals(1, $this->message->getSyslogLevel());
-        $this->assertEquals(LogLevel::ALERT, $this->message->getLevel());
+        self::assertEquals(1, $this->message->getSyslogLevel());
+        self::assertEquals(LogLevel::ALERT, $this->message->getLevel());
 
         $this->message->setLevel(0);
-        $this->assertEquals(0, $this->message->getSyslogLevel());
-        $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
+        self::assertEquals(0, $this->message->getSyslogLevel());
+        self::assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
 
         $this->message->setLevel(LogLevel::EMERGENCY);
-        $this->assertEquals(0, $this->message->getSyslogLevel());
-        $this->assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
+        self::assertEquals(0, $this->message->getSyslogLevel());
+        self::assertEquals(LogLevel::EMERGENCY, $this->message->getLevel());
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testLevelInvalidString()
+    public function testLevelInvalidString(): void
     {
+        self::expectException(RuntimeException::class);
         $this->message->setLevel("invalid");
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
     public function testLevelInvalidInteger()
     {
+        self::expectException(RuntimeException::class);
         $this->message->setLevel(8);
     }
 
-    public function testLogLevelToPsr()
+    public function testLogLevelToPsr(): void
     {
-        $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr("alert"));
-        $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr("ALERT"));
-        $this->assertEquals(LogLevel::ALERT, Message::logLevelToPsr(1));
+        self::assertEquals(LogLevel::ALERT, Message::logLevelToPsr("alert"));
+        self::assertEquals(LogLevel::ALERT, Message::logLevelToPsr("ALERT"));
+        self::assertEquals(LogLevel::ALERT, Message::logLevelToPsr(1));
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testLogLevelToPsrInvalidString()
+    public function testLogLevelToPsrInvalidString(): void
     {
+        self::expectException(RuntimeException::class);
         Message::logLevelToPsr("invalid");
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testLogLevelToPsrInvalidInt()
+    public function testLogLevelToPsrInvalidInt(): void
     {
+        self::expectException(RuntimeException::class);
         Message::logLevelToPsr(-1);
     }
 
-    public function testOptionalMessageFields()
+    public function testOptionalMessageFields(): void
     {
-        $fields = array(
-            "Line",
-            "File",
-            "Facility",
-            "FullMessage",
-            "ShortMessage"
-        );
+        $fields = [
+            "Line" => 1337,
+            "File" => '/foo/bar.php',
+            "Facility" => 'test facility',
+            "FullMessage" => 'full message',
+            "ShortMessage" => 'short message'
+        ];
 
-        foreach ($fields as $field) {
+        foreach ($fields as $field => $value) {
             $g = "get$field";
             $s = "set$field";
-            $this->assertEmpty($this->message->$g());
+            self::assertEmpty($this->message->$g());
 
-            $this->message->$s("test");
-            $this->assertEquals("test", $this->message->$g());
+            $this->message->$s($value);
+            self::assertEquals($value, $this->message->$g());
         }
     }
 
-    public function testAdditionals()
+    public function testAdditionals(): void
     {
-        $this->assertInternalType('array', $this->message->getAllAdditionals());
-        $this->assertCount(0, $this->message->getAllAdditionals());
+        self::assertCount(0, $this->message->getAllAdditionals());
 
-        $this->assertFalse($this->message->hasAdditional("foo"));
+        self::assertFalse($this->message->hasAdditional("foo"));
         $this->message->setAdditional("foo", "bar");
-        $this->assertEquals("bar", $this->message->getAdditional("foo"));
-        $this->assertTrue($this->message->hasAdditional("foo"));
-        $this->assertCount(1, $this->message->getAllAdditionals());
+        self::assertEquals("bar", $this->message->getAdditional("foo"));
+        self::assertTrue($this->message->hasAdditional("foo"));
+        self::assertCount(1, $this->message->getAllAdditionals());
 
         $this->message->setAdditional("foo", "buk");
-        $this->assertEquals("buk", $this->message->getAdditional("foo"));
-        $this->assertCount(1, $this->message->getAllAdditionals());
+        self::assertEquals("buk", $this->message->getAdditional("foo"));
+        self::assertCount(1, $this->message->getAllAdditionals());
 
-        $this->assertEquals(
-            array("foo" => "buk"),
+        self::assertEquals(
+            ["foo" => "buk"],
             $this->message->getAllAdditionals()
         );
     }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testSetAdditionalEmptyKey()
+    
+    public function testSetAdditionalEmptyKey(): void
     {
+        self::expectException(RuntimeException::class);
         $this->message->setAdditional("", "test");
     }
-    public function testSetZeroKey()
+
+    public function testGetAdditionalInvalidKey(): void
     {
-        $key = 0;
-        $value = 'zero';
-        $this->message->setAdditional($key, $value);
-        $this->assertEquals($value, $this->message->getAdditional($key));
-    }
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testGetAdditionalInvalidKey()
-    {
+        self::expectException(RuntimeException::class);
         $this->message->getAdditional("invalid");
     }
 
-    public function testSetTimestamp()
+    public function testSetTimestamp(): void
     {
-        $dt = new \DateTime('@1393661544.3012');
+        $dt = new DateTime('@1393661544.3012');
         $this->message->setTimestamp($dt);
 
-        $this->assertEquals($dt->format("U.u"), $this->message->getTimestamp());
+        self::assertEquals($dt->format("U.u"), $this->message->getTimestamp());
     }
 
-    public function testMethodChaining()
+    public function testMethodChaining(): void
     {
         $message = $this->message
-            ->setTimestamp(new \DateTime())
+            ->setTimestamp(new DateTime())
             ->setAdditional("test", "value")
             ->setFacility("test")
             ->setHost("test")
@@ -198,29 +172,28 @@ class MessageTest extends TestCase
             ->setVersion("1.1")
         ;
 
-        $this->assertEquals($this->message, $message);
+        self::assertEquals($this->message, $message);
     }
 
-    public function testToArrayV10()
+    public function testToArrayV10(): void
     {
         $this->message->setAdditional("foo", "bar");
         $this->message->setAdditional("bool-true", true);
         $this->message->setAdditional("bool-false", false);
         $this->message->setAdditional("int-zero", 0);
         $data = $this->message->toArray();
-        $this->assertInternalType('array', $data);
 
         // test additionals
-        $this->assertArrayHasKey("_foo", $data);
-        $this->assertEquals("bar", $data["_foo"]);
-        $this->assertArrayHasKey("_bool-true", $data);
-        $this->assertTrue($data["_bool-true"]);
-        $this->assertArrayHasKey("_bool-false", $data);
-        $this->assertFalse($data["_bool-false"]);
-        $this->assertArrayHasKey("_int-zero", $data);
-        $this->assertEquals(0, $data["_int-zero"]);
+        self::assertArrayHasKey("_foo", $data);
+        self::assertEquals("bar", $data["_foo"]);
+        self::assertArrayHasKey("_bool-true", $data);
+        self::assertTrue($data["_bool-true"]);
+        self::assertArrayHasKey("_bool-false", $data);
+        self::assertFalse($data["_bool-false"]);
+        self::assertArrayHasKey("_int-zero", $data);
+        self::assertEquals(0, $data["_int-zero"]);
 
-        $map = array(
+        $map = [
             "version"       => "getVersion",
             "host"          => "getHost",
             "timestamp"     => "getTimestamp",
@@ -230,7 +203,7 @@ class MessageTest extends TestCase
             "file"          => "getFile",
             "facility"      => "getFacility",
             "level"         => "getSyslogLevel"
-        );
+        ];
 
         foreach ($map as $k => $method) {
             $r = $this->message->$method();
@@ -241,20 +214,19 @@ class MessageTest extends TestCase
                     $method,
                     $k
                 );
-                $this->assertFalse(array_key_exists($k, $data), $error);
+                self::assertArrayNotHasKey($k, $data, $error);
             } else {
-                $this->assertEquals($data[$k], $this->message->$method());
+                self::assertEquals($data[$k], $this->message->$method());
             }
         }
     }
 
-    public function testToArrayWithArrayData()
+    public function testToArrayWithArrayData(): void
     {
-        $this->message->setAdditional("foo", array("foo" => "bar"));
+        $this->message->setAdditional("foo", ["foo" => "bar"]);
         $data = $this->message->toArray();
-        $this->assertTrue(is_array($data));
 
-        $map = array(
+        $map = [
             "version"       => "getVersion",
             "host"          => "getHost",
             "timestamp"     => "getTimestamp",
@@ -264,7 +236,7 @@ class MessageTest extends TestCase
             "file"          => "getFile",
             "facility"      => "getFacility",
             "level"         => "getSyslogLevel"
-        );
+        ];
 
         foreach ($map as $k => $method) {
             $r = $this->message->$method();
@@ -275,14 +247,14 @@ class MessageTest extends TestCase
                     $method,
                     $k
                 );
-                $this->assertArrayNotHasKey($k, $data, $error);
+                self::assertArrayNotHasKey($k, $data, $error);
             } else {
-                $this->assertEquals($data[$k], $this->message->$method());
+                self::assertEquals($data[$k], $this->message->$method());
             }
         }
     }
 
-    public function testToArrayV11()
+    public function testToArrayV11(): void
     {
         $this->message->setVersion("1.1");
         $this->message->setShortMessage("lorem ipsum");
@@ -291,7 +263,7 @@ class MessageTest extends TestCase
         $this->message->setAdditional("bool-false", false);
         $this->message->setAdditional("int-zero", 0);
 
-        // check that deperacted behaviour is overridden in 1.1
+        // check that deprecated behaviour is overridden in 1.1
         $this->message->setLine(50);
         $this->message->setAdditional("line", 100);
 
@@ -299,24 +271,24 @@ class MessageTest extends TestCase
 
         $data = $this->message->toArray();
 
-        $this->assertSame('1.1', $data['version']);
-        $this->assertSame('lorem ipsum', $data['short_message']);
+        self::assertSame('1.1', $data['version']);
+        self::assertSame('lorem ipsum', $data['short_message']);
 
-        $this->assertArrayHasKey('_line', $data);
-        $this->assertSame(100, $data['_line']);
-        $this->assertArrayNotHasKey('line', $data);
+        self::assertArrayHasKey('_line', $data);
+        self::assertSame(100, $data['_line']);
+        self::assertArrayNotHasKey('line', $data);
 
-        $this->assertArrayHasKey('_file', $data);
-        $this->assertSame('foo/bar', $data['_file']);
-        $this->assertArrayNotHasKey('file', $data);
+        self::assertArrayHasKey('_file', $data);
+        self::assertSame('foo/bar', $data['_file']);
+        self::assertArrayNotHasKey('file', $data);
 
-        $this->assertArrayHasKey('_foo', $data);
-        $this->assertSame('bar', $data['_foo']);
-        $this->assertArrayHasKey("_bool-true", $data);
-        $this->assertTrue($data["_bool-true"]);
-        $this->assertArrayHasKey("_bool-false", $data);
-        $this->assertFalse($data["_bool-false"]);
-        $this->assertArrayHasKey("_int-zero", $data);
-        $this->assertEquals(0, $data["_int-zero"]);
+        self::assertArrayHasKey('_foo', $data);
+        self::assertSame('bar', $data['_foo']);
+        self::assertArrayHasKey("_bool-true", $data);
+        self::assertTrue($data["_bool-true"]);
+        self::assertArrayHasKey("_bool-false", $data);
+        self::assertFalse($data["_bool-false"]);
+        self::assertArrayHasKey("_int-zero", $data);
+        self::assertEquals(0, $data["_int-zero"]);
     }
 }

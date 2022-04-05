@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -21,101 +22,71 @@ interface MessageInterface
 {
     /**
      * Returns the GELF version of the message
-     *
-     * @return string
      */
-    public function getVersion();
+    public function getVersion(): ?string;
 
     /**
      * Returns the host of the message
-     *
-     * @return string
      */
-    public function getHost();
+    public function getHost(): ?string;
 
     /**
      * Returns the short text of the message
-     *
-     * @return string
      */
-    public function getShortMessage();
+    public function getShortMessage(): ?string;
 
     /**
      * Returns the full text of the message
-     *
-     * @return string
      */
-    public function getFullMessage();
+    public function getFullMessage(): ?string;
 
     /**
      * Returns the timestamp of the message
-     *
-     * @return float
      */
-    public function getTimestamp();
+    public function getTimestamp(): ?float;
 
     /**
      * Returns the log level of the message as a Psr\Log\Level-constant
-     *
-     * @return string
      */
-    public function getLevel();
+    public function getLevel(): ?string;
 
     /**
      * Returns the log level of the message as a numeric syslog level
-     *
-     * @return int
      */
-    public function getSyslogLevel();
+    public function getSyslogLevel(): ?int;
 
     /**
      * Returns the facility of the message
-     *
-     * @return string
      */
-    public function getFacility();
+    public function getFacility(): ?string;
 
     /**
      * Returns the file of the message
-     *
-     * @return string
      */
-    public function getFile();
+    public function getFile(): ?string;
 
     /**
-     * Returns the the line of the message
-     *
-     * @return string
+     * Returns the line of the message
      */
-    public function getLine();
+    public function getLine(): ?int;
 
     /**
      * Returns the value of the additional field of the message
-     *
-     * @param  string $key
-     * @return mixed
      */
-    public function getAdditional($key);
+    public function getAdditional(string $key): mixed;
 
     /**
-     * Checks if a additional fields is set
-     *
-     * @param  string $key
-     * @return bool
+     * Checks if an additional fields is set
      */
-    public function hasAdditional($key);
+    public function hasAdditional(string $key): bool;
 
     /**
      * Returns all additional fields as an array
-     *
-     * @return array
      */
-    public function getAllAdditionals();
+    public function getAllAdditionals(): array;
 
     /**
      * Converts the message to an array
-     *
-     * @return array
      */
-    public function toArray();
+    public function toArray(): array;
 }

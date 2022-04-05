@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -11,6 +12,7 @@
 
 namespace Gelf;
 
+use DateTimeInterface;
 use Psr\Log\LogLevel;
 use RuntimeException;
 
@@ -22,17 +24,17 @@ use RuntimeException;
  */
 class Message implements MessageInterface
 {
+    private ?string $version;
+    private ?string $host;
+    private ?float $timestamp;
+    private ?int $level;
 
-    protected $host;
-    protected $shortMessage;
-    protected $fullMessage;
-    protected $timestamp;
-    protected $level;
-    protected $facility;
-    protected $file;
-    protected $line;
-    protected $additionals = array();
-    protected $version;
+    private ?string $shortMessage = null;
+    private ?string $fullMessage = null;
+    private ?string $facility = null;
+    private ?string $file = null;
+    private ?int $line = null;
+    private array $additionals = [];
 
     /**
      * A list of the PSR LogLevel constants which is also a mapping of
@@ -40,7 +42,7 @@ class Message implements MessageInterface
      *
      * @var array
      */
-    private static $psrLevels = array(
+    private static array $psrLevels = [
         LogLevel::EMERGENCY,    // 0
         LogLevel::ALERT,        // 1
         LogLevel::CRITICAL,     // 2
@@ -49,7 +51,7 @@ class Message implements MessageInterface
         LogLevel::NOTICE,       // 5
         LogLevel::INFO,         // 6
         LogLevel::DEBUG         // 7
-    );
+    ];
 
     /**
      * Creates a new message
@@ -67,11 +69,8 @@ class Message implements MessageInterface
     /**
      * Trys to convert a given log-level (psr or syslog) to
      * the psr representation
-     *
-     * @param  mixed  $level
-     * @return string
      */
-    final public static function logLevelToPsr($level)
+    final public static function logLevelToPsr(int|string $level): string
     {
         $origLevel = $level;
 
@@ -95,11 +94,8 @@ class Message implements MessageInterface
     /**
      * Trys to convert a given log-level (psr or syslog) to
      * the syslog representation
-     *
-     * @param mxied
-     * @return integer
      */
-    final public static function logLevelToSyslog($level)
+    final public static function logLevelToSyslog(int|string $level): int
     {
         $origLevel = $level;
 
@@ -121,124 +117,124 @@ class Message implements MessageInterface
         );
     }
 
-    public function getVersion()
+    public function getVersion(): ?string
     {
         return $this->version;
     }
 
-    public function setVersion($version)
+    public function setVersion(?string $version): self
     {
         $this->version = $version;
 
         return $this;
     }
 
-    public function getHost()
+    public function getHost(): ?string
     {
         return $this->host;
     }
 
-    public function setHost($host)
+    public function setHost(?string $host): self
     {
         $this->host = $host;
 
         return $this;
     }
 
-    public function getShortMessage()
+    public function getShortMessage(): ?string
     {
         return $this->shortMessage;
     }
 
-    public function setShortMessage($shortMessage)
+    public function setShortMessage(?string $shortMessage): self
     {
         $this->shortMessage = $shortMessage;
 
         return $this;
     }
 
-    public function getFullMessage()
+    public function getFullMessage(): ?string
     {
         return $this->fullMessage;
     }
 
-    public function setFullMessage($fullMessage)
+    public function setFullMessage(?string $fullMessage): self
     {
         $this->fullMessage = $fullMessage;
 
         return $this;
     }
 
-    public function getTimestamp()
+    public function getTimestamp(): ?float
     {
         return (float) $this->timestamp;
     }
 
-    public function setTimestamp($timestamp)
+    public function setTimestamp(float|int|DateTimeInterface $timestamp): self
     {
-        if ($timestamp instanceof \DateTime || $timestamp instanceof \DateTimeInterface) {
+        if ($timestamp instanceof DateTimeInterface) {
             $timestamp = $timestamp->format("U.u");
         }
 
-        $this->timestamp = (float) $timestamp;
+        $this->timestamp = (float)$timestamp;
 
         return $this;
     }
 
-    public function getLevel()
+    public function getLevel(): ?string
     {
         return self::logLevelToPsr($this->level);
     }
 
-    public function getSyslogLevel()
+    public function getSyslogLevel(): ?int
     {
         return self::logLevelToSyslog($this->level);
     }
 
-    public function setLevel($level)
+    public function setLevel(string|int $level): self
     {
         $this->level = self::logLevelToSyslog($level);
 
         return $this;
     }
 
-    public function getFacility()
+    public function getFacility(): ?string
     {
         return $this->facility;
     }
 
-    public function setFacility($facility)
+    public function setFacility(?string $facility): self
     {
         $this->facility = $facility;
 
         return $this;
     }
 
-    public function getFile()
+    public function getFile(): ?string
     {
         return $this->file;
     }
 
-    public function setFile($file)
+    public function setFile(?string $file): self
     {
         $this->file = $file;
 
         return $this;
     }
 
-    public function getLine()
+    public function getLine(): ?int
     {
         return $this->line;
     }
 
-    public function setLine($line)
+    public function setLine(?int $line): self
     {
         $this->line = $line;
 
         return $this;
     }
 
-    public function getAdditional($key)
+    public function getAdditional(string $key): mixed
     {
         if (!isset($this->additionals[$key])) {
             throw new RuntimeException(
@@ -249,14 +245,13 @@ class Message implements MessageInterface
         return $this->additionals[$key];
     }
 
-    public function hasAdditional($key)
+    public function hasAdditional(string $key): bool
     {
         return isset($this->additionals[$key]);
     }
 
-    public function setAdditional($key, $value)
+    public function setAdditional(string $key, mixed $value): self
     {
-        $key = (string)$key;
         if ($key === '') {
             throw new RuntimeException("Additional field key cannot be empty");
         }
@@ -266,14 +261,14 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function getAllAdditionals()
+    public function getAllAdditionals(): array
     {
         return $this->additionals;
     }
 
-    public function toArray()
+    public function toArray(): array
     {
-        $message = array(
+        $message = [
             'version'       => $this->getVersion(),
             'host'          => $this->getHost(),
             'short_message' => $this->getShortMessage(),
@@ -283,12 +278,12 @@ class Message implements MessageInterface
             'facility'      => $this->getFacility(),
             'file'          => $this->getFile(),
             'line'          => $this->getLine()
-        );
+        ];
 
         // Transform 1.1 deprecated fields to additionals
         // Will be refactored for 2.0, see #23
         if ($this->getVersion() == "1.1") {
-            foreach (array('line', 'facility', 'file') as $idx) {
+            foreach (['line', 'facility', 'file'] as $idx) {
                 $message["_" . $idx] = $message[$idx];
                 unset($message[$idx]);
             }
