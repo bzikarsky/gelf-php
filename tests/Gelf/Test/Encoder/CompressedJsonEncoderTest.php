@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -12,30 +13,25 @@
 namespace Gelf\Test\Encoder;
 
 use Gelf\Encoder\CompressedJsonEncoder;
+use Gelf\Encoder\JsonEncoder;
+use Gelf\MessageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CompressedJsonEncoderTest extends TestCase
 {
+    private MockObject|MessageInterface $message;
+    private CompressedJsonEncoder $encoder;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $message;
-
-    /**
-     * @var CompressedJsonEncoder
-     */
-    protected $encoder;
-
-    public function setUp()
+    public function setUp(): void
     {
-        $this->message = $this->createMock('\\Gelf\\Message');
+        $this->message = $this->createMock(MessageInterface::class);
         $this->encoder = new CompressedJsonEncoder();
     }
 
     public function testEncode()
     {
-        $testData = array('foo' => 'bar');
+        $testData = ['foo' => 'bar'];
 
         $this->message
             ->expects($this->once())
@@ -49,11 +45,9 @@ class CompressedJsonEncoderTest extends TestCase
 
         // check that it's uncompressable
         $json = gzuncompress($bytes);
-        $this->assertInternalType('string', $json);
 
         // check that there is JSON inside
-        $data = json_decode($json, $assoc = true);
-        $this->assertInternalType('array', $data);
+        $data = json_decode($json, associative: true);
 
         // check that we have our data array
         $this->assertEquals($testData, $data);

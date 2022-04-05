@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -25,9 +26,6 @@ interface EncoderInterface
 
     /**
      * Encodes a given message
-     *
-     * @param  MessageInterface $message
-     * @return mixed
      */
-    public function encode(MessageInterface $message);
+    public function encode(MessageInterface $message): string;
 }

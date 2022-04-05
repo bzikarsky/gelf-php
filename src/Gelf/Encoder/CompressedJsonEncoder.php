@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -23,25 +24,16 @@ class CompressedJsonEncoder implements EncoderInterface
 {
     const DEFAULT_COMPRESSION_LEVEL = -1;
 
-    /**
-     * @var int
-     */
-    protected $compressionLevel;
-
-    /** @var JsonEncoder */
-    private $jsonEncoder;
+    private JsonEncoder $jsonEncoder;
 
     /**
      * Class constructor
      *
      * Allows the specification of the gzip compression-level
-     *
-     * @param int $compressionLevel
      */
     public function __construct(
-        $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL
+        private int $compressionLevel = self::DEFAULT_COMPRESSION_LEVEL
     ) {
-        $this->compressionLevel = $compressionLevel;
         $this->jsonEncoder = new JsonEncoder();
     }
 
@@ -51,7 +43,7 @@ class CompressedJsonEncoder implements EncoderInterface
      * @param  MessageInterface $message
      * @return string
      */
-    public function encode(MessageInterface $message)
+    public function encode(MessageInterface $message): string
     {
         $json = $this->jsonEncoder->encode($message);
 

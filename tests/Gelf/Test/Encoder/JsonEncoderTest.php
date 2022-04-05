@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -12,30 +13,24 @@
 namespace Gelf\Test\Encoder;
 
 use Gelf\Encoder\JsonEncoder;
+use Gelf\MessageInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class JsonEncoderTest extends TestCase
 {
+    private MockObject|MessageInterface $message;
+    private JsonEncoder $encoder;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $message;
-
-    /**
-     * @var CompressedJsonEncoder
-     */
-    protected $encoder;
-
-    public function setUp()
+    public function setUp(): void
     {
-        $this->message = $this->createMock('\\Gelf\\Message');
+        $this->message = $this->createMock(MessageInterface::class);
         $this->encoder = new JsonEncoder();
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
-        $testData = array('foo' => 'bar');
+        $testData = ['foo' => 'bar'];
 
         $this->message
             ->expects($this->once())
@@ -45,16 +40,15 @@ class JsonEncoderTest extends TestCase
         $json = $this->encoder->encode($this->message);
 
         // check that there is JSON inside
-        $data = json_decode($json, $assoc = true);
-        $this->assertInternalType('array', $data);
+        $data = json_decode($json, associative: true);
 
         // check that we have our data array
-        $this->assertEquals($testData, $data);
+        self::assertEquals($testData, $data);
     }
 
-    public function testUnicodeEncode()
+    public function testUnicodeEncode(): void
     {
-        $testData = array('foo' => 'бар');
+        $testData = ['foo' => 'бар'];
 
         $this->message
             ->expects($this->once())
@@ -63,11 +57,6 @@ class JsonEncoderTest extends TestCase
 
         $json = $this->encoder->encode($this->message);
 
-        if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
-            $this->assertEquals('{"foo":"бар"}', $json);
-        } else {
-            $this->assertEquals('{"foo":"\u0431\u0430\u0440"}', $json);
-        }
-
+        self::assertEquals('{"foo":"бар"}', $json);
     }
 }
