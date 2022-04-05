@@ -186,4 +186,19 @@ class LoggerTest extends TestCase
             $this->returnCallback($validator)
         );
     }
+
+    public function testDefaultContext(): void
+    {
+        $this->logger->setDefaultContext(['defaultFoo' => 'bar', 'defaultBar' => 'foo']);
+        $this->validatePublish(
+            function (MessageInterface $message) {
+                self::assertEquals("bar", $message->getAdditional('defaultFoo'));
+                self::assertEquals("baz", $message->getAdditional('defaultBar'));
+            }
+        );
+
+        $this->logger->log(5, 'test', [
+            'defaultBar' => 'baz'
+        ]);
+    }
 }
