@@ -180,18 +180,6 @@ class LoggerTest extends TestCase
         $this->logger->info('0');
     }
 
-    // @see https://github.com/bzikarsky/gelf-php/issues/9
-    public function testNumericZeroMessage(): void
-    {
-        $this->validatePublish(
-            function (MessageInterface $message) {
-                self::assertEquals(0, $message->getShortMessage());
-            }
-        );
-
-        $this->logger->alert(0);
-    }
-
     private function validatePublish(Closure $validator): void
     {
         $this->publisher->expects($this->once())->method('publish')->will(
