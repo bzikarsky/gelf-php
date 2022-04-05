@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -19,11 +20,7 @@ namespace Gelf;
 interface MessageValidatorInterface
 {
     /**
-     * Validate a the given message for validity.
-     *
-     * @param  MessageInterface $message
-     * @param  string           &$reason
-     * @return bool
+     * Validate a given message for validity.
      */
-    public function validate(MessageInterface $message, &$reason = "");
+    public function validate(MessageInterface $message, string &$reason = null): bool;
 }

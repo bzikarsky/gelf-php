@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -21,7 +22,7 @@ use RuntimeException;
  */
 class MessageValidator implements MessageValidatorInterface
 {
-    public function validate(MessageInterface $message, &$reason = "")
+    public function validate(MessageInterface $message, ?string &$reason = null): bool
     {
         switch ($message->getVersion()) {
             case "1.0":
@@ -40,12 +41,8 @@ class MessageValidator implements MessageValidatorInterface
 
     /**
      * Validates a message according to 1.0 standard
-     *
-     * @param  MessageInterface $message
-     * @param  string           &$reason reason for the validation fail
-     * @return bool
      */
-    public function validate0100(MessageInterface $message, &$reason = "")
+    public function validate0100(MessageInterface $message, ?string &$reason = null): bool
     {
         if (self::isEmpty($message->getHost())) {
             $reason = "host not set";
@@ -76,14 +73,10 @@ class MessageValidator implements MessageValidatorInterface
 
     /**
      * Validates a message according to 1.1 standard
-     *
-     * @param  MessageInterface $message
-     * @param  string           &$reason
-     * @return bool
      */
-    public function validate0101(MessageInterface $message, &$reason = "")
+    public function validate0101(MessageInterface $message, ?string &$reason = null): bool
     {
-        // 1.1 incorporates 1.0 validation standar
+        // 1.1 incorporates 1.0 validation standard
         if (!$this->validate0100($message, $reason)) {
             return false;
         }
@@ -107,12 +100,9 @@ class MessageValidator implements MessageValidatorInterface
      * to a non-empty message element
      *
      * Fails on null, false and empty strings
-     *
-     * @param  string $scalar
-     * @return bool
      */
-    public static function isEmpty($scalar)
+    public static function isEmpty(mixed $scalar): bool
     {
-        return strlen($scalar) < 1;
+        return strlen((string)$scalar) < 1;
     }
 }

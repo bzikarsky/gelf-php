@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -11,15 +12,16 @@
 
 namespace Gelf\Test;
 
+use Gelf\MessageInterface;
 use Gelf\MessageValidator;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class MessageValidatorTest extends TestCase
 {
+    private MessageValidator $messageValidator;
 
-    protected $messageValidator;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->messageValidator = new MessageValidator();
     }
@@ -27,29 +29,15 @@ class MessageValidatorTest extends TestCase
     /**
      * @dataProvider versions
      */
-    public function testValid($version)
+    public function testValid(string $version): void
     {
         $msg = $this->getMessage("lorem", "example.local", $version);
-        $this->assertTrue($this->messageValidator->validate($msg, $reason));
+        self::assertTrue($this->messageValidator->validate($msg, $reason));
     }
 
-    /**
-     * @dataProvider versions
-     */
-    public function testZeroMessagesValidates($version)
+    public function testInvalidVersion(): void
     {
-        $msg = $this->getMessage(0, "example.local", $version);
-        $this->assertTrue($this->messageValidator->validate($msg));
-
-        $msg = $this->getMessage("0", "example.local", $version);
-        $this->assertTrue($this->messageValidator->validate($msg));
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testInvalidVersion()
-    {
+        self::expectException(RuntimeException::class);
         $msg = $this->getMessage("lorem ipsum", "example.local", null);
         $this->messageValidator->validate($msg);
     }
@@ -57,68 +45,68 @@ class MessageValidatorTest extends TestCase
     /**
      * @dataProvider versions
      */
-    public function testMissingShortMessage($version)
+    public function testMissingShortMessage(string $version): void
     {
         $msg = $this->getMessage(null, "example.local", $version);
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('short-message', $reason);
+        self::assertFalse($this->messageValidator->validate($msg, $reason));
+        self::assertStringContainsString('short-message', $reason);
     }
 
     /**
      * @dataProvider versions
      */
-    public function testMissingHost($version)
+    public function testMissingHost(string $version): void
     {
         $msg = $this->getMessage("lorem ipsum", null, $version);
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('host', $reason);
+        self::assertFalse($this->messageValidator->validate($msg, $reason));
+        self::assertStringContainsString('host', $reason);
     }
 
-    public function testMissingVersion()
+    public function testMissingVersion(): void
     {
         $msg = $this->getMessage("lorem ipsum", "example.local", null);
 
         // direct into version validate, parent would throw invalid version
-        $this->assertFalse($this->messageValidator->validate0100($msg, $r));
-        $this->assertContains('version', $r);
+        self::assertFalse($this->messageValidator->validate0100($msg, $r));
+        self::assertStringContainsString('version', $r);
     }
 
     /**
      * @dataProvider versions
      */
-    public function testInvalidAddtionalFieldID($version)
+    public function testInvalidAddtionalFieldID(string $version): void
     {
         $msg = $this->getMessage(
             "lorem ipsum",
             "example.local",
             $version,
-            array('id' => 1)
+            ['id' => 1]
         );
 
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('id', $reason);
+        self::assertFalse($this->messageValidator->validate($msg, $reason));
+        self::assertStringContainsString('id', $reason);
     }
 
-    public function testInvalidAddtionalKeyV11()
+    public function testInvalidAddtionalKeyV11(): void
     {
         $msg = $this->getMessage(
             "lorem",
             "example.local",
             "1.1",
-            array('foo?' => 1)
+            ['foo?' => 1]
         );
 
-        $this->assertFalse($this->messageValidator->validate($msg, $reason));
-        $this->assertContains('additional', $reason);
+        self::assertFalse($this->messageValidator->validate($msg, $reason));
+        self::assertStringContainsString('additional', $reason);
     }
 
     private function getMessage(
-        $shortMessage = "lorem ipsum",
-        $host = "example.local",
-        $version = "1.0",
-        $additionals = array()
-    ) {
-        $msg = $this->createMock('Gelf\MessageInterface');
+        ?string $shortMessage = "lorem ipsum",
+        ?string $host = "example.local",
+        ?string $version = "1.0",
+        array $additionals = []
+    ): MessageInterface {
+        $msg = $this->createMock(MessageInterface::class);
         $msg->expects($this->any())->method('getHost')
             ->will($this->returnValue($host));
         $msg->expects($this->any())->method('getVersion')
@@ -139,8 +127,8 @@ class MessageValidatorTest extends TestCase
         return $msg;
     }
 
-    public static function versions()
+    public static function versions(): array
     {
-        return array(array('1.0'), array('1.1'));
+        return [['1.0'], ['1.1']];
     }
 }
