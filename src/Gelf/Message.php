@@ -24,10 +24,10 @@ use RuntimeException;
  */
 class Message implements MessageInterface
 {
-    private ?string $version;
-    private ?string $host;
-    private ?float $timestamp;
-    private ?int $level;
+    private string $version;
+    private string $host;
+    private float $timestamp;
+    private int $level;
 
     private ?string $shortMessage = null;
     private ?string $fullMessage = null;
@@ -67,7 +67,7 @@ class Message implements MessageInterface
      * Trys to convert a given log-level (psr or syslog) to
      * the psr representation
      */
-    final public static function logLevelToPsr(int|string $level): string
+    final public static function logLevelToPsr(int|string|null $level): string
     {
         $origLevel = $level;
 
@@ -84,7 +84,7 @@ class Message implements MessageInterface
         }
 
         throw new RuntimeException(
-            sprintf("Cannot convert log-level '%s' to psr-style", $origLevel)
+            sprintf("Cannot convert log-level '%s' to psr-style", $origLevel ?? '<null>')
         );
     }
 
@@ -92,7 +92,7 @@ class Message implements MessageInterface
      * Trys to convert a given log-level (psr or syslog) to
      * the syslog representation
      */
-    final public static function logLevelToSyslog(int|string $level): int
+    final public static function logLevelToSyslog(int|string|null $level): int
     {
         $origLevel = $level;
 
@@ -110,28 +110,28 @@ class Message implements MessageInterface
         }
 
         throw new RuntimeException(
-            sprintf("Cannot convert log-level '%s' to syslog-style", $origLevel)
+            sprintf("Cannot convert log-level '%s' to syslog-style", $origLevel ?? '<null>')
         );
     }
 
-    public function getVersion(): ?string
+    public function getVersion(): string
     {
         return $this->version;
     }
 
-    public function setVersion(?string $version): self
+    public function setVersion(string $version): self
     {
         $this->version = $version;
 
         return $this;
     }
 
-    public function getHost(): ?string
+    public function getHost(): string
     {
         return $this->host;
     }
 
-    public function setHost(?string $host): self
+    public function setHost(string $host): self
     {
         $this->host = $host;
 
@@ -162,9 +162,9 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function getTimestamp(): ?float
+    public function getTimestamp(): float
     {
-        return (float) $this->timestamp;
+        return $this->timestamp;
     }
 
     public function setTimestamp(float|int|DateTimeInterface $timestamp): self
@@ -178,12 +178,12 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function getLevel(): ?string
+    public function getLevel(): string
     {
         return self::logLevelToPsr($this->level);
     }
 
-    public function getSyslogLevel(): ?int
+    public function getSyslogLevel(): int
     {
         return self::logLevelToSyslog($this->level);
     }

@@ -67,7 +67,7 @@ class HttpTransport extends AbstractTransport
      * If a https URI is given, the provided SslOptions (with a fallback to
      * the default SslOptions) are used.
      */
-    public static function fromUrl(string $url, ?SslOptions $sslOptions = null): static
+    public static function fromUrl(string $url, ?SslOptions $sslOptions = null): self
     {
         $parsed = parse_url($url);
         
@@ -93,7 +93,7 @@ class HttpTransport extends AbstractTransport
          
         // merge defaults and real data and build transport
         $parsed = array_merge($defaults, $parsed);
-        $transport = new static($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
+        $transport = new self($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
 
         // add optional authentication
         if ($parsed['user']) {

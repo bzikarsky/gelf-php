@@ -15,6 +15,7 @@ namespace Gelf\Transport;
 use Gelf\MessageInterface as Message;
 use Gelf\Encoder\CompressedJsonEncoder as DefaultEncoder;
 use InvalidArgumentException;
+use LogicException;
 use RuntimeException;
 
 /**
@@ -94,6 +95,10 @@ class UdpTransport extends AbstractTransport
     {
         // split to chunks
         $chunks = str_split($rawMessage, $this->chunkSize - self::CHUNK_HEADER_LENGTH);
+        if ($chunks === false) {
+            throw new LogicException('Invalid chunk-size. Cannot chunk');
+        }
+
         $numChunks = count($chunks);
 
         if ($numChunks > self::CHUNK_MAX_COUNT) {

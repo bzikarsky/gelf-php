@@ -35,13 +35,6 @@ class MessageValidatorTest extends TestCase
         self::assertTrue($this->messageValidator->validate($msg, $reason));
     }
 
-    public function testInvalidVersion(): void
-    {
-        self::expectException(RuntimeException::class);
-        $msg = $this->getMessage("lorem ipsum", "example.local", null);
-        $this->messageValidator->validate($msg);
-    }
-
     /**
      * @dataProvider versions
      */
@@ -50,25 +43,6 @@ class MessageValidatorTest extends TestCase
         $msg = $this->getMessage(null, "example.local", $version);
         self::assertFalse($this->messageValidator->validate($msg, $reason));
         self::assertStringContainsString('short-message', $reason);
-    }
-
-    /**
-     * @dataProvider versions
-     */
-    public function testMissingHost(string $version): void
-    {
-        $msg = $this->getMessage("lorem ipsum", null, $version);
-        self::assertFalse($this->messageValidator->validate($msg, $reason));
-        self::assertStringContainsString('host', $reason);
-    }
-
-    public function testMissingVersion(): void
-    {
-        $msg = $this->getMessage("lorem ipsum", "example.local", null);
-
-        // direct into version validate, parent would throw invalid version
-        self::assertFalse($this->messageValidator->validate0100($msg, $r));
-        self::assertStringContainsString('version', $r);
     }
 
     /**

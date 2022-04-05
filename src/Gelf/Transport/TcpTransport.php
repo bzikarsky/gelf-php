@@ -96,7 +96,7 @@ class TcpTransport extends AbstractTransport
         return $this->socketClient->getConnectTimeout();
     }
 
-    public function setMessageEncoder(EncoderInterface $encoder): self
+    public function setMessageEncoder(EncoderInterface $encoder): static
     {
         if (!$encoder instanceof NoNullByteEncoderInterface) {
             throw new InvalidArgumentException(
@@ -104,6 +104,7 @@ class TcpTransport extends AbstractTransport
             );
         }
 
-        return parent::setMessageEncoder($encoder);
+        parent::setMessageEncoder($encoder);
+        return $this;
     }
 }

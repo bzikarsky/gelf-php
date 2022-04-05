@@ -23,12 +23,12 @@ interface MessageInterface
     /**
      * Returns the GELF version of the message
      */
-    public function getVersion(): ?string;
+    public function getVersion(): string;
 
     /**
      * Returns the host of the message
      */
-    public function getHost(): ?string;
+    public function getHost(): string;
 
     /**
      * Returns the short text of the message
@@ -43,17 +43,17 @@ interface MessageInterface
     /**
      * Returns the timestamp of the message
      */
-    public function getTimestamp(): ?float;
+    public function getTimestamp(): float;
 
     /**
      * Returns the log level of the message as a Psr\Log\Level-constant
      */
-    public function getLevel(): ?string;
+    public function getLevel(): string;
 
     /**
      * Returns the log level of the message as a numeric syslog level
      */
-    public function getSyslogLevel(): ?int;
+    public function getSyslogLevel(): int;
 
     /**
      * Returns the value of the additional field of the message

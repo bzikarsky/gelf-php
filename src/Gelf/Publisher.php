@@ -14,7 +14,6 @@ namespace Gelf;
 
 use Gelf\Transport\TransportInterface;
 use Gelf\MessageValidator as DefaultMessageValidator;
-use SplObjectStorage as Set;
 use RuntimeException;
 
 /**
@@ -25,7 +24,7 @@ use RuntimeException;
  */
 class Publisher implements PublisherInterface
 {
-    private Set $transports;
+    private array $transports = [];
     private MessageValidatorInterface $messageValidator;
 
     /**
@@ -35,7 +34,6 @@ class Publisher implements PublisherInterface
         ?TransportInterface $transport = null,
         ?MessageValidatorInterface $messageValidator = null
     ) {
-        $this->transports = new Set();
         $this->messageValidator = $messageValidator
             ?: new DefaultMessageValidator();
 
@@ -71,7 +69,7 @@ class Publisher implements PublisherInterface
      */
     public function addTransport(TransportInterface $transport): void
     {
-        $this->transports->attach($transport);
+        $this->transports[spl_object_hash($transport)] = $transport;
     }
 
     /**
@@ -81,7 +79,7 @@ class Publisher implements PublisherInterface
      */
     public function getTransports(): array
     {
-        return iterator_to_array($this->transports);
+        return array_values($this->transports);
     }
 
     /**

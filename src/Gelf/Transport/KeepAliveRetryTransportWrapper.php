@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Gelf\Transport;
 
 use RuntimeException;
+use Throwable;
 
 class KeepAliveRetryTransportWrapper extends RetryTransportWrapper
 {
@@ -12,8 +13,8 @@ class KeepAliveRetryTransportWrapper extends RetryTransportWrapper
 
     public function __construct(HttpTransport $transport)
     {
-        parent::__construct($transport, 1, function (RuntimeException $e) {
-            return $e->getMessage() === self::NO_RESPONSE;
+        parent::__construct($transport, 1, function (Throwable $e) {
+            return $e instanceof RuntimeException && $e->getMessage() === self::NO_RESPONSE;
         });
     }
 }

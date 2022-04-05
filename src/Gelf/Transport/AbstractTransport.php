@@ -35,7 +35,7 @@ abstract class AbstractTransport implements TransportInterface
     /**
      * Sets a message encoder
      */
-    public function setMessageEncoder(EncoderInterface $encoder): self
+    public function setMessageEncoder(EncoderInterface $encoder): static
     {
         $this->messageEncoder = $encoder;
 
