@@ -56,21 +56,6 @@ interface MessageInterface
     public function getSyslogLevel(): ?int;
 
     /**
-     * Returns the facility of the message
-     */
-    public function getFacility(): ?string;
-
-    /**
-     * Returns the file of the message
-     */
-    public function getFile(): ?string;
-
-    /**
-     * Returns the line of the message
-     */
-    public function getLine(): ?int;
-
-    /**
      * Returns the value of the additional field of the message
      */
     public function getAdditional(string $key): mixed;

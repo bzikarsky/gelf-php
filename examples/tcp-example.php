@@ -25,6 +25,5 @@ $message = new Gelf\Message();
 $message->setShortMessage("It works in TCP!")
         ->setLevel(\Psr\Log\LogLevel::ALERT)
         ->setFullMessage("There was a foo in bar")
-        ->setFacility("local8")
 ;
 $publisher->publish($message);

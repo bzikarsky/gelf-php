@@ -32,7 +32,6 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     public function __construct(
         PublisherInterface $publisher = null,
-        private ?string $facility = null,
         private array $defaultContext = []
     ) {
         // if no publisher is provided build a "default" publisher
@@ -71,22 +70,6 @@ class Logger extends AbstractLogger implements LoggerInterface
         $this->publisher = $publisher;
     }
 
-    /**
-     * Returns the faciilty-name used in GELF
-     */
-    public function getFacility(): ?string
-    {
-        return $this->facility;
-    }
-
-    /**
-     * Sets the facility for GELF messages
-     */
-    public function setFacility(?string $facility = null): void
-    {
-        $this->facility = $facility;
-    }
-
     public function getDefaultContext(): array
     {
         return $this->defaultContext;
@@ -111,7 +94,6 @@ class Logger extends AbstractLogger implements LoggerInterface
         $messageObj = new Message();
         $messageObj->setLevel($level);
         $messageObj->setShortMessage($message);
-        $messageObj->setFacility($this->facility);
 
         foreach ($this->getDefaultContext() as $key => $value) {
             $messageObj->setAdditional($key, $value);
@@ -163,8 +145,8 @@ class Logger extends AbstractLogger implements LoggerInterface
      */
     private function initExceptionData(Message $message, Exception $exception): void
     {
-        $message->setLine($exception->getLine());
-        $message->setFile($exception->getFile());
+        $message->setAdditional('line', $exception->getLine());
+        $message->setAdditional('file', $exception->getFile());
 
         $longText = "";
 

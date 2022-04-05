@@ -26,12 +26,11 @@ class LoggerTest extends TestCase
 {
     private MockObject|PublisherInterface $publisher;
     private Logger $logger;
-    private string $facility = "test-facility";
 
     public function setUp(): void
     {
         $this->publisher = $this->createMock(PublisherInterface::class);
-        $this->logger = new Logger($this->publisher, $this->facility);
+        $this->logger = new Logger($this->publisher);
     }
 
     public function testPublisher(): void
@@ -43,27 +42,12 @@ class LoggerTest extends TestCase
         self::assertEquals($newPublisher, $this->logger->getPublisher());
     }
 
-    public function testFacility(): void
-    {
-        self::assertEquals($this->facility, $this->logger->getFacility());
-
-        $newFacility = "foobar-facil";
-        $this->logger->setFacility($newFacility);
-        self::assertEquals($newFacility, $this->logger->getFacility());
-
-        $newFacility = null;
-        $this->logger->setFacility($newFacility);
-        self::assertEquals($newFacility, $this->logger->getFacility());
-    }
-
     public function testSimpleLog(): void
     {
-        $facility = $this->facility;
         $this->validatePublish(
-            function (MessageInterface $message) use ($facility) {
+            function (MessageInterface $message) {
                 self::assertEquals("test", $message->getShortMessage());
                 self::assertEquals(LogLevel::ALERT, $message->getLevel());
-                self::assertEquals($facility, $message->getFacility());
             }
         );
 
@@ -155,8 +139,8 @@ class LoggerTest extends TestCase
                         get_class($e),
                         $message->getFullMessage()
                     );
-                    self::assertEquals($line, $message->getLine());
-                    self::assertEquals(__FILE__, $message->getFile());
+                    self::assertEquals($line, $message->getAdditional('line'));
+                    self::assertEquals(__FILE__, $message->getAdditional('file'));
                 }
             );
 

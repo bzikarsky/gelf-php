@@ -31,9 +31,6 @@ class Message implements MessageInterface
 
     private ?string $shortMessage = null;
     private ?string $fullMessage = null;
-    private ?string $facility = null;
-    private ?string $file = null;
-    private ?int $line = null;
     private array $additionals = [];
 
     /**
@@ -63,7 +60,7 @@ class Message implements MessageInterface
         $this->timestamp = microtime(true);
         $this->host = gethostname();
         $this->level = 1; //ALERT
-        $this->version = "1.0";
+        $this->version = "1.1";
     }
 
     /**
@@ -198,42 +195,6 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function getFacility(): ?string
-    {
-        return $this->facility;
-    }
-
-    public function setFacility(?string $facility): self
-    {
-        $this->facility = $facility;
-
-        return $this;
-    }
-
-    public function getFile(): ?string
-    {
-        return $this->file;
-    }
-
-    public function setFile(?string $file): self
-    {
-        $this->file = $file;
-
-        return $this;
-    }
-
-    public function getLine(): ?int
-    {
-        return $this->line;
-    }
-
-    public function setLine(?int $line): self
-    {
-        $this->line = $line;
-
-        return $this;
-    }
-
     public function getAdditional(string $key): mixed
     {
         if (!isset($this->additionals[$key])) {
@@ -274,20 +235,8 @@ class Message implements MessageInterface
             'short_message' => $this->getShortMessage(),
             'full_message'  => $this->getFullMessage(),
             'level'         => $this->getSyslogLevel(),
-            'timestamp'     => $this->getTimestamp(),
-            'facility'      => $this->getFacility(),
-            'file'          => $this->getFile(),
-            'line'          => $this->getLine()
+            'timestamp'     => $this->getTimestamp()
         ];
-
-        // Transform 1.1 deprecated fields to additionals
-        // Will be refactored for 2.0, see #23
-        if ($this->getVersion() == "1.1") {
-            foreach (['line', 'facility', 'file'] as $idx) {
-                $message["_" . $idx] = $message[$idx];
-                unset($message[$idx]);
-            }
-        }
 
         // add additionals
         foreach ($this->getAllAdditionals() as $key => $value) {

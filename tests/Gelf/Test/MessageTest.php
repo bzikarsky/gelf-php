@@ -38,8 +38,6 @@ class MessageTest extends TestCase
 
     public function testVersion(): void
     {
-        self::assertEquals("1.0", $this->message->getVersion());
-        self::assertEquals($this->message, $this->message->setVersion("1.1"));
         self::assertEquals("1.1", $this->message->getVersion());
     }
 
@@ -100,9 +98,6 @@ class MessageTest extends TestCase
     public function testOptionalMessageFields(): void
     {
         $fields = [
-            "Line" => 1337,
-            "File" => '/foo/bar.php',
-            "Facility" => 'test facility',
             "FullMessage" => 'full message',
             "ShortMessage" => 'short message'
         ];
@@ -162,63 +157,14 @@ class MessageTest extends TestCase
         $message = $this->message
             ->setTimestamp(new DateTime())
             ->setAdditional("test", "value")
-            ->setFacility("test")
             ->setHost("test")
-            ->setFile("test")
             ->setFullMessage("testtest")
             ->setShortMessage("test")
             ->setLevel("ERROR")
-            ->setLine(1)
             ->setVersion("1.1")
         ;
 
         self::assertEquals($this->message, $message);
-    }
-
-    public function testToArrayV10(): void
-    {
-        $this->message->setAdditional("foo", "bar");
-        $this->message->setAdditional("bool-true", true);
-        $this->message->setAdditional("bool-false", false);
-        $this->message->setAdditional("int-zero", 0);
-        $data = $this->message->toArray();
-
-        // test additionals
-        self::assertArrayHasKey("_foo", $data);
-        self::assertEquals("bar", $data["_foo"]);
-        self::assertArrayHasKey("_bool-true", $data);
-        self::assertTrue($data["_bool-true"]);
-        self::assertArrayHasKey("_bool-false", $data);
-        self::assertFalse($data["_bool-false"]);
-        self::assertArrayHasKey("_int-zero", $data);
-        self::assertEquals(0, $data["_int-zero"]);
-
-        $map = [
-            "version"       => "getVersion",
-            "host"          => "getHost",
-            "timestamp"     => "getTimestamp",
-            "full_message"  => "getFullMessage",
-            "short_message" => "getShortMessage",
-            "line"          => "getLine",
-            "file"          => "getFile",
-            "facility"      => "getFacility",
-            "level"         => "getSyslogLevel"
-        ];
-
-        foreach ($map as $k => $method) {
-            $r = $this->message->$method();
-            if (empty($r)) {
-                $error = sprintf(
-                    "When method %s returns an empty value, " .
-                    "%s should not be in array",
-                    $method,
-                    $k
-                );
-                self::assertArrayNotHasKey($k, $data, $error);
-            } else {
-                self::assertEquals($data[$k], $this->message->$method());
-            }
-        }
     }
 
     public function testToArrayWithArrayData(): void
@@ -232,9 +178,6 @@ class MessageTest extends TestCase
             "timestamp"     => "getTimestamp",
             "full_message"  => "getFullMessage",
             "short_message" => "getShortMessage",
-            "line"          => "getLine",
-            "file"          => "getFile",
-            "facility"      => "getFacility",
             "level"         => "getSyslogLevel"
         ];
 
@@ -263,24 +206,10 @@ class MessageTest extends TestCase
         $this->message->setAdditional("bool-false", false);
         $this->message->setAdditional("int-zero", 0);
 
-        // check that deprecated behaviour is overridden in 1.1
-        $this->message->setLine(50);
-        $this->message->setAdditional("line", 100);
-
-        $this->message->setFile("foo/bar");
-
         $data = $this->message->toArray();
 
         self::assertSame('1.1', $data['version']);
         self::assertSame('lorem ipsum', $data['short_message']);
-
-        self::assertArrayHasKey('_line', $data);
-        self::assertSame(100, $data['_line']);
-        self::assertArrayNotHasKey('line', $data);
-
-        self::assertArrayHasKey('_file', $data);
-        self::assertSame('foo/bar', $data['_file']);
-        self::assertArrayNotHasKey('file', $data);
 
         self::assertArrayHasKey('_foo', $data);
         self::assertSame('bar', $data['_foo']);
