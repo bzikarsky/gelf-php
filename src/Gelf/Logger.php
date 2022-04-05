@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -15,6 +16,7 @@ use Gelf\Transport\UdpTransport;
 use Psr\Log\LoggerInterface;
 use Psr\Log\AbstractLogger;
 use Exception;
+use Stringable;
 
 /**
  * A basic PSR-3 compliant logger
@@ -23,127 +25,82 @@ use Exception;
  */
 class Logger extends AbstractLogger implements LoggerInterface
 {
-    /**
-     * @var string|null
-     */
-    protected $facility;
-
-    /**
-     * @var array
-     */
-    protected $defaultContext;
-
-    /**
-     * @var PublisherInterface
-     */
-    protected $publisher;
+    private PublisherInterface $publisher;
 
     /**
      * Creates a PSR-3 Logger for GELF/Graylog2
-     *
-     * @param PublisherInterface|null $publisher
-     * @param string|null $facility
-     * @param array $defaultContext
      */
     public function __construct(
         PublisherInterface $publisher = null,
-        $facility = null,
-        array $defaultContext = array()
+        private ?string $facility = null,
+        private array $defaultContext = []
     ) {
         // if no publisher is provided build a "default" publisher
         // which is logging via Gelf over UDP to localhost on the default port
-        $this->publisher = $publisher ?: new Publisher(new UdpTransport());
-
-        $this->setFacility($facility);
-        $this->setDefaultContext($defaultContext);
+        $this->publisher = $publisher ?? new Publisher(new UdpTransport());
     }
 
-    /**
-     * Publishes a given message and context with given level
-     *
-     * @param mixed $level
-     * @param mixed $rawMessage
-     * @param array $context
-     */
-    public function log($level, $rawMessage, array $context = array())
+    /** @inheritDoc */
+    public function log($level, string|Stringable $message, array $context = []): void
     {
-        $message = $this->initMessage($level, $rawMessage, $context);
+        $messageObj = $this->initMessage($level, $message, $context);
 
         // add exception data if present
         if (isset($context['exception'])
            && $context['exception'] instanceof Exception
         ) {
-            $this->initExceptionData($message, $context['exception']);
+            $this->initExceptionData($messageObj, $context['exception']);
         }
 
-        $this->publisher->publish($message);
+        $this->publisher->publish($messageObj);
     }
 
     /**
      * Returns the currently used publisher
-     *
-     * @return PublisherInterface
      */
-    public function getPublisher()
+    public function getPublisher(): PublisherInterface
     {
         return $this->publisher;
     }
 
     /**
      * Sets a new publisher
-     *
-     * @param PublisherInterface $publisher
      */
-    public function setPublisher(PublisherInterface $publisher)
+    public function setPublisher(PublisherInterface $publisher): void
     {
         $this->publisher = $publisher;
     }
 
     /**
      * Returns the faciilty-name used in GELF
-     *
-     * @return string|null
      */
-    public function getFacility()
+    public function getFacility(): ?string
     {
         return $this->facility;
     }
 
     /**
      * Sets the facility for GELF messages
-     *
-     * @param string|null $facility
      */
-    public function setFacility($facility = null)
+    public function setFacility(?string $facility = null): void
     {
         $this->facility = $facility;
     }
 
-    /**
-     * @return array
-     */
-    public function getDefaultContext()
+    public function getDefaultContext(): array
     {
         return $this->defaultContext;
     }
 
-    /**
-     * @param array $defaultContext
-     */
-    public function setDefaultContext($defaultContext)
+    public function setDefaultContext(array $defaultContext): void
     {
         $this->defaultContext = $defaultContext;
     }
 
     /**
      * Initializes message-object
-     *
-     * @param  mixed   $level
-     * @param  mixed   $message
-     * @param  array   $context
-     * @return Message
      */
-    protected function initMessage($level, $message, array $context)
+    private function initMessage(mixed $level, string|Stringable $message, array $context): Message
     {
         // assert that message is a string, and interpolate placeholders
         $message = (string) $message;
@@ -168,13 +125,10 @@ class Logger extends AbstractLogger implements LoggerInterface
 
     /**
      * Initializes context array, ensuring all values are string-safe
-     *
-     * @param array $context
-     * @return array
      */
-    protected function initContext($context)
+    private function initContext(array $context): array
     {
-        foreach ($context as $key => &$value) {
+        foreach ($context as &$value) {
             switch (gettype($value)) {
                 case 'string':
                 case 'integer':
@@ -205,12 +159,9 @@ class Logger extends AbstractLogger implements LoggerInterface
     }
 
     /**
-     * Initializes Exceptiondata with given message
-     *
-     * @param Message   $message
-     * @param Exception $exception
+     * Initializes Exception-data with given message
      */
-    protected function initExceptionData(Message $message, Exception $exception)
+    private function initExceptionData(Message $message, Exception $exception): void
     {
         $message->setLine($exception->getLine());
         $message->setFile($exception->getFile());
@@ -237,12 +188,8 @@ class Logger extends AbstractLogger implements LoggerInterface
      *
      * Reference implementation
      * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md#12-message
-     *
-     * @param mixed $message
-     * @param array $context
-     * @return string
      */
-    private static function interpolate($message, array $context)
+    private static function interpolate(string|Stringable $message, array $context): string
     {
         // build a replacement array with braces around the context keys
         $replace = array();
@@ -251,6 +198,6 @@ class Logger extends AbstractLogger implements LoggerInterface
         }
 
         // interpolate replacement values into the message and return
-        return strtr($message, $replace);
+        return strtr((string)$message, $replace);
     }
 }
