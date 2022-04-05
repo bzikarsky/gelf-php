@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -12,29 +13,22 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
-use Gelf\TestCase;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class StreamSocketClientUdpTest extends TestCase
 {
+    private StreamSocketClient $socketClient;
+    private mixed $serverSocket;
 
-    /**
-     * @var StreamSocketClient
-     */
-    protected $socketClient;
-
-    /**
-     * @var resource
-     */
-    protected $serverSocket;
-
-    public function setUp()
+    public function setUp(): void
     {
         $host = "127.0.0.1";
         $this->serverSocket = stream_socket_server(
             "udp://$host:0",
             $errNo,
             $errMsg,
-            $flags = STREAM_SERVER_BIND
+            flags: STREAM_SERVER_BIND
         );
 
         if (!$this->serverSocket) {
@@ -44,43 +38,42 @@ class StreamSocketClientUdpTest extends TestCase
         // get random port
         $socketName = stream_socket_get_name(
             $this->serverSocket,
-            $peerName = false
+            remote: false
         );
-        list(, $port) = explode(":", $socketName);
+        [, $port] = explode(":", $socketName);
 
-        $this->socketClient = new StreamSocketClient('udp', $host, $port);
+        $this->socketClient = new StreamSocketClient('udp', $host, (int)$port);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->socketClient);
         fclose($this->serverSocket);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testInvalidConstructorArguments()
+    public function testInvalidConstructorArguments(): void
     {
+        self::expectException(RuntimeException::class);
+
         $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
         $client->getSocket();
     }
 
-    public function testGetSocket()
+    public function testGetSocket(): void
     {
-        $this->assertInternalType('resource', $this->socketClient->getSocket());
+        self::assertIsResource($this->socketClient->getSocket());
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $testData = "Hello World!";
         $numBytes = $this->socketClient->write($testData);
 
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         // check that message is sent to server
         $readData = fread($this->serverSocket, $numBytes);
 
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
     }
 }

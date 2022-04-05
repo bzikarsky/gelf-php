@@ -1,44 +1,37 @@
 <?php
+declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
 use Gelf\Message;
-use Gelf\TestCase;
-use Gelf\Transport\AbstractTransport;
 use Gelf\Transport\RetryTransportWrapper;
+use Gelf\Transport\TransportInterface;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class RetryTransportWrapperTest extends TestCase
 {
-    /**
-     * @var Message
-     */
-    private $message;
+    private Message $message;
+    private TransportInterface|MockObject $transport;
 
-    /**
-     * @var AbstractTransport|MockObject
-     */
-    private $transport;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
-        $this->transport = $this->buildTransport();
+        $this->transport = $this->createMock(TransportInterface::class);
     }
 
-    public function testGetTransport()
+    public function testGetTransport(): void
     {
         $wrapper = new RetryTransportWrapper($this->transport, 1, null);
-        $this->assertEquals($this->transport, $wrapper->getTransport());
+        self::assertEquals($this->transport, $wrapper->getTransport());
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage bar
-     */
-    public function testWithoutMatcher()
+    public function testWithoutMatcher(): void
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("bar");
+
         $wrapper = new RetryTransportWrapper($this->transport, 1, null);
 
         $expectedException1 = new RuntimeException('foo');
@@ -54,18 +47,15 @@ class RetryTransportWrapperTest extends TestCase
 
         $bytes = $wrapper->send($this->message);
 
-        $this->assertEquals('', $bytes);
+        self::assertEquals('', $bytes);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage bar
-     */
-    public function testWithMatcher()
+    public function testWithMatcher(): void
     {
-        $wrapper = new RetryTransportWrapper($this->transport, 1, function (RuntimeException $e) {
-            return true;
-        });
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("bar");
+
+        $wrapper = new RetryTransportWrapper($this->transport, 1);
 
         $expectedException1 = new RuntimeException('foo');
         $expectedException2 = new RuntimeException('bar');
@@ -80,18 +70,14 @@ class RetryTransportWrapperTest extends TestCase
 
         $bytes = $wrapper->send($this->message);
 
-        $this->assertEquals('', $bytes);
+        self::assertEquals('', $bytes);
     }
-    
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage foo
-     */
-    public function testWithFalseMatcher()
+
+    public function testWithFalseMatcher(): void
     {
-        $wrapper = new RetryTransportWrapper($this->transport, 1, function (RuntimeException $e) {
-            return false;
-        });
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("foo");
+        $wrapper = new RetryTransportWrapper($this->transport, 1, fn () => false);
 
         $expectedException1 = new RuntimeException('foo');
 
@@ -102,14 +88,6 @@ class RetryTransportWrapperTest extends TestCase
 
         $bytes = $wrapper->send($this->message);
 
-        $this->assertEquals('', $bytes);
-    }
-
-    /**
-     * @return MockObject|AbstractTransport
-     */
-    private function buildTransport()
-    {
-        return $this->createMock("\\Gelf\\Transport\\AbstractTransport");
+        self::assertEquals('', $bytes);
     }
 }

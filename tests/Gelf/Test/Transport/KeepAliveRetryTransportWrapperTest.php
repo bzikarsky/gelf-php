@@ -1,83 +1,67 @@
 <?php
+declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
 use Gelf\Message;
-use Gelf\TestCase;
 use Gelf\Transport\HttpTransport;
 use Gelf\Transport\KeepAliveRetryTransportWrapper;
-use PHPUnit_Framework_MockObject_MockObject as MockObject;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 
-/**
- * @covers \Gelf\Transport\KeepAliveRetryTransportWrapper
- */
 class KeepAliveRetryTransportWrapperTest extends TestCase
 {
-    /**
-     * @const string
-     */
-    const SUCCESS_VALUE = "HTTP/1.1 202 Accepted\r\n\r\n";
+    private const FAILURE_MESSAGE
+        = "Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''";
 
-    /**
-     * @var Message
-     */
-    private $message;
+    private Message $message;
+    private HttpTransport|MockObject $transport;
+    private KeepAliveRetryTransportWrapper $wrapper;
 
-    /**
-     * @var HttpTransport|MockObject
-     */
-    private $transport;
-
-    /**
-     * @var KeepAliveRetryTransportWrapper
-     */
-    private $wrapper;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new Message();
-        $this->transport = $this->buildTransport();
+        $this->transport = $this->createMock(HttpTransport::class);
         $this->wrapper   = new KeepAliveRetryTransportWrapper($this->transport);
     }
 
-    public function testSendSuccess()
+    public function testSendSuccess(): void
     {
         $this->transport->expects($this->once())
             ->method('send')
             ->with($this->message)
-            ->will($this->returnValue(self::SUCCESS_VALUE));
+            ->will($this->returnValue(42));
 
         $bytes = $this->wrapper->send($this->message);
 
-        $this->assertEquals(self::SUCCESS_VALUE, $bytes);
+        self::assertEquals(42, $bytes);
     }
 
-    public function testSendSuccessAfterRetry()
+    public function testSendSuccessAfterRetry(): void
     {
-        $expectedException = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+        $expectedException = new RuntimeException(self::FAILURE_MESSAGE);
 
         $this->transport->expects($this->exactly(2))
             ->method('send')
             ->with($this->message)
             ->will($this->onConsecutiveCalls(
                 $this->throwException($expectedException),
-                $this->returnValue(self::SUCCESS_VALUE)
+                42
             ));
 
         $bytes = $this->wrapper->send($this->message);
 
-        $this->assertEquals(self::SUCCESS_VALUE, $bytes);
+        self::assertEquals(42, $bytes);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage response is ''
-     */
-    public function testSendFailTwiceWithoutResponse()
+    public function testSendFailTwiceWithoutResponse(): void
     {
-        $expectedException1 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
-        $expectedException2 = new RuntimeException(KeepAliveRetryTransportWrapper::NO_RESPONSE);
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage("response is ''");
+
+        $expectedException1 = new RuntimeException(self::FAILURE_MESSAGE);
+        $expectedException2 = new RuntimeException(self::FAILURE_MESSAGE);
 
         $this->transport->expects($this->exactly(2))
             ->method('send')
@@ -90,12 +74,11 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
         $this->wrapper->send($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage foo
-     */
-    public function testSendFailWithUnmanagedException()
+    public function testSendFailWithUnmanagedException(): void
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("foo");
+
         $expectedException = new RuntimeException('foo');
 
         $this->transport->expects($this->once())
@@ -104,13 +87,5 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
             ->willThrowException($expectedException);
 
         $this->wrapper->send($this->message);
-    }
-
-    /**
-     * @return MockObject|HttpTransport
-     */
-    private function buildTransport()
-    {
-        return $this->createMock("\\Gelf\\Transport\\HttpTransport");
     }
 }

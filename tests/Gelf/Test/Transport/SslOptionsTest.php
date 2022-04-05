@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -11,20 +12,20 @@
 
 namespace Gelf\Test\Transport;
 
-use Gelf\TestCase;
 use Gelf\Transport\SslOptions;
+use PHPUnit\Framework\TestCase;
 
 class SslOptionsTest extends TestCase
 {
-    public function testState()
+    public function testState(): void
     {
         $options = new SslOptions();
 
         // test sane defaults
-        $this->assertTrue($options->getVerifyPeer());
-        $this->assertFalse($options->getAllowSelfSigned());
-        $this->assertNull($options->getCaFile());
-        $this->assertNull($options->getCiphers());
+        self::assertTrue($options->getVerifyPeer());
+        self::assertFalse($options->getAllowSelfSigned());
+        self::assertNull($options->getCaFile());
+        self::assertNull($options->getCiphers());
 
         // test setters
         $options->setVerifyPeer(false);
@@ -32,49 +33,49 @@ class SslOptionsTest extends TestCase
         $options->setCaFile('/path/to/ca');
         $options->setCiphers('ALL:!ADH:@STRENGTH');
 
-        $this->assertFalse($options->getVerifyPeer());
-        $this->assertTrue($options->getAllowSelfSigned());
-        $this->assertEquals('/path/to/ca', $options->getCaFile());
-        $this->assertEquals('ALL:!ADH:@STRENGTH', $options->getCiphers());
+        self::assertFalse($options->getVerifyPeer());
+        self::assertTrue($options->getAllowSelfSigned());
+        self::assertEquals('/path/to/ca', $options->getCaFile());
+        self::assertEquals('ALL:!ADH:@STRENGTH', $options->getCiphers());
     }
 
-    public function testToStreamContext()
+    public function testToStreamContext(): void
     {
         $options = new SslOptions();
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        self::assertEquals([
+            'ssl' => [
                 'verify_peer' => true,
                 'allow_self_signed' => false,
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
 
         $options->setVerifyPeer(false);
         $options->setAllowSelfSigned(true);
         $options->setCaFile('/path/to/ca');
         $options->setCiphers('ALL:!ADH:@STRENGTH');
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        self::assertEquals([
+            'ssl' => [
                 'verify_peer' => false,
                 'allow_self_signed' => true,
                 'cafile' => '/path/to/ca',
                 'ciphers' => 'ALL:!ADH:@STRENGTH'
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
 
         $options->setCaFile(null);
         $options->setCiphers(null);
 
-        $this->assertEquals(array(
-            'ssl' => array(
+        self::assertEquals([
+            'ssl' => [
                 'verify_peer' => false,
                 'allow_self_signed' => true,
-            )
-        ), $options->toStreamContext());
+            ]
+        ], $options->toStreamContext());
     }
 
-    public function testToStreamContextWithHostname()
+    public function testToStreamContextWithHostname(): void
     {
         $options = new SslOptions();
         $peerNameKey = PHP_VERSION_ID < 50600 ? 'CN_match' : 'peer_name';
@@ -84,25 +85,25 @@ class SslOptionsTest extends TestCase
         $options->setVerifyPeer(false);
         $context = $options->toStreamContext($host);
 
-        $this->assertArrayHasKey('ssl', $context);
-        $this->assertArrayHasKey('SNI_enabled', $context['ssl']);
-        $this->assertArrayNotHasKey('CN_match', $context['ssl']);
-        $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
+        self::assertArrayHasKey('ssl', $context);
+        self::assertArrayHasKey('SNI_enabled', $context['ssl']);
+        self::assertArrayNotHasKey('CN_match', $context['ssl']);
+        self::assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        $this->assertEquals(true, $context['ssl']['SNI_enabled']);
-        $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
+        self::assertEquals(true, $context['ssl']['SNI_enabled']);
+        self::assertEquals($host, $context['ssl'][$sniPeerNameKey]);
 
 
         $options->setVerifyPeer(true);
         $context = $options->toStreamContext($host);
 
-        $this->assertArrayHasKey('ssl', $context);
-        $this->assertArrayHasKey('SNI_enabled', $context['ssl']);
-        $this->assertArrayHasKey($peerNameKey, $context['ssl']);
-        $this->assertArrayHasKey($sniPeerNameKey, $context['ssl']);
+        self::assertArrayHasKey('ssl', $context);
+        self::assertArrayHasKey('SNI_enabled', $context['ssl']);
+        self::assertArrayHasKey($peerNameKey, $context['ssl']);
+        self::assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        $this->assertEquals(true, $context['ssl']['SNI_enabled']);
-        $this->assertEquals($host, $context['ssl'][$peerNameKey]);
-        $this->assertEquals($host, $context['ssl'][$sniPeerNameKey]);
+        self::assertEquals(true, $context['ssl']['SNI_enabled']);
+        self::assertEquals($host, $context['ssl'][$peerNameKey]);
+        self::assertEquals($host, $context['ssl'][$sniPeerNameKey]);
     }
 }

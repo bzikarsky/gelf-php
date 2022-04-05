@@ -1,19 +1,21 @@
 <?php
+declare(strict_types=1);
 
 namespace Gelf\Test\Transport;
 
-use Gelf\Message;
-use Gelf\TestCase;
-use Gelf\Transport\AbstractTransport;
+use Gelf\MessageInterface;
 use Gelf\Transport\IgnoreErrorTransportWrapper;
-use \PHPUnit_Framework_MockObject_MockObject as MockObject;
+use Gelf\Transport\TransportInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class IgnoreErrorTransportWrapperTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $expectedMessage   = $this->buildMessage();
-        $expectedException = new \RuntimeException();
+        $expectedException = new RuntimeException();
 
         $transport = $this->buildTransport();
         $wrapper   = new IgnoreErrorTransportWrapper($transport);
@@ -26,23 +28,17 @@ class IgnoreErrorTransportWrapperTest extends TestCase
         $bytes = $wrapper->send($expectedMessage);
         $lastError = $wrapper->getLastError();
 
-        $this->assertEquals(0, $bytes);
-        $this->assertSame($expectedException, $lastError);
+        self::assertEquals(0, $bytes);
+        self::assertSame($expectedException, $lastError);
     }
 
-    /**
-     * @return MockObject|AbstractTransport
-     */
-    private function buildTransport()
+    private function buildTransport(): MockObject|TransportInterface
     {
-        return $this->createMock("\\Gelf\\Transport\\AbstractTransport");
+        return $this->createMock(TransportInterface::class);
     }
 
-    /**
-     * @return MockObject|Message
-     */
-    private function buildMessage()
+    private function buildMessage(): MockObject|MessageInterface
     {
-        return $this->createMock("\\Gelf\\Message");
+        return $this->createMock(MessageInterface::class);
     }
 }

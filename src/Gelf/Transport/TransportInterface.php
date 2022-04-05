@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -24,8 +25,7 @@ interface TransportInterface
     /**
      * Sends a Message over this transport.
      *
-     * @param Message $message
-     * @return int the number of bytes sent
+     * @return int an indicator over the amount sent (can be messages, packages, bytes,...)
      */
-    public function send(Message $message);
+    public function send(Message $message): int;
 }

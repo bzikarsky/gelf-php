@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -12,49 +13,39 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Transport\StreamSocketClient;
-use Gelf\TestCase;
+use LogicException;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class StreamSocketClientTcpTest extends TestCase
 {
+    private StreamSocketClient $socketClient;
+    private mixed $serverSocket;
 
-    /**
-     * @var StreamSocketClient
-     */
-    protected $socketClient;
+    private string $host = "127.0.0.1";
+    private int $port;
 
-    /**
-     * @var resource
-     */
-    protected $serverSocket;
-
-    protected $host = "127.0.0.1";
-    protected $port;
-
-    public function setUp()
+    public function setUp(): void
     {
         $host = $this->host;
-        $this->serverSocket = stream_socket_server(
-            "tcp://$host:0",
-            $errNo,
-            $errMsg
-        );
+        $this->serverSocket = stream_socket_server("tcp://$host:0");
 
         if (!$this->serverSocket) {
-            throw new \RuntimeException("Failed to create test-server-socket");
+            throw new RuntimeException("Failed to create test-server-socket");
         }
 
         // get random port
         $socketName = stream_socket_get_name(
             $this->serverSocket,
-            $peerName = false
+            remote: false
         );
-        list(, $port) = explode(":", $socketName);
+        [, $port] = explode(":", $socketName);
 
-        $this->socketClient = new StreamSocketClient('tcp', $host, $port);
-        $this->port = $port;
+        $this->socketClient = new StreamSocketClient('tcp', $host, (int)$port);
+        $this->port = (int)$port;
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->socketClient);
         if ($this->serverSocket !== null) {
@@ -63,37 +54,36 @@ class StreamSocketClientTcpTest extends TestCase
         }
     }
 
-    public function testGetSocket()
+    public function testGetSocket(): void
     {
-        $this->assertInternalType('resource', $this->socketClient->getSocket());
+        self::assertIsResource($this->socketClient->getSocket());
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $testData = "Hello World!";
         $numBytes = $this->socketClient->write($testData);
 
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         // check that message is sent to server
         $connection = stream_socket_accept($this->serverSocket);
         $readData = fread($connection, $numBytes);
 
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testBadWrite()
+    public function testBadWrite(): void
     {
+        self::expectException(RuntimeException::class);
+
         $this->socketClient->write("Hello ");
         fclose($this->serverSocket);
         $this->serverSocket = null;
         $this->socketClient->write("world!");
     }
 
-    public function testMultiWrite()
+    public function testMultiWrite(): void
     {
         // lower timeout for server-socket
         stream_set_timeout($this->serverSocket, 0, 100);
@@ -103,33 +93,33 @@ class StreamSocketClientTcpTest extends TestCase
         $testData = "First thing in the morning should be to check,";
 
         $numBytes = $this->socketClient->write($testData);
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         // open connection on server-socket
         $serverConnection = stream_socket_accept($this->serverSocket);
 
         $readData = fread($serverConnection, $numBytes);
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
 
         // -- second write
 
         $testData = "if we can write multiple times on the same socket";
 
         $numBytes = $this->socketClient->write($testData);
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         $readData = fread($serverConnection, $numBytes);
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
 
         fclose($serverConnection);
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $testData = "Hello Reader :)";
 
         $numBytes = $this->socketClient->write($testData);
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         // lower timeout for server-socket
         stream_set_timeout($this->serverSocket, 0, 100);
@@ -142,15 +132,15 @@ class StreamSocketClientTcpTest extends TestCase
         fclose($connection);
         $readData = $this->socketClient->read($numBytes);
 
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
     }
 
-    public function testReadContents()
+    public function testReadContents(): void
     {
         $testData = str_repeat("0123456789", mt_rand(1, 10));
 
         $numBytes = $this->socketClient->write($testData);
-        $this->assertEquals(strlen($testData), $numBytes);
+        self::assertEquals(strlen($testData), $numBytes);
 
         // lower timeout for server-socket
         stream_set_timeout($this->serverSocket, 0, 100);
@@ -164,64 +154,54 @@ class StreamSocketClientTcpTest extends TestCase
 
         $readData = $this->socketClient->read(1024);
 
-        $this->assertEquals($testData, $readData);
+        self::assertEquals($testData, $readData);
     }
 
-    public function testCloseWithoutConnectionWrite()
+    public function testCloseWithoutConnectionWrite(): void
     {
         // close unopened stream
         $this->socketClient->close();
-        $this->assertTrue($this->socketClient->isClosed());
+        self::assertTrue($this->socketClient->isClosed());
 
         $this->socketClient->write("abcd");
-        $this->assertFalse($this->socketClient->isClosed());
+        self::assertFalse($this->socketClient->isClosed());
         $client = stream_socket_accept($this->serverSocket);
-        $this->assertEquals("abcd", fread($client, 4));
+        self::assertEquals("abcd", fread($client, 4));
     }
 
-    public function testCloseWrite()
+    public function testCloseWrite(): void
     {
         $this->socketClient->write("abcd");
-        $this->assertFalse($this->socketClient->isClosed());
+        self::assertFalse($this->socketClient->isClosed());
         $client = stream_socket_accept($this->serverSocket);
-        $this->assertEquals("abcd", fread($client, 4));
+        self::assertEquals("abcd", fread($client, 4));
 
         $this->socketClient->close();
-        $this->assertTrue($this->socketClient->isClosed());
+        self::assertTrue($this->socketClient->isClosed());
 
         $this->socketClient->write("efgh");
         $client2 = stream_socket_accept($this->serverSocket);
-        $this->assertEquals("efgh", fread($client2, 4));
+        self::assertEquals("efgh", fread($client2, 4));
     }
 
-    /**
-     * @group hhvm-failures
-     */
-    public function testStreamContext()
+    public function testStreamContext(): void
     {
-        $this->failsOnHHVM();
-
         $testName = '127.0.0.1:12345';
-        $context = array(
-            'socket' => array(
+        $context = [
+            'socket' => [
                 'bindto' => $testName
-            )
-        );
+            ]
+        ];
 
         $client = new StreamSocketClient("tcp", $this->host, $this->port, $context);
-        $this->assertEquals($context, $client->getContext());
+        self::assertEquals($context, $client->getContext());
 
-        $this->assertEquals($testName, stream_socket_get_name($client->getSocket(), false));
-        $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+        self::assertEquals($testName, stream_socket_get_name($client->getSocket(), false));
+        self::assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
     }
 
-    /**
-     * @group hhvm-failures
-     */
-    public function testUpdateStreamContext()
+    public function testUpdateStreamContext(): void
     {
-        $this->failsOnHHVM();
-
         $testName = '127.0.0.1:12345';
         $context = array(
             'socket' => array(
@@ -229,32 +209,28 @@ class StreamSocketClientTcpTest extends TestCase
             )
         );
 
-        $this->assertEquals(array(), $this->socketClient->getContext());
-        $this->assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+        self::assertEquals(array(), $this->socketClient->getContext());
+        self::assertNotEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
         $this->socketClient->close();
 
         $this->socketClient->setContext($context);
-        $this->assertEquals($context, $this->socketClient->getContext());
+        self::assertEquals($context, $this->socketClient->getContext());
 
-        $this->assertEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
+        self::assertEquals($testName, stream_socket_get_name($this->socketClient->getSocket(), false));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testSetContextFailsAfterConnect()
+    public function testSetContextFailsAfterConnect(): void
     {
+        self::expectException(LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 
         $this->socketClient->setContext(array("foo" => "bar"));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
-    public function testSetConnectTimeoutFailsAfterConnect()
+    public function testSetConnectTimeoutFailsAfterConnect(): void
     {
+        self::expectException(LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 
@@ -263,8 +239,7 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testConnectTimeout()
     {
-        $this->assertEquals(StreamSocketClient::SOCKET_TIMEOUT, $this->socketClient->getConnectTimeout());
         $this->socketClient->setConnectTimeout(1);
-        $this->assertEquals(1, $this->socketClient->getConnectTimeout());
+        self::assertEquals(1, $this->socketClient->getConnectTimeout());
     }
 }

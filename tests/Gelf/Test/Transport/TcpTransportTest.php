@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -12,47 +13,37 @@
 namespace Gelf\Test\Transport;
 
 use Gelf\Encoder\CompressedJsonEncoder;
+use Gelf\Encoder\EncoderInterface;
 use Gelf\Encoder\JsonEncoder;
+use Gelf\Encoder\NoNullByteEncoderInterface;
+use Gelf\MessageInterface;
+use Gelf\Transport\StreamSocketClient;
 use Gelf\Transport\TcpTransport;
 use Gelf\Transport\SslOptions;
+use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionObject;
 
 class TcpTransportTest extends TestCase
 {
+    private MockObject|StreamSocketClient $socketClient;
+    private MockObject|MessageInterface $message;
+    private MockObject|EncoderInterface $encoder;
+    private TcpTransport $transport;
+    private string $testMessage;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $socketClient;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $message;
-
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $encoder;
-
-    /**
-     * @var TcpTransport
-     */
-    protected $transport;
-
-    protected $testMessage;
-
-    public function setUp()
+    public function setUp(): void
     {
         $this->testMessage = str_repeat("0123456789", 30); // 300 char string
 
-        $this->socketClient = $this->getMockBuilder("\\Gelf\\Transport\\StreamSocketClient")
+        $this->socketClient = $this->getMockBuilder(StreamSocketClient::class)
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->message = $this->createMock("\\Gelf\\Message");
+        $this->message = $this->createMock(MessageInterface::class);
 
         // create an encoder always return $testMessage
-        $this->encoder = $this->createMock("\\Gelf\\Encoder\\NoNullByteEncoderInterface");
+        $this->encoder = $this->createMock(NoNullByteEncoderInterface::class);
         $this->encoder->expects($this->any())->method('encode')->will(
             $this->returnValue($this->testMessage)
         );
@@ -60,15 +51,15 @@ class TcpTransportTest extends TestCase
         $this->transport = $this->getTransport();
     }
 
-    protected function getTransport()
+    private function getTransport(): TcpTransport
     {
         // initialize transport with an unlimited packet-size
         // and the mocked message encoder
-        $transport = new TcpTransport(null, null);
+        $transport = new TcpTransport("", 0);
         $transport->setMessageEncoder($this->encoder);
 
         // replace internal stream socket client with our mock
-        $reflectedTransport = new \ReflectionObject($transport);
+        $reflectedTransport = new ReflectionObject($transport);
         $reflectedClient = $reflectedTransport->getProperty('socketClient');
         $reflectedClient->setAccessible(true);
         $reflectedClient->setValue($transport, $this->socketClient);
@@ -76,7 +67,7 @@ class TcpTransportTest extends TestCase
         return $transport;
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $transport = new TcpTransport();
         $this->validateTransport($transport, '127.0.0.1', 12201);
@@ -95,51 +86,42 @@ class TcpTransportTest extends TestCase
         $host,
         $port,
         $sslOptions = null
-    ) {
-        $r = new \ReflectionObject($transport);
+    ): void {
+        $r = new ReflectionObject($transport);
 
-        foreach (array('host', 'port', 'sslOptions') as $test) {
+        foreach (['host' => $host, 'port' => $port, 'sslOptions' => $sslOptions] as $test => $value) {
             $p = $r->getProperty($test);
             $p->setAccessible(true);
-            $this->assertEquals(${$test}, $p->getValue($transport));
+            self::assertEquals($value, $p->getValue($transport));
         }
     }
 
-    public function testSslOptionsAreUsed()
+    public function testSslOptionsAreUsed(): void
     {
-        $sslOptions = $this->createMock('\\Gelf\\Transport\\SslOptions');
+        $sslOptions = $this->createMock(SslOptions::class);
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
-            ->will($this->returnValue(array('ssl' => null)));
+            ->will($this->returnValue(['ssl' => null]));
 
-        $transport = new TcpTransport("localhost", "12202", $sslOptions);
+        $transport = new TcpTransport("localhost", 12202, $sslOptions);
 
-        $reflectedTransport = new \ReflectionObject($transport);
+        $reflectedTransport = new ReflectionObject($transport);
         $reflectedGetContext = $reflectedTransport->getMethod('getContext');
         $reflectedGetContext->setAccessible(true);
         $context = $reflectedGetContext->invoke($transport);
 
-        $this->assertEquals(array('ssl' => null), $context);
+        self::assertEquals(['ssl' => null], $context);
     }
 
-    public function testSetEncoder()
+    public function testSetEncoder(): void
     {
-        $encoder = $this->createMock('\\Gelf\\Encoder\\NoNullByteEncoderInterface');
+        $encoder = $this->createMock(NoNullByteEncoderInterface::class);
         $this->transport->setMessageEncoder($encoder);
 
-        $this->assertEquals($encoder, $this->transport->getMessageEncoder());
+        self::assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 
-    public function testGetEncoder()
-    {
-        $transport = new TcpTransport();
-        $this->assertInstanceOf(
-            "\\Gelf\\Encoder\\EncoderInterface",
-            $transport->getMessageEncoder()
-        );
-    }
-
-    public function testSend()
+    public function testSend(): void
     {
         $this->socketClient
             ->expects($this->once())
@@ -151,14 +133,14 @@ class TcpTransportTest extends TestCase
         $this->transport->send($this->message);
     }
 
-    public function testConnectTimeout()
+    public function testConnectTimeout(): void
     {
         $this->socketClient
             ->expects($this->once())
             ->method('getConnectTimeout')
             ->will($this->returnValue(123));
 
-        $this->assertEquals(123, $this->transport->getConnectTimeout());
+        self::assertEquals(123, $this->transport->getConnectTimeout());
 
         $this->socketClient
             ->expects($this->once())
@@ -168,26 +150,21 @@ class TcpTransportTest extends TestCase
         $this->transport->setConnectTimeout(123);
     }
 
-    public function testNonNullSafeEncoderFails()
+    public function testNonNullSafeEncoderFails(): void
     {
-        $this->expectException('InvalidArgumentException');
+        self::expectException(InvalidArgumentException::class);
         $this->transport->setMessageEncoder(new CompressedJsonEncoder());
     }
 
-    public function testSafeEncoderSucceeds()
+    public function testSafeEncoderSucceeds(): void
     {
-        $this->assertInstanceOf(
-            "Gelf\Encoder\NoNullByteEncoderInterface",
-            $this->transport->getMessageEncoder()
-        );
-
         $encoder = new JsonEncoder();
-        $this->assertInstanceOf(
-            "Gelf\Encoder\NoNullByteEncoderInterface",
+        self::assertInstanceOf(
+            NoNullByteEncoderInterface::class,
             $encoder
         );
 
         $this->transport->setMessageEncoder($encoder);
-        $this->assertEquals($encoder, $this->transport->getMessageEncoder());
+        self::assertEquals($encoder, $this->transport->getMessageEncoder());
     }
 }

@@ -27,76 +27,29 @@ use RuntimeException;
  */
 class HttpTransport extends AbstractTransport
 {
-    const DEFAULT_HOST = "127.0.0.1";
-    const DEFAULT_PORT = 12202;
-    const DEFAULT_PATH = "/gelf";
-    
-    const AUTO_SSL_PORT = 443;
-    
-    /**
-     * @var string
-     */
-    protected $host;
+    private const DEFAULT_HOST = "127.0.0.1";
+    private const DEFAULT_PORT = 12202;
+    private const DEFAULT_PATH = "/gelf";
+    private const AUTO_SSL_PORT = 443;
 
-    /**
-     * @var int
-     */
-    protected $port;
+    private StreamSocketClient $socketClient;
 
-    /**
-     * @var string
-     */
-    protected $path;
+    private ?string $authentication = null;
+    private ?string $proxyUri = null;
+    private ?bool $requestFullUri = false;
 
-    /**
-     * @var StreamSocketClient
-     */
-    protected $socketClient;
-
-    /**
-     * @var SslOptions|null
-     */
-    protected $sslOptions = null;
-
-    /**
-     * @var string|null
-     */
-    protected $authentication = null;
-
-    /**
-     * @var string|null
-     */
-    protected $proxyUri = null;
-
-    /**
-     * @var bool
-     */
-    protected $requestFullUri = false;
-
-    /**
-     * Class constructor
-     *
-     * @param string|null     $host       when NULL or empty default-host is used
-     * @param int|null        $port       when NULL or empty default-port is used
-     * @param string|null     $path       when NULL or empty default-path is used
-     * @param SslOptions|null $sslOptions when null not SSL is used
-     */
     public function __construct(
-        $host = self::DEFAULT_HOST,
-        $port = self::DEFAULT_PORT,
-        $path = self::DEFAULT_PATH,
-        SslOptions $sslOptions = null
+        private string $host = self::DEFAULT_HOST,
+        private int $port = self::DEFAULT_PORT,
+        private string $path = self::DEFAULT_PATH,
+        private ?SslOptions $sslOptions = null
     ) {
-        $this->host = $host;
-        $this->port = $port;
-        $this->path = $path;
+        parent::__construct();
 
-        if ($port == self::AUTO_SSL_PORT && $sslOptions == null) {
-            $sslOptions = new SslOptions();
+        if ($port == self::AUTO_SSL_PORT && $sslOptions === null) {
+            $this->sslOptions = new SslOptions();
         }
 
-        $this->sslOptions = $sslOptions;
-        $this->messageEncoder = new DefaultEncoder();
         $this->socketClient = new StreamSocketClient(
             $this->getScheme(),
             $this->host,
@@ -113,13 +66,8 @@ class HttpTransport extends AbstractTransport
      * If a username but no password is given, and empty password is used.
      * If a https URI is given, the provided SslOptions (with a fallback to
      * the default SslOptions) are used.
-     *
-     * @param  string          $url
-     * @param  SslOptions|null $sslOptions
-     *
-     * @return HttpTransport
      */
-    public static function fromUrl($url, SslOptions $sslOptions = null)
+    public static function fromUrl(string $url, ?SslOptions $sslOptions = null): static
     {
         $parsed = parse_url($url);
         
@@ -130,12 +78,12 @@ class HttpTransport extends AbstractTransport
         
         // check it's http or https
         $scheme = strtolower($parsed['scheme']);
-        if (!in_array($scheme, array('http', 'https'))) {
+        if (!in_array($scheme, ['http', 'https'])) {
             throw new \InvalidArgumentException("$url is not a valid http/https URL");
         }
 
         // setup defaults
-        $defaults = array('port' => 80, 'path' => '', 'user' => null, 'pass' => '');
+        $defaults = ['port' => 80, 'path' => '', 'user' => null, 'pass' => ''];
 
         // change some defaults for https
         if ($scheme == 'https') {
@@ -157,22 +105,16 @@ class HttpTransport extends AbstractTransport
 
     /**
      * Sets HTTP basic authentication
-     *
-     * @param string $username
-     * @param string $password
      */
-    public function setAuthentication($username, $password)
+    public function setAuthentication(string $username, string $password): void
     {
         $this->authentication = $username . ":" . $password;
     }
 
     /**
      * Enables HTTP proxy
-     *
-     * @param $proxyUri
-     * @param bool $requestFullUri
      */
-    public function setProxy($proxyUri, $requestFullUri = false)
+    public function setProxy(string $proxyUri, bool $requestFullUri = false): void
     {
         $this->proxyUri = $proxyUri;
         $this->requestFullUri = $requestFullUri;
@@ -181,25 +123,21 @@ class HttpTransport extends AbstractTransport
     }
 
     /**
-     * Sends a Message over this transport
-     *
-     * @param MessageInterface $message
-     *
-     * @return int the number of bytes sent
+     * @inheritDoc
      */
-    public function send(MessageInterface $message)
+    public function send(MessageInterface $message): int
     {
         $messageEncoder = $this->getMessageEncoder();
         $rawMessage = $messageEncoder->encode($message);
 
-        $request = array(
+        $request = [
             sprintf("POST %s HTTP/1.1", $this->path),
             sprintf("Host: %s:%d", $this->host, $this->port),
             sprintf("Content-Length: %d", strlen($rawMessage)),
             "Content-Type: application/json",
             "Connection: Keep-Alive",
             "Accept: */*"
-        );
+        ];
 
         if (null !== $this->authentication) {
             $request[] = "Authorization: Basic " . base64_encode($this->authentication);
@@ -219,7 +157,7 @@ class HttpTransport extends AbstractTransport
 
         // if we don't have a HTTP/1.1 connection, or the server decided to close the connection
         // we should do so as well. next read/write-attempt will open a new socket in this case.
-        if (strpos($headers, "HTTP/1.1") !== 0 || preg_match("!Connection:\s*Close!i", $headers)) {
+        if (!str_starts_with($headers, "HTTP/1.1") || preg_match("!Connection:\s*Close!i", $headers)) {
             $this->socketClient->close();
         }
 
@@ -235,10 +173,7 @@ class HttpTransport extends AbstractTransport
         return $byteCount;
     }
 
-    /**
-     * @return string
-     */
-    private function readResponseHeaders()
+    private function readResponseHeaders(): string
     {
         $chunkSize = 1024; // number of bytes to read at once
         $delimiter = "\r\n\r\n"; // delimiter between headers and response
@@ -247,37 +182,31 @@ class HttpTransport extends AbstractTransport
         do {
             $chunk = $this->socketClient->read($chunkSize);
             $response .= $chunk;
-        } while (false === strpos($chunk, $delimiter) && strlen($chunk) > 0);
+        } while (!str_contains($chunk, $delimiter) && strlen($chunk) > 0);
 
         $elements = explode($delimiter, $response, 2);
 
         return $elements[0];
     }
 
-    /**
-     * @return string
-     */
-    private function getScheme()
+    private function getScheme(): string
     {
         return null === $this->sslOptions ? 'tcp' : 'ssl';
     }
 
-    /**
-     * @return array
-     */
-    private function getContext()
+    private function getContext(): array
     {
-        $options = array();
+        $options = [];
 
         if (null !== $this->sslOptions) {
             $options = array_merge($options, $this->sslOptions->toStreamContext($this->host));
         }
 
         if (null !== $this->proxyUri) {
-            $options['http'] = array(
+            $options['http'] = [
                 'proxy' => $this->proxyUri,
                 'request_fulluri' => $this->requestFullUri
-            );
+            ];
         }
 
         return $options;
@@ -285,20 +214,16 @@ class HttpTransport extends AbstractTransport
 
     /**
      * Sets the connect-timeout
-     *
-     * @param int $timeout
      */
-    public function setConnectTimeout($timeout)
+    public function setConnectTimeout(int $timeout): void
     {
         $this->socketClient->setConnectTimeout($timeout);
     }
 
     /**
      * Returns the connect-timeout
-     *
-     * @return int
      */
-    public function getConnectTimeout()
+    public function getConnectTimeout(): int
     {
         return $this->socketClient->getConnectTimeout();
     }
