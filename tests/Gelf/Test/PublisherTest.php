@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -11,25 +12,29 @@
 
 namespace Gelf\Test;
 
+use Gelf\MessageInterface;
+use Gelf\MessageValidatorInterface;
 use Gelf\Publisher;
+use Gelf\Transport\TransportInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class PublisherTest extends TestCase
 {
+    private MockObject|TransportInterface $transportA;
+    private MockObject|TransportInterface $transportB;
+    private MockObject|MessageValidatorInterface $messageValidator;
+    private MockObject|MessageInterface $message;
+    private Publisher $publisher;
 
-    protected $transportA;
-    protected $transportB;
-    protected $messageValidator;
-    protected $message;
-    protected $publisher;
-
-    public function setUp()
+    public function setUp(): void
     {
-        $this->transportA = $this->createMock('Gelf\Transport\TransportInterface');
-        $this->transportB = $this->createMock('Gelf\Transport\TransportInterface');
+        $this->transportA = $this->createMock(TransportInterface::class);
+        $this->transportB = $this->createMock(TransportInterface::class);
         $this->messageValidator =
-            $this->createMock('Gelf\MessageValidatorInterface');
-        $this->message = $this->createMock('Gelf\MessageInterface');
+            $this->createMock(MessageValidatorInterface::class);
+        $this->message = $this->createMock(MessageInterface::class);
 
         $this->publisher = new Publisher(
             $this->transportA,
@@ -37,7 +42,7 @@ class PublisherTest extends TestCase
         );
     }
 
-    public function testPublish()
+    public function testPublish(): void
     {
         $this->transportA->expects($this->once())
             ->method('send')
@@ -50,11 +55,9 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testPublishErrorOnInvalid()
+    public function testPublishErrorOnInvalid(): void
     {
+        self::expectException(RuntimeException::class);
         $this->messageValidator->expects($this->once())
             ->method('validate')
             ->will($this->returnValue(false));
@@ -62,18 +65,16 @@ class PublisherTest extends TestCase
         $this->publisher->publish($this->message);
     }
 
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testMissingTransport()
+    public function testMissingTransport(): void
     {
+        self::expectException(RuntimeException::class);
         $publisher = new Publisher(null, $this->messageValidator);
-        $this->assertCount(0, $publisher->getTransports());
+        self::assertCount(0, $publisher->getTransports());
 
         $publisher->publish($this->message);
     }
 
-    public function testMultipleTransports()
+    public function testMultipleTransports(): void
     {
         $pub = $this->publisher;
         $pub->addTransport($this->transportB);
@@ -92,27 +93,18 @@ class PublisherTest extends TestCase
         $pub->publish($this->message);
     }
 
-    public function testGetTransports()
+    public function testGetTransports(): void
     {
         $pub = new Publisher(null, $this->messageValidator);
-        $this->assertCount(0, $pub->getTransports());
+        self::assertCount(0, $pub->getTransports());
 
         $pub->addTransport($this->transportA);
-        $this->assertCount(1, $pub->getTransports());
+        self::assertCount(1, $pub->getTransports());
 
         $pub->addTransport($this->transportB);
-        $this->assertCount(2, $pub->getTransports());
+        self::assertCount(2, $pub->getTransports());
 
         $pub->addTransport($this->transportA);
-        $this->assertCount(2, $pub->getTransports());
-    }
-
-    public function testInitWithDefaultValidator()
-    {
-        $pub = new Publisher();
-        $this->assertInstanceOf(
-            'Gelf\MessageValidatorInterface',
-            $pub->getMessageValidator()
-        );
+        self::assertCount(2, $pub->getTransports());
     }
 }

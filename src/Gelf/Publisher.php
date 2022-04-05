@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * This file is part of the php-gelf package.
@@ -24,25 +25,15 @@ use RuntimeException;
  */
 class Publisher implements PublisherInterface
 {
-    /**
-     * @var Set
-     */
-    protected $transports;
-
-    /**
-     * @var MessageValidatorInterface
-     */
-    protected $messageValidator;
+    private Set $transports;
+    private MessageValidatorInterface $messageValidator;
 
     /**
      * Creates a Publisher for GELF-messages.
-     *
-     * @param TransportInterface|null         $transport
-     * @param MessageValidatorInterface|null  $messageValidator
      */
     public function __construct(
-        TransportInterface $transport = null,
-        MessageValidatorInterface $messageValidator = null
+        ?TransportInterface $transport = null,
+        ?MessageValidatorInterface $messageValidator = null
     ) {
         $this->transports = new Set();
         $this->messageValidator = $messageValidator
@@ -54,11 +45,9 @@ class Publisher implements PublisherInterface
     }
 
     /**
-     * Publish a message over all defined transports
-     *
-     * @param MessageInterface $message
+     * @inheritDoc
      */
-    public function publish(MessageInterface $message)
+    public function publish(MessageInterface $message): void
     {
         if (count($this->transports) == 0) {
             throw new RuntimeException(
@@ -78,11 +67,9 @@ class Publisher implements PublisherInterface
     }
 
     /**
-     * Adds a transport to the publisher.
-     *
-     * @param TransportInterface $transport
+     * Adds a transport object to the publisher.
      */
-    public function addTransport(TransportInterface $transport)
+    public function addTransport(TransportInterface $transport): void
     {
         $this->transports->attach($transport);
     }
@@ -92,17 +79,15 @@ class Publisher implements PublisherInterface
      *
      * @return TransportInterface[]
      */
-    public function getTransports()
+    public function getTransports(): array
     {
         return iterator_to_array($this->transports);
     }
 
     /**
      * Returns the current message validator.
-     *
-     * @return MessageValidatorInterface
      */
-    public function getMessageValidator()
+    public function getMessageValidator(): MessageValidatorInterface
     {
         return $this->messageValidator;
     }
