@@ -20,6 +20,4 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: xdebug
       - run: composer update --dev
-      - run: vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover
-      - run: wget https://scrutinizer-ci.com/ocular.phar
-      - run: php ocular.phar code-coverage:upload --format=php-clover coverage.clover
+      - run: vendor/bin/phpunit --coverage-text
