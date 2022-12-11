@@ -23,17 +23,20 @@ class SslOptionsTest extends TestCase
 
         // test sane defaults
         self::assertTrue($options->getVerifyPeer());
+        self::assertTrue($options->getVerifyPeerName());
         self::assertFalse($options->getAllowSelfSigned());
         self::assertNull($options->getCaFile());
         self::assertNull($options->getCiphers());
 
         // test setters
         $options->setVerifyPeer(false);
+        $options->setVerifyPeerName(false);
         $options->setAllowSelfSigned(true);
         $options->setCaFile('/path/to/ca');
         $options->setCiphers('ALL:!ADH:@STRENGTH');
 
         self::assertFalse($options->getVerifyPeer());
+        self::assertFalse($options->getVerifyPeerName());
         self::assertTrue($options->getAllowSelfSigned());
         self::assertEquals('/path/to/ca', $options->getCaFile());
         self::assertEquals('ALL:!ADH:@STRENGTH', $options->getCiphers());
@@ -46,11 +49,13 @@ class SslOptionsTest extends TestCase
         self::assertEquals([
             'ssl' => [
                 'verify_peer' => true,
+                'verify_peer_name' => true,
                 'allow_self_signed' => false,
             ]
         ], $options->toStreamContext());
 
         $options->setVerifyPeer(false);
+        $options->setVerifyPeerName(false);
         $options->setAllowSelfSigned(true);
         $options->setCaFile('/path/to/ca');
         $options->setCiphers('ALL:!ADH:@STRENGTH');
@@ -58,6 +63,7 @@ class SslOptionsTest extends TestCase
         self::assertEquals([
             'ssl' => [
                 'verify_peer' => false,
+                'verify_peer_name' => false,
                 'allow_self_signed' => true,
                 'cafile' => '/path/to/ca',
                 'ciphers' => 'ALL:!ADH:@STRENGTH'
@@ -70,6 +76,7 @@ class SslOptionsTest extends TestCase
         self::assertEquals([
             'ssl' => [
                 'verify_peer' => false,
+                'verify_peer_name' => false,
                 'allow_self_signed' => true,
             ]
         ], $options->toStreamContext());
