@@ -30,6 +30,11 @@ class SslOptions
     private bool $allowSelfSigned = false;
 
     /**
+     * Require verification of peer name.
+     */
+    private bool $verifyPeerName = true;
+
+    /**
      * Path to custom CA
      */
     private ?string $caFile = null;
@@ -108,12 +113,29 @@ class SslOptions
     }
 
     /**
+     * Whether to check the peer name
+     */
+    public function getVerifyPeerName(): bool
+    {
+        return $this->verifyPeerName;
+    }
+
+    /**
+     * Enable or disable the peer name check
+     */
+    public function setVerifyPeerName(bool $verifyPeerName): void
+    {
+        $this->verifyPeerName = $verifyPeerName;
+    }
+
+    /**
      * Returns a stream-context representation of this config
      */
     public function toStreamContext(?string $serverName = null): array
     {
         $sslContext = [
             'verify_peer'       => $this->verifyPeer,
+            'verify_peer_name'  => $this->verifyPeerName,
             'allow_self_signed' => $this->allowSelfSigned
         ];
 
