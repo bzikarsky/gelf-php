@@ -27,10 +27,10 @@ use RuntimeException;
  */
 class HttpTransport extends AbstractTransport
 {
-    private const DEFAULT_HOST = "127.0.0.1";
-    private const DEFAULT_PORT = 12202;
-    private const DEFAULT_PATH = "/gelf";
-    private const AUTO_SSL_PORT = 443;
+    public const DEFAULT_HOST = "127.0.0.1";
+    public const DEFAULT_PORT = 12202;
+    public const DEFAULT_PATH = "/gelf";
+    public const AUTO_SSL_PORT = 443;
 
     private StreamSocketClient $socketClient;
 
@@ -70,12 +70,12 @@ class HttpTransport extends AbstractTransport
     public static function fromUrl(string $url, ?SslOptions $sslOptions = null): self
     {
         $parsed = parse_url($url);
-        
+
         // check it's a valid URL
         if (false === $parsed || !isset($parsed['host']) || !isset($parsed['scheme'])) {
             throw new \InvalidArgumentException("$url is not a valid URL");
         }
-        
+
         // check it's http or https
         $scheme = strtolower($parsed['scheme']);
         if (!in_array($scheme, ['http', 'https'])) {
@@ -90,7 +90,7 @@ class HttpTransport extends AbstractTransport
             $sslOptions = $sslOptions ?: new SslOptions();
             $defaults['port'] = 443;
         }
-         
+
         // merge defaults and real data and build transport
         $parsed = array_merge($defaults, $parsed);
         $transport = new self($parsed['host'], $parsed['port'], $parsed['path'], $sslOptions);
