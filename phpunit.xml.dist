@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<phpunit bootstrap="./tests/bootstrap.php" colors="true">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="./tests/bootstrap.php"
+         colors="true"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         cacheDirectory=".phpunit.cache">
+    <coverage/>
 
     <testsuites>
         <testsuite name="gelf php test suite">
@@ -8,14 +12,15 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <source>
+        <include>
             <directory>./</directory>
-            <exclude>
-                <directory>./tests</directory>
-                <directory>./vendor</directory>
-                <directory>./examples</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <directory>./tests</directory>
+            <directory>./vendor</directory>
+            <directory>./examples</directory>
+        </exclude>
+    </source>
+
 </phpunit>
