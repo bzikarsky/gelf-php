@@ -11,10 +11,11 @@ jobs:
     strategy:
       matrix:
         php:
+          - 8.2
           - 8.1
           - 8.0
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -28,10 +29,9 @@ jobs:
     strategy:
       matrix:
         php:
-          - 8.1
-          - 8.0
+          - 8.2
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
