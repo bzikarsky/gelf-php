@@ -93,11 +93,11 @@ class UdpTransport extends AbstractTransport
      */
     private function sendMessageInChunks(string $rawMessage): int
     {
+        /** @var int<1, max> $length */
+        $length = $this->chunkSize - self::CHUNK_HEADER_LENGTH;
+
         // split to chunks
-        $chunks = str_split($rawMessage, $this->chunkSize - self::CHUNK_HEADER_LENGTH);
-        if ($chunks === false) {
-            throw new LogicException('Invalid chunk-size. Cannot chunk');
-        }
+        $chunks = str_split($rawMessage, $length);
 
         $numChunks = count($chunks);
 
