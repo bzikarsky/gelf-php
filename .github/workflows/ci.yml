@@ -6,7 +6,7 @@ on:
 
 jobs:
   PHPUnit:
-    name: PHPUnit (PHP ${{ matrix.php }})
+    name: PHPUnit (PHP ${{ matrix.php }} ${{ matrix.dependencies }})
     runs-on: ubuntu-20.04
     strategy:
       matrix:
@@ -14,13 +14,21 @@ jobs:
           - 8.2
           - 8.1
           - 8.0
+        dependencies:
+          - highest
+          - lowest
     steps:
       - uses: actions/checkout@v3
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           coverage: xdebug
-      - run: composer update --dev
+      - name: "Install lowest dependencies"
+        if: ${{ matrix.dependencies == 'lowest' }}
+        run: "composer update --prefer-lowest --no-interaction --no-progress"
+      - name: "Install highest dependencies"
+        if: ${{ matrix.dependencies == 'highest' }}
+        run: "composer update --no-interaction --no-progress"
       - run: vendor/bin/phpunit --coverage-text
 
   Psalm:
