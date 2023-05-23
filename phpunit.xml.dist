@@ -3,7 +3,7 @@
          bootstrap="./tests/bootstrap.php"
          colors="true"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
-         cacheDirectory=".phpunit.cache">
+>
     <coverage/>
 
     <testsuites>
