@@ -26,6 +26,9 @@
         "squizlabs/php_codesniffer": "^3.6",
         "vimeo/psalm": "^5.11"
     },
+    "conflict": {
+        "monolog/monolog": "^1"
+    },
     "provide": {
         "psr/log-implementation": "3.0.0"
     }
