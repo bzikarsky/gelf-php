@@ -39,7 +39,8 @@ class TcpTransport extends AbstractTransport
     public function __construct(
         private string $host = self::DEFAULT_HOST,
         private int $port = self::DEFAULT_PORT,
-        private ?SslOptions $sslOptions = null
+        private ?SslOptions $sslOptions = null,
+        private bool $closeOnWrite = false,
     ) {
         parent::__construct();
 
@@ -63,7 +64,13 @@ class TcpTransport extends AbstractTransport
         $rawMessage = $this->getMessageEncoder()->encode($message) . "\0";
 
         // send message in one packet
-        return $this->socketClient->write($rawMessage);
+        $result = $this->socketClient->write($rawMessage);
+
+        if ($this->closeOnWrite) {
+            $this->socketClient->close();
+        }
+
+        return $result;
     }
 
     private function getScheme(): string
