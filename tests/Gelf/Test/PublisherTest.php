@@ -50,24 +50,24 @@ class PublisherTest extends TestCase
 
         $this->messageValidator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $this->publisher->publish($this->message);
     }
 
     public function testPublishErrorOnInvalid(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->messageValidator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(false));
+            ->willReturn(false);
 
         $this->publisher->publish($this->message);
     }
 
     public function testMissingTransport(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $publisher = new Publisher(null, $this->messageValidator);
         self::assertCount(0, $publisher->getTransports());
 
@@ -88,7 +88,7 @@ class PublisherTest extends TestCase
 
         $this->messageValidator->expects($this->once())
             ->method('validate')
-            ->will($this->returnValue(true));
+            ->willReturn(true);
 
         $pub->publish($this->message);
     }

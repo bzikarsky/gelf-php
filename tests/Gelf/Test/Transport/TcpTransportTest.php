@@ -44,8 +44,8 @@ class TcpTransportTest extends TestCase
 
         // create an encoder always return $testMessage
         $this->encoder = $this->createMock(NoNullByteEncoderInterface::class);
-        $this->encoder->expects($this->any())->method('encode')->will(
-            $this->returnValue($this->testMessage)
+        $this->encoder->expects($this->any())->method('encode')->willReturn(
+            $this->testMessage
         );
 
         $this->transport = $this->getTransport();
@@ -101,7 +101,7 @@ class TcpTransportTest extends TestCase
         $sslOptions = $this->createMock(SslOptions::class);
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
-            ->will($this->returnValue(['ssl' => null]));
+            ->willReturn(['ssl' => null]);
 
         $transport = new TcpTransport("localhost", 12202, $sslOptions);
 
@@ -138,7 +138,7 @@ class TcpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method('getConnectTimeout')
-            ->will($this->returnValue(123));
+            ->willReturn(123);
 
         self::assertEquals(123, $this->transport->getConnectTimeout());
 
@@ -152,7 +152,7 @@ class TcpTransportTest extends TestCase
 
     public function testNonNullSafeEncoderFails(): void
     {
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->transport->setMessageEncoder(new CompressedJsonEncoder());
     }
 

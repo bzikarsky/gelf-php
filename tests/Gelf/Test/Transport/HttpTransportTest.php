@@ -42,8 +42,8 @@ class HttpTransportTest extends TestCase
 
         // create an encoder always return $testMessage
         $this->encoder = $this->createMock(EncoderInterface::class);
-        $this->encoder->expects($this->any())->method('encode')->will(
-            $this->returnValue($this->testMessage)
+        $this->encoder->expects($this->any())->method('encode')->willReturn(
+            $this->testMessage
         );
 
         $this->transport = $this->getTransport();
@@ -83,13 +83,13 @@ class HttpTransportTest extends TestCase
 
     public function testFromUrlConstructorInvalidUri(): void
     {
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         HttpTransport::fromUrl('-://:-');
     }
 
     public function testFromUrlConstructorInvalidScheme(): void
     {
-        self::expectException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         HttpTransport::fromUrl('ftp://foobar');
     }
 
@@ -152,7 +152,7 @@ class HttpTransportTest extends TestCase
         $sslOptions = $this->createMock(SslOptions::class);
         $sslOptions->expects($this->exactly(2))
             ->method('toStreamContext')
-            ->will($this->returnValue(array('ssl' => null)));
+            ->willReturn(array('ssl' => null));
 
         $transport = new HttpTransport("localhost", 12345, "/gelf", $sslOptions);
 
@@ -174,8 +174,8 @@ class HttpTransportTest extends TestCase
 
     public function testEmptyResponseException(): void
     {
-        self::expectException(RuntimeException::class);
-        self::expectExceptionMessage(
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(
             "Graylog-Server didn't answer properly, expected 'HTTP/1.x 202 Accepted', response is ''"
         );
 
@@ -201,7 +201,7 @@ class HttpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method("read")
-            ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
+            ->willReturn("HTTP/1.1 202 Accepted\r\n\r\n");
 
         $this->transport->send($this->message);
     }
@@ -212,17 +212,17 @@ class HttpTransportTest extends TestCase
 
         $this->socketClient->expects($this->once())
             ->method("write")
-            ->will($this->returnCallback(function ($data) {
+            ->willReturnCallback(function ($data) {
                 self::assertStringContainsString("Authorization: Basic " . base64_encode("test:test"), $data);
                 return 1;
-            }));
+            });
 
 
 
         $this->socketClient
             ->expects($this->once())
             ->method("read")
-            ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
+            ->willReturn("HTTP/1.1 202 Accepted\r\n\r\n");
 
         $this->transport->send($this->message);
     }
@@ -265,14 +265,14 @@ class HttpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method("read")
-            ->will($this->returnValue("HTTP/1.1 202 Accepted\r\n\r\n"));
+            ->willReturn("HTTP/1.1 202 Accepted\r\n\r\n");
 
         $compressedEncoder = $this->createMock(CompressedJsonEncoder::class);
         $compressedEncoder
             ->expects($this->any())
             ->method('encode')
-            ->will(
-                $this->returnValue($this->testMessage)
+            ->willReturn(
+                $this->testMessage
             );
         $this->transport->setMessageEncoder($compressedEncoder);
 
@@ -284,7 +284,7 @@ class HttpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method("read")
-            ->will($this->returnValue("HTTP/1.0 202 Accepted\r\n\r\n"));
+            ->willReturn("HTTP/1.0 202 Accepted\r\n\r\n");
 
         $this->socketClient
             ->expects($this->once())
@@ -298,7 +298,7 @@ class HttpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method("read")
-            ->will($this->returnValue("HTTP/1.1 202 Accepted\r\nConnection: Close\r\n\r\n"));
+            ->willReturn("HTTP/1.1 202 Accepted\r\nConnection: Close\r\n\r\n");
 
         $this->socketClient
             ->expects($this->once())
@@ -312,7 +312,7 @@ class HttpTransportTest extends TestCase
         $this->socketClient
             ->expects($this->once())
             ->method('getConnectTimeout')
-            ->will($this->returnValue(123));
+            ->willReturn(123);
 
         self::assertEquals(123, $this->transport->getConnectTimeout());
 

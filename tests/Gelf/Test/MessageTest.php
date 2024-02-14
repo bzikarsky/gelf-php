@@ -66,13 +66,13 @@ class MessageTest extends TestCase
 
     public function testLevelInvalidString(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->message->setLevel("invalid");
     }
 
     public function testLevelInvalidInteger()
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->message->setLevel(8);
     }
 
@@ -85,13 +85,13 @@ class MessageTest extends TestCase
 
     public function testLogLevelToPsrInvalidString(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         Message::logLevelToPsr("invalid");
     }
 
     public function testLogLevelToPsrInvalidInt(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         Message::logLevelToPsr(-1);
     }
 
@@ -134,13 +134,13 @@ class MessageTest extends TestCase
     
     public function testSetAdditionalEmptyKey(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->message->setAdditional("", "test");
     }
 
     public function testGetAdditionalInvalidKey(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->message->getAdditional("invalid");
     }
 

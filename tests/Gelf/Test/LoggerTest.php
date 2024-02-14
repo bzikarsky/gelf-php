@@ -166,8 +166,8 @@ class LoggerTest extends TestCase
 
     private function validatePublish(Closure $validator): void
     {
-        $this->publisher->expects($this->once())->method('publish')->will(
-            $this->returnCallback($validator)
+        $this->publisher->expects($this->once())->method('publish')->willReturnCallback(
+            $validator
         );
     }
 

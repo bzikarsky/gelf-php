@@ -97,7 +97,7 @@ class SslOptionsTest extends TestCase
         self::assertArrayNotHasKey('CN_match', $context['ssl']);
         self::assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        self::assertEquals(true, $context['ssl']['SNI_enabled']);
+        self::assertTrue($context['ssl']['SNI_enabled']);
         self::assertEquals($host, $context['ssl'][$sniPeerNameKey]);
 
 
@@ -109,7 +109,7 @@ class SslOptionsTest extends TestCase
         self::assertArrayHasKey($peerNameKey, $context['ssl']);
         self::assertArrayHasKey($sniPeerNameKey, $context['ssl']);
 
-        self::assertEquals(true, $context['ssl']['SNI_enabled']);
+        self::assertTrue($context['ssl']['SNI_enabled']);
         self::assertEquals($host, $context['ssl'][$peerNameKey]);
         self::assertEquals($host, $context['ssl'][$sniPeerNameKey]);
     }
