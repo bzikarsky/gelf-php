@@ -82,7 +82,7 @@ class MessageValidator implements MessageValidatorInterface
         }
 
         foreach ($message->getAllAdditionals() as $key => $value) {
-            if (!preg_match('#^[\w\.\-]*$#', $key)) {
+            if (!preg_match('#^[\w\.\-]*$#', (string)$key)) {
                 $reason = sprintf(
                     "additional key '%s' contains invalid characters",
                     $key
