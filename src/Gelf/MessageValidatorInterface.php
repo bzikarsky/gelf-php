@@ -22,5 +22,5 @@ interface MessageValidatorInterface
     /**
      * Validate a given message for validity.
      */
-    public function validate(MessageInterface $message, string &$reason = null): bool;
+    public function validate(MessageInterface $message, ?string &$reason = null): bool;
 }
