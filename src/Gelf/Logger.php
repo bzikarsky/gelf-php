@@ -31,7 +31,7 @@ class Logger extends AbstractLogger implements LoggerInterface
      * Creates a PSR-3 Logger for GELF/Graylog2
      */
     public function __construct(
-        PublisherInterface $publisher = null,
+        ?PublisherInterface $publisher = null,
         private array $defaultContext = []
     ) {
         // if no publisher is provided build a "default" publisher
