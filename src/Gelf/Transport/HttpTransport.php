@@ -46,7 +46,7 @@ class HttpTransport extends AbstractTransport
     ) {
         parent::__construct();
 
-        if ($port == self::AUTO_SSL_PORT && $sslOptions === null) {
+        if ($port === self::AUTO_SSL_PORT && $sslOptions === null) {
             $this->sslOptions = new SslOptions();
         }
 
@@ -72,7 +72,7 @@ class HttpTransport extends AbstractTransport
         $parsed = parse_url($url);
         
         // check it's a valid URL
-        if (false === $parsed || !isset($parsed['host']) || !isset($parsed['scheme'])) {
+        if (false === $parsed || !isset($parsed['host'], $parsed['scheme'])) {
             throw new \InvalidArgumentException("$url is not a valid URL");
         }
         
@@ -86,7 +86,7 @@ class HttpTransport extends AbstractTransport
         $defaults = ['port' => 80, 'path' => '', 'user' => null, 'pass' => ''];
 
         // change some defaults for https
-        if ($scheme == 'https') {
+        if ($scheme === 'https') {
             $sslOptions = $sslOptions ?: new SslOptions();
             $defaults['port'] = 443;
         }

@@ -44,8 +44,8 @@ class UdpTransport extends AbstractTransport
     /**
      * Class constructor
      *
-     * @param string $host when NULL or empty DEFAULT_HOST is used
-     * @param int $port when NULL or empty DEFAULT_PORT is used
+     * @param string $host when empty DEFAULT_HOST is used
+     * @param int $port when empty DEFAULT_PORT is used
      * @param int $chunkSize defaults to CHUNK_SIZE_WAN,
      *                          0 disables chunks completely
      */
@@ -56,7 +56,7 @@ class UdpTransport extends AbstractTransport
     ) {
         parent::__construct();
 
-        // allow NULL-like values for fallback on default
+        // fallback to default on empty values
         $host = $host ?: self::DEFAULT_HOST;
         $port = $port ?: self::DEFAULT_PORT;
 

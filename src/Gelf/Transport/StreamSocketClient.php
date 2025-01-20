@@ -124,7 +124,7 @@ class StreamSocketClient
             $failed = false;
             $errorMessage = "Failed to write to socket";
             /** @psalm-suppress InvalidArgument */
-            set_error_handler(function ($errno, $errstr) use (&$failed, &$errorMessage) {
+            set_error_handler(static function (int $errno, string $errstr) use (&$failed, &$errorMessage) {
                 $failed = true;
                 $errorMessage .= ": $errstr ($errno)";
             });

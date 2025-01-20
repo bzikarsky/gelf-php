@@ -13,7 +13,7 @@ class KeepAliveRetryTransportWrapper extends RetryTransportWrapper
 
     public function __construct(HttpTransport $transport)
     {
-        parent::__construct($transport, 1, function (Throwable $e) {
+        parent::__construct($transport, 1, static function (Throwable $e) {
             return $e instanceof RuntimeException && $e->getMessage() === self::NO_RESPONSE;
         });
     }

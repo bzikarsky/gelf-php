@@ -43,7 +43,7 @@ class TcpTransport extends AbstractTransport
     ) {
         parent::__construct();
 
-        if ($port == self::AUTO_SSL_PORT && $this->sslOptions == null) {
+        if ($port === self::AUTO_SSL_PORT && $this->sslOptions === null) {
             $this->sslOptions = new SslOptions();
         }
 

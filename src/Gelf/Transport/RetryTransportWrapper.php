@@ -21,7 +21,7 @@ class RetryTransportWrapper implements TransportInterface
         private int $maxRetries,
         ?callable $exceptionMatcher = null
     ) {
-        $this->exceptionMatcher = Closure::fromCallable($exceptionMatcher ?? fn (Throwable $_) => true);
+        $this->exceptionMatcher = Closure::fromCallable($exceptionMatcher ?? static fn (Throwable $_) => true);
     }
 
     public function getTransport(): TransportInterface
