@@ -40,8 +40,8 @@ class UdpTransportTest extends TestCase
 
         // create an encoder always return $testMessage
         $this->encoder = $this->createMock(EncoderInterface::class);
-        $this->encoder->expects($this->any())->method('encode')->will(
-            $this->returnValue($this->testMessage)
+        $this->encoder->expects($this->any())->method('encode')->willReturn(
+            $this->testMessage
         );
 
         $this->transport = $this->getTransport(0);
@@ -101,7 +101,7 @@ class UdpTransportTest extends TestCase
 
     public function testInvalidChunkNumber()
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $transport = $this->getTransport(self::CHUNK_HEADER_LENGTH + 1);
         $transport->send($this->message);

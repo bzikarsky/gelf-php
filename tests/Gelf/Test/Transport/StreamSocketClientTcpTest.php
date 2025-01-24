@@ -75,11 +75,13 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testBadWrite(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $this->socketClient->write("Hello ");
-        fclose($this->serverSocket);
+        self::assertTrue(fclose($this->serverSocket));
+
         $this->serverSocket = null;
+        usleep(100);
         $this->socketClient->write("world!");
     }
 
@@ -97,6 +99,9 @@ class StreamSocketClientTcpTest extends TestCase
 
         // open connection on server-socket
         $serverConnection = stream_socket_accept($this->serverSocket);
+        self::assertIsResource($serverConnection);
+
+        usleep(100);
 
         $readData = fread($serverConnection, $numBytes);
         self::assertEquals($testData, $readData);
@@ -108,10 +113,12 @@ class StreamSocketClientTcpTest extends TestCase
         $numBytes = $this->socketClient->write($testData);
         self::assertEquals(strlen($testData), $numBytes);
 
+        usleep(500);
+
         $readData = fread($serverConnection, $numBytes);
         self::assertEquals($testData, $readData);
 
-        fclose($serverConnection);
+        self::assertTrue(fclose($serverConnection));
     }
 
     public function testRead(): void
@@ -122,14 +129,19 @@ class StreamSocketClientTcpTest extends TestCase
         self::assertEquals(strlen($testData), $numBytes);
 
         // lower timeout for server-socket
-        stream_set_timeout($this->serverSocket, 0, 100);
+        self::assertTrue(stream_set_timeout($this->serverSocket, 0, 100));
 
         $connection = stream_socket_accept($this->serverSocket);
 
         // return input as output
-        stream_copy_to_stream($connection, $connection, strlen($testData));
+        self::assertEquals(strlen($testData), stream_copy_to_stream($connection, $connection, strlen($testData)));
 
-        fclose($connection);
+        usleep(300);
+
+        self::assertTrue(fclose($connection));
+
+        usleep(500);
+
         $readData = $this->socketClient->read($numBytes);
 
         self::assertEquals($testData, $readData);
@@ -137,20 +149,25 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testReadContents(): void
     {
-        $testData = str_repeat("0123456789", mt_rand(1, 10));
+        $testData = str_repeat("0123456789", random_int(1, 10));
+        #$testData = str_repeat("0123456789", 10);
 
         $numBytes = $this->socketClient->write($testData);
         self::assertEquals(strlen($testData), $numBytes);
 
         // lower timeout for server-socket
-        stream_set_timeout($this->serverSocket, 0, 100);
+        self::assertTrue(stream_set_timeout($this->serverSocket, 0, 100));
 
         $connection = stream_socket_accept($this->serverSocket);
 
         // return input as output
-        stream_copy_to_stream($connection, $connection, strlen($testData));
+        self::assertEquals(strlen($testData), stream_copy_to_stream($connection, $connection, strlen($testData)));
 
-        fclose($connection);
+        usleep(300);
+
+        self::assertTrue(fclose($connection));
+
+        usleep(500);
 
         $readData = $this->socketClient->read(1024);
 
@@ -221,7 +238,7 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testSetContextFailsAfterConnect(): void
     {
-        self::expectException(LogicException::class);
+        $this->expectException(LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 
@@ -230,7 +247,7 @@ class StreamSocketClientTcpTest extends TestCase
 
     public function testSetConnectTimeoutFailsAfterConnect(): void
     {
-        self::expectException(LogicException::class);
+        $this->expectException(LogicException::class);
         // enforce connect
         $this->socketClient->getSocket();
 

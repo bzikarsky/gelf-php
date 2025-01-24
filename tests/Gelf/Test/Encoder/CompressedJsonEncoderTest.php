@@ -36,7 +36,7 @@ class CompressedJsonEncoderTest extends TestCase
         $this->message
             ->expects($this->once())
             ->method('toArray')
-            ->will($this->returnValue($testData));
+            ->willReturn($testData);
 
         $bytes = $this->encoder->encode($this->message);
 

@@ -31,7 +31,7 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
         $this->transport->expects($this->once())
             ->method('send')
             ->with($this->message)
-            ->will($this->returnValue(42));
+            ->willReturn(42);
 
         $bytes = $this->wrapper->send($this->message);
 
@@ -57,8 +57,8 @@ class KeepAliveRetryTransportWrapperTest extends TestCase
 
     public function testSendFailTwiceWithoutResponse(): void
     {
-        self::expectException(RuntimeException::class);
-        self::expectExceptionMessage("response is ''");
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage("response is ''");
 
         $expectedException1 = new RuntimeException(self::FAILURE_MESSAGE);
         $expectedException2 = new RuntimeException(self::FAILURE_MESSAGE);

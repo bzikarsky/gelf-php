@@ -82,21 +82,19 @@ class MessageValidatorTest extends TestCase
     ): MessageInterface {
         $msg = $this->createMock(MessageInterface::class);
         $msg->expects($this->any())->method('getHost')
-            ->will($this->returnValue($host));
+            ->willReturn($host);
         $msg->expects($this->any())->method('getVersion')
-            ->will($this->returnValue($version));
+            ->willReturn($version);
         $msg->expects($this->any())->method('getShortMessage')
-            ->will($this->returnValue($shortMessage));
+            ->willReturn($shortMessage);
 
         $msg->expects($this->any())->method('getAllAdditionals')
-            ->will($this->returnValue($additionals));
+            ->willReturn($additionals);
 
         $msg->expects($this->any())->method('hasAdditional')
-            ->will($this->returnCallback(
-                function ($key) use ($additionals) {
-                    return isset($additionals[$key]);
-                }
-            ));
+            ->willReturnCallback(function ($key) use ($additionals) {
+                return isset($additionals[$key]);
+            });
 
         return $msg;
     }

@@ -53,7 +53,7 @@ class StreamSocketClientUdpTest extends TestCase
 
     public function testInvalidConstructorArguments(): void
     {
-        self::expectException(RuntimeException::class);
+        $this->expectException(RuntimeException::class);
 
         $client = new StreamSocketClient("not-a-scheme", "not-a-host", -1);
         $client->getSocket();

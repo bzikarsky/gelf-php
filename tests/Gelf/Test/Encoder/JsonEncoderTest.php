@@ -35,7 +35,7 @@ class JsonEncoderTest extends TestCase
         $this->message
             ->expects($this->once())
             ->method('toArray')
-            ->will($this->returnValue($testData));
+            ->willReturn($testData);
 
         $json = $this->encoder->encode($this->message);
 
@@ -53,7 +53,7 @@ class JsonEncoderTest extends TestCase
         $this->message
             ->expects($this->once())
             ->method('toArray')
-            ->will($this->returnValue($testData));
+            ->willReturn($testData);
 
         $json = $this->encoder->encode($this->message);
 
